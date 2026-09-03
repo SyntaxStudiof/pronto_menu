@@ -1,0 +1,154 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "Piatti",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "Categoria",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "proprietario",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "isCestinato",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "Nome",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Piatti",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "Categoria",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "proprietario",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "isCestinato",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "Prezzo",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "stato_ordine",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "data_creazione",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "categories",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "proprietario",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "ordine_categoria",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Piatti",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "proprietario",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "isCestinato",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sottocategoria_ref",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "Categoria",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "Nome",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Piatti",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "proprietario",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "isCestinato",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sottocategoria_ref",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "Categoria",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "Prezzo",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "Tickets",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "ristoratore_ref",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "data_creazione",
+          "order": "DESCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": [
+    {
+      "collectionGroup": "fcm_tokens",
+      "fieldPath": "fcm_token",
+      "indexes": [
+        {
+          "order": "ASCENDING",
+          "queryScope": "COLLECTION_GROUP"
+        }
+      ]
+    }
+  ]
+}
