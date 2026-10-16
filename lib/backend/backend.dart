@@ -15,6 +15,7 @@ import 'schema/cancellation_requests_record.dart';
 import 'schema/jukebox_requests_record.dart';
 import 'schema/dispensa_record.dart';
 import 'schema/action_logs_record.dart';
+import 'schema/tris_matches_record.dart';
 
 export 'dart:async' show StreamSubscription;
 export 'package:cloud_firestore/cloud_firestore.dart' hide Order;
@@ -33,6 +34,7 @@ export 'schema/cancellation_requests_record.dart';
 export 'schema/jukebox_requests_record.dart';
 export 'schema/dispensa_record.dart';
 export 'schema/action_logs_record.dart';
+export 'schema/tris_matches_record.dart';
 
 /// Functions to query CategoriesRecords (as a Stream and as a Future).
 Future<int> queryCategoriesRecordCount({
@@ -399,6 +401,43 @@ Future<List<ActionLogsRecord>> queryActionLogsRecordOnce({
     queryCollectionOnce(
       ActionLogsRecord.collection,
       ActionLogsRecord.fromSnapshot,
+      queryBuilder: queryBuilder,
+      limit: limit,
+      singleRecord: singleRecord,
+    );
+
+/// Functions to query TrisMatchesRecords (as a Stream and as a Future).
+Future<int> queryTrisMatchesRecordCount({
+  Query Function(Query)? queryBuilder,
+  int limit = -1,
+}) =>
+    queryCollectionCount(
+      TrisMatchesRecord.collection,
+      queryBuilder: queryBuilder,
+      limit: limit,
+    );
+
+Stream<List<TrisMatchesRecord>> queryTrisMatchesRecord({
+  Query Function(Query)? queryBuilder,
+  int limit = -1,
+  bool singleRecord = false,
+}) =>
+    queryCollection(
+      TrisMatchesRecord.collection,
+      TrisMatchesRecord.fromSnapshot,
+      queryBuilder: queryBuilder,
+      limit: limit,
+      singleRecord: singleRecord,
+    );
+
+Future<List<TrisMatchesRecord>> queryTrisMatchesRecordOnce({
+  Query Function(Query)? queryBuilder,
+  int limit = -1,
+  bool singleRecord = false,
+}) =>
+    queryCollectionOnce(
+      TrisMatchesRecord.collection,
+      TrisMatchesRecord.fromSnapshot,
       queryBuilder: queryBuilder,
       limit: limit,
       singleRecord: singleRecord,

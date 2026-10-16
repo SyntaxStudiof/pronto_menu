@@ -1309,6 +1309,45 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                       },
                     ),
                   ),
+                Padding(
+                  padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 8.0, 0.0),
+                  child: IconButton(
+                    tooltip: 'Tris al Tavolo',
+                    icon: Container(
+                      width: 36.0,
+                      height: 36.0,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: const Color(0xFF8B5CF6).withValues(alpha: 0.35),
+                          width: 1.2,
+                        ),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Icon(
+                        Icons.sports_esports_rounded,
+                        color: Color(0xFF8B5CF6),
+                        size: 20.0,
+                      ),
+                    ),
+                    onPressed: () {
+                      context.pushNamed(
+                        TrisGameWidget.routeName,
+                        queryParameters: {
+                          'ristoranteRef': serializeParam(
+                            widget.ristoranteRef,
+                            ParamType.DocumentReference,
+                          ),
+                          'tavoloPreimpostato': serializeParam(
+                            FFAppState().numeroTavolo,
+                            ParamType.String,
+                          ),
+                        }.withoutNulls,
+                      );
+                    },
+                  ),
+                ),
                 if (!widget.solaConsultazione)
                   InkWell(
                     splashColor: Colors.transparent,

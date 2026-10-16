@@ -3,6 +3,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 
 import '/backend/backend.dart';
+import '/cliente/giochi/tris_game_widget.dart';
 import '/cliente/jukebox_modal/jukebox_modal_widget.dart';
 import '/cliente/menu_cliente/menu_cliente_widget.dart';
 import '/cliente/menu_disattivati/menu_disattivati_widget.dart';
@@ -447,6 +448,34 @@ class _HubClienteWidgetState extends State<HubClienteWidget> {
                     ),
                     const SizedBox(height: 16.0),
                   ],
+
+                  // OPZIONE 4: SALA GIOCHI (TRIS AL TAVOLO)
+                  _buildHubOptionCard(
+                    theme: theme,
+                    icon: Icons.sports_esports_rounded,
+                    iconColor: const Color(0xFF8B5CF6),
+                    iconBgColor:
+                        const Color(0xFF8B5CF6).withValues(alpha: 0.12),
+                    title: 'Sala Giochi • Tris al Tavolo',
+                    subtitle:
+                        'Gioca con chi è al tuo tavolo o sfida gli altri tavoli del ristorante!',
+                    onTap: () {
+                      context.pushNamed(
+                        TrisGameWidget.routeName,
+                        queryParameters: {
+                          'ristoranteRef': serializeParam(
+                            widget.ristoranteRef,
+                            ParamType.DocumentReference,
+                          ),
+                          'tavoloPreimpostato': serializeParam(
+                            FFAppState().numeroTavolo,
+                            ParamType.String,
+                          ),
+                        }.withoutNulls,
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 16.0),
                 ],
               ),
             ),

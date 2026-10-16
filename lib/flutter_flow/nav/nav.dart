@@ -478,7 +478,23 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
               collectionNamePath: ['users'],
             ),
           ),
-        )
+        ),
+        FFRoute(
+          name: TrisGameWidget.routeName,
+          path: TrisGameWidget.routePath,
+          builder: (context, params) => TrisGameWidget(
+            ristoranteRef: params.getParam(
+              'ristoranteRef',
+              ParamType.DocumentReference,
+              isList: false,
+              collectionNamePath: ['users'],
+            ),
+            tavoloPreimpostato: params.getParam(
+              'tavoloPreimpostato',
+              ParamType.String,
+            ),
+          ),
+        ),
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );
 

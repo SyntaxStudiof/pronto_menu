@@ -114,6 +114,9 @@ class FFAppState extends ChangeNotifier {
       _ristoranteSalvato =
           prefs.getString('ff_ristoranteSalvato')?.ref ?? _ristoranteSalvato;
     });
+    _safeInit(() {
+      _numeroTavolo = prefs.getString('ff_numeroTavolo') ?? _numeroTavolo;
+    });
   }
 
   void update(VoidCallback callback) {
@@ -698,6 +701,13 @@ class FFAppState extends ChangeNotifier {
   String get loginProvider => _loginProvider;
   set loginProvider(String value) {
     _loginProvider = value;
+  }
+
+  String _numeroTavolo = '';
+  String get numeroTavolo => _numeroTavolo;
+  set numeroTavolo(String value) {
+    _numeroTavolo = value;
+    prefs.setString('ff_numeroTavolo', value);
   }
 }
 

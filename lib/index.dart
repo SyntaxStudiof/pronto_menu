@@ -63,6 +63,7 @@ export '/admin/admin_metriche/admin_metriche_widget.dart'
     show AdminMetricheWidget;
 export '/admin/admin_cronologia_azioni/admin_cronologia_azioni_widget.dart'
     show AdminCronologiaAzioniWidget;
+export '/cliente/giochi/tris_game_widget.dart' show TrisGameWidget;
 
 
 
