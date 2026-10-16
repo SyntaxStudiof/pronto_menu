@@ -56,4 +56,7 @@ export '/dispensa/gestione_dispensa/gestione_dispensa_widget.dart'
     show GestioneDispensaWidget;
 export '/impostazioni_mutaforma/impostazioni_mutaforma_widget.dart'
     show ImpostazioniMutaformaWidget;
+export '/cliente/hub_cliente/hub_cliente_widget.dart' show HubClienteWidget;
+export '/cliente/menu_disattivati/menu_disattivati_widget.dart'
+    show MenuDisattivatiWidget;
 

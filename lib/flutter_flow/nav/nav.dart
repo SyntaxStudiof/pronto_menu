@@ -263,6 +263,14 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
               'isAnteprima',
               ParamType.bool,
             ) ?? false,
+            fasciaId: params.getParam(
+              'fasciaId',
+              ParamType.String,
+            ),
+            solaConsultazione: params.getParam(
+              'solaConsultazione',
+              ParamType.bool,
+            ) ?? false,
           ),
         ),
         FFRoute(
@@ -427,6 +435,30 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           path: GestioneDispensaWidget.routePath,
           requireAuth: true,
           builder: (context, params) => GestioneDispensaWidget(
+            ristoranteRef: params.getParam(
+              'ristoranteRef',
+              ParamType.DocumentReference,
+              isList: false,
+              collectionNamePath: ['users'],
+            ),
+          ),
+        ),
+        FFRoute(
+          name: HubClienteWidget.routeName,
+          path: HubClienteWidget.routePath,
+          builder: (context, params) => HubClienteWidget(
+            ristoranteRef: params.getParam(
+              'ristoranteRef',
+              ParamType.DocumentReference,
+              isList: false,
+              collectionNamePath: ['users'],
+            ),
+          ),
+        ),
+        FFRoute(
+          name: MenuDisattivatiWidget.routeName,
+          path: MenuDisattivatiWidget.routePath,
+          builder: (context, params) => MenuDisattivatiWidget(
             ristoranteRef: params.getParam(
               'ristoranteRef',
               ParamType.DocumentReference,

@@ -156,6 +156,16 @@ class MutaformaService {
     });
   }
 
+  /// Imposta se i clienti possono consultare o meno i menù fuori orario / disattivati
+  static Future<void> toggleMostraMenuDisattivati({
+    required DocumentReference userRef,
+    required bool mostra,
+  }) async {
+    await userRef.update({
+      'mostra_menu_disattivati': mostra,
+    });
+  }
+
   /// Restituisce la fascia attualmente attiva (se presente)
   static FasciaMutaforma? getFasciaAttiva(List<FasciaMutaforma> fasce, [DateTime? now]) {
     final dt = now ?? DateTime.now();

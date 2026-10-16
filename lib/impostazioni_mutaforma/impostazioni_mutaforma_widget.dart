@@ -837,7 +837,7 @@ class _ImpostazioniMutaformaWidgetState
                     ),
                     const SizedBox(height: 18.0),
 
-                    // Card Switch Attivazione Principale
+                    // Card Switch Attivazione Principale & Visibilità Menù Fuori Orario
                     Container(
                       decoration: BoxDecoration(
                         color: theme.cardColor,
@@ -848,63 +848,138 @@ class _ImpostazioniMutaformaWidgetState
                       ),
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16.0, vertical: 12.0),
-                      child: Row(
+                      child: Column(
                         children: [
-                          Container(
-                            width: 40.0,
-                            height: 40.0,
-                            decoration: BoxDecoration(
-                              color: mutaformaAttivo
-                                  ? colorScheme.primary
-                                      .withValues(alpha: 0.15)
-                                  : theme.dividerColor.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(12.0),
-                            ),
-                            alignment: Alignment.center,
-                            child: Icon(
-                              Icons.schedule_rounded,
-                              color: mutaformaAttivo
-                                  ? colorScheme.primary
-                                  : theme.hintColor,
-                              size: 22.0,
-                            ),
+                          Row(
+                            children: [
+                              Container(
+                                width: 40.0,
+                                height: 40.0,
+                                decoration: BoxDecoration(
+                                  color: mutaformaAttivo
+                                      ? colorScheme.primary
+                                          .withValues(alpha: 0.15)
+                                      : theme.dividerColor.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+                                alignment: Alignment.center,
+                                child: Icon(
+                                  Icons.schedule_rounded,
+                                  color: mutaformaAttivo
+                                      ? colorScheme.primary
+                                      : theme.hintColor,
+                                  size: 22.0,
+                                ),
+                              ),
+                              const SizedBox(width: 14.0),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Attiva Menù Mutaforma',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15.5,
+                                        color: colorScheme.onSurface,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2.0),
+                                    Text(
+                                      mutaformaAttivo
+                                          ? 'Funzionalità attiva: il menu si adatta all\'orario'
+                                          : 'Disattivato: i clienti vedono tutte le categorie',
+                                      style: TextStyle(
+                                        fontSize: 12.5,
+                                        color: theme.hintColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Switch(
+                                value: mutaformaAttivo,
+                                activeThumbColor: colorScheme.primary,
+                                onChanged: (val) async {
+                                  await MutaformaService.toggleMutaforma(
+                                    userRef: currentUserReference!,
+                                    attivo: val,
+                                  );
+                                },
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 14.0),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                          if (mutaformaAttivo) ...[
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Divider(
+                                height: 1.0,
+                                color: theme.dividerColor.withValues(alpha: 0.1),
+                              ),
+                            ),
+                            Row(
                               children: [
-                                Text(
-                                  'Attiva Menù Mutaforma',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15.5,
-                                    color: colorScheme.onSurface,
+                                Container(
+                                  width: 40.0,
+                                  height: 40.0,
+                                  decoration: BoxDecoration(
+                                    color: userRecord.mostraMenuDisattivati
+                                        ? colorScheme.primary
+                                            .withValues(alpha: 0.15)
+                                        : theme.dividerColor.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(12.0),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Icon(
+                                    userRecord.mostraMenuDisattivati
+                                        ? Icons.visibility_rounded
+                                        : Icons.visibility_off_rounded,
+                                    color: userRecord.mostraMenuDisattivati
+                                        ? colorScheme.primary
+                                        : theme.hintColor,
+                                    size: 22.0,
                                   ),
                                 ),
-                                const SizedBox(height: 2.0),
-                                Text(
-                                  mutaformaAttivo
-                                      ? 'Funzionalità attiva: il menu si adatta all\'orario'
-                                      : 'Disattivato: i clienti vedono tutte le categorie',
-                                  style: TextStyle(
-                                    fontSize: 12.5,
-                                    color: theme.hintColor,
+                                const SizedBox(width: 14.0),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Mostra menù fuori orario',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14.5,
+                                          color: colorScheme.onSurface,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2.0),
+                                      Text(
+                                        userRecord.mostraMenuDisattivati
+                                            ? 'I clienti possono consultare gli altri menù (sola lettura)'
+                                            : 'I menù non attivi sono completamente invisibili',
+                                        style: TextStyle(
+                                          fontSize: 12.0,
+                                          color: theme.hintColor,
+                                        ),
+                                      ),
+                                    ],
                                   ),
+                                ),
+                                Switch(
+                                  value: userRecord.mostraMenuDisattivati,
+                                  activeThumbColor: colorScheme.primary,
+                                  onChanged: (val) async {
+                                    await MutaformaService
+                                        .toggleMostraMenuDisattivati(
+                                      userRef: currentUserReference!,
+                                      mostra: val,
+                                    );
+                                  },
                                 ),
                               ],
                             ),
-                          ),
-                          Switch(
-                            value: mutaformaAttivo,
-                            activeThumbColor: colorScheme.primary,
-                            onChanged: (val) async {
-                              await MutaformaService.toggleMutaforma(
-                                userRef: currentUserReference!,
-                                attivo: val,
-                              );
-                            },
-                          ),
+                          ],
                         ],
                       ),
                     ),

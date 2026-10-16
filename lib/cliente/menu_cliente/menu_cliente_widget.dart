@@ -32,10 +32,14 @@ class MenuClienteWidget extends StatefulWidget {
     super.key,
     required this.ristoranteRef,
     this.isAnteprima = false,
+    this.fasciaId,
+    this.solaConsultazione = false,
   });
 
   final DocumentReference? ristoranteRef;
   final bool isAnteprima;
+  final String? fasciaId;
+  final bool solaConsultazione;
 
   static String routeName = 'MenuCliente';
   static String routePath = '/MenuCliente';
@@ -1102,18 +1106,27 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
         final bool mutaformaAttivo = menuClienteUsersRecord.menuMutaformaAttivo;
         final List<FasciaMutaforma> fasceMutaforma =
             MutaformaService.decodeFasce(menuClienteUsersRecord.fasceMutaforma);
+        final FasciaMutaforma? fasciaRichiesta = widget.fasciaId != null
+            ? fasceMutaforma
+                .where((f) => f.id == widget.fasciaId)
+                .firstOrNull
+            : null;
         final FasciaMutaforma? fasciaAttiva =
             mutaformaAttivo && fasceMutaforma.isNotEmpty
                 ? MutaformaService.getFasciaAttiva(fasceMutaforma)
                 : null;
-        final bool mutaformaInPausa =
-            mutaformaAttivo && fasceMutaforma.isNotEmpty && fasciaAttiva == null;
+        final FasciaMutaforma? fasciaTarget = fasciaRichiesta ?? fasciaAttiva;
+
+        final bool mutaformaInPausa = widget.fasciaId == null &&
+            mutaformaAttivo &&
+            fasceMutaforma.isNotEmpty &&
+            fasciaAttiva == null;
         final FasciaMutaforma? prossimaFascia =
             mutaformaInPausa ? MutaformaService.getProssimaFascia(fasceMutaforma) : null;
 
-        if (fasciaAttiva != null &&
+        if (fasciaTarget != null &&
             _model.categoriaSelezionata != null &&
-            !fasciaAttiva.categoriaIds.contains(_model.categoriaSelezionata)) {
+            !fasciaTarget.categoriaIds.contains(_model.categoriaSelezionata)) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) {
               safeSetState(() {
@@ -1138,17 +1151,32 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
               automaticallyImplyLeading: false,
               elevation: 2.0,
               centerTitle: true,
-              leadingWidth: 92.0,
+              leadingWidth: context.canPop() ? 134.0 : 92.0,
               leading: Align(
                 alignment: Alignment.centerLeft,
                 child: Padding(
-                  padding: const EdgeInsetsDirectional.only(start: 12.0),
-                  child: InkWell(
-                    onTap: () => _mostraSelettoreLingua(theme),
-                    borderRadius: BorderRadius.circular(16.0),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 6.0, vertical: 4.0),
+                  padding: const EdgeInsetsDirectional.only(start: 8.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (context.canPop())
+                        IconButton(
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(
+                              minWidth: 32.0, minHeight: 32.0),
+                          icon: Icon(
+                            Icons.arrow_back_rounded,
+                            size: 22.0,
+                            color: theme.colorScheme.onSurface,
+                          ),
+                          onPressed: () => context.safePop(),
+                        ),
+                      InkWell(
+                        onTap: () => _mostraSelettoreLingua(theme),
+                        borderRadius: BorderRadius.circular(16.0),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6.0, vertical: 4.0),
                       decoration: BoxDecoration(
                         color: theme.colorScheme.primary.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(16.0),
@@ -1190,8 +1218,10 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                       ),
                     ),
                   ),
-                ),
+                ],
               ),
+            ),
+          ),
               title: Row(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -1279,30 +1309,33 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                       },
                     ),
                   ),
-                InkWell(
-                  splashColor: Colors.transparent,
-                  focusColor: Colors.transparent,
-                  hoverColor: Colors.transparent,
-                  highlightColor: Colors.transparent,
-                  onTap: () async {
-                    context.pushNamed(
-                      RiepilogoFinaleWidget.routeName,
-                      queryParameters: {
-                        'ristoranteRef': serializeParam(
-                          widget!.ristoranteRef,
-                          ParamType.DocumentReference,
-                        ),
-                      }.withoutNulls,
-                    );
-                  },
-                  child: Center(
-                    child: wrapWithModel(
-                      model: _model.compCarrelloModel,
-                      updateCallback: () => safeSetState(() {}),
-                      child: CompCarrelloWidget(),
+                if (!widget.solaConsultazione)
+                  InkWell(
+                    splashColor: Colors.transparent,
+                    focusColor: Colors.transparent,
+                    hoverColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    onTap: () async {
+                      context.pushNamed(
+                        RiepilogoFinaleWidget.routeName,
+                        queryParameters: {
+                          'ristoranteRef': serializeParam(
+                            widget!.ristoranteRef,
+                            ParamType.DocumentReference,
+                          ),
+                        }.withoutNulls,
+                      );
+                    },
+                    child: Center(
+                      child: wrapWithModel(
+                        model: _model.compCarrelloModel,
+                        updateCallback: () => safeSetState(() {}),
+                        child: CompCarrelloWidget(),
+                      ),
                     ),
-                  ),
-                ),
+                  )
+                else
+                  const SizedBox(width: 48.0),
               ],
             ),
             body: SafeArea(
@@ -1316,6 +1349,46 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                           Column(
                             mainAxisSize: MainAxisSize.max,
                             children: [
+                              if (widget.solaConsultazione)
+                                Container(
+                                  width: double.infinity,
+                                  margin: const EdgeInsets.fromLTRB(
+                                      16.0, 8.0, 16.0, 4.0),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 14.0, vertical: 8.0),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF673AB7)
+                                        .withValues(alpha: 0.10),
+                                    borderRadius: BorderRadius.circular(12.0),
+                                    border: Border.all(
+                                      color: const Color(0xFF673AB7)
+                                          .withValues(alpha: 0.25),
+                                      width: 1.0,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.visibility_rounded,
+                                        color: Color(0xFF673AB7),
+                                        size: 18.0,
+                                      ),
+                                      const SizedBox(width: 8.0),
+                                      Expanded(
+                                        child: Text(
+                                          fasciaTarget != null
+                                              ? 'Menù ${fasciaTarget.nome} • Sola consultazione'
+                                              : 'Menù fuori orario • Sola consultazione',
+                                          style: const TextStyle(
+                                            color: Color(0xFF673AB7),
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 12.5,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               Container(
                                 width: double.infinity,
                                 height: 60.0,
@@ -1359,10 +1432,10 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                                         listViewCategoriesRecordList =
                                         snapshot.data!;
 
-                                    if (fasciaAttiva != null) {
+                                    if (fasciaTarget != null) {
                                       listViewCategoriesRecordList =
                                           listViewCategoriesRecordList
-                                              .where((c) => fasciaAttiva
+                                              .where((c) => fasciaTarget
                                                   .categoriaIds
                                                   .contains(c.reference.id))
                                               .toList();
@@ -1773,6 +1846,8 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                                                         menuClienteUsersRecord.prezzoAggiuntaManuale,
                                                     ingredientiManualiAttivi:
                                                         menuClienteUsersRecord.ingredientiManualiAttivi,
+                                                    solaConsultazione:
+                                                        widget.solaConsultazione,
                                                   ),
                                                 ),
                                               );
@@ -1980,12 +2055,12 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                                                             listViewNomePiattiRecord.prezzo, formatType: FormatType.decimal, decimalType: DecimalType.periodDecimal, currency: '€'), textAlign: TextAlign.end, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600, color: theme.hintColor)),
                                                       ),
                                                     ),
-                                                    if (menuClienteUsersRecord.dispensaAttiva &&
+                                                    if (!widget.solaConsultazione) ...[
+                                                      if (menuClienteUsersRecord.dispensaAttiva &&
                                                           menuClienteUsersRecord.modifichePiattiAttive &&
                                                           widget.ristoranteRef != null)
                                                         Padding(
-                                                          padding:
-                                                              const EdgeInsets.only(right: 6.0),
+                                                          padding: const EdgeInsets.only(right: 6.0),
                                                           child: FlutterFlowIconButton(
                                                             borderRadius: 25.0,
                                                             buttonSize: 38.0,
@@ -2008,49 +2083,44 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                                                             },
                                                           ),
                                                         ),
-                                                    Padding(
-                                                      padding:
-                                                          EdgeInsetsDirectional
-                                                              .fromSTEB(
-                                                                  0.0,
-                                                                  0.0,
-                                                                  5.0,
-                                                                  0.0),
-                                                      child:
-                                                          FlutterFlowIconButton(
-                                                        borderRadius: 25.0,
-                                                        buttonSize: 40.0,
-                                                        fillColor: theme.colorScheme.primary,
-                                                        icon: FaIcon(
-                                                          FontAwesomeIcons.plus,
-                                                          color: theme.colorScheme.onPrimary,
-                                                          size: 20.0,
+                                                      Padding(
+                                                        padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 5.0, 0.0),
+                                                        child: FlutterFlowIconButton(
+                                                          borderRadius: 25.0,
+                                                          buttonSize: 40.0,
+                                                          fillColor: theme.colorScheme.primary,
+                                                          icon: FaIcon(
+                                                            FontAwesomeIcons.plus,
+                                                            color: theme.colorScheme.onPrimary,
+                                                            size: 20.0,
+                                                          ),
+                                                          onPressed: () async {
+                                                            FFAppState().addToCarrello(
+                                                                listViewNomePiattiRecord.reference);
+                                                            safeSetState(() {});
+                                                            FFAppState().totaleCarrello =
+                                                                FFAppState().totaleCarrello +
+                                                                    listViewNomePiattiRecord.prezzo;
+                                                            safeSetState(() {});
+                                                            FFAppState().addToCarrelloNomi(
+                                                                listViewNomePiattiRecord.nome);
+                                                            safeSetState(() {});
+                                                            FFAppState().addToCarrelloPrezzi(
+                                                                listViewNomePiattiRecord.prezzo);
+                                                            safeSetState(() {});
+                                                          },
                                                         ),
-                                                        onPressed: () async {
-                                                          FFAppState().addToCarrello(
-                                                              listViewNomePiattiRecord
-                                                                  .reference);
-                                                          safeSetState(() {});
-                                                          FFAppState()
-                                                                  .totaleCarrello =
-                                                              FFAppState()
-                                                                      .totaleCarrello +
-                                                                  listViewNomePiattiRecord
-                                                                      .prezzo;
-                                                          safeSetState(() {});
-                                                          FFAppState()
-                                                              .addToCarrelloNomi(
-                                                                  listViewNomePiattiRecord
-                                                                      .nome);
-                                                          safeSetState(() {});
-                                                          FFAppState()
-                                                              .addToCarrelloPrezzi(
-                                                                  listViewNomePiattiRecord
-                                                                      .prezzo);
-                                                          safeSetState(() {});
-                                                        },
                                                       ),
-                                                    ),
+                                                    ] else ...[
+                                                      Padding(
+                                                        padding: const EdgeInsets.only(right: 8.0),
+                                                        child: Icon(
+                                                          Icons.remove_red_eye_outlined,
+                                                          size: 18.0,
+                                                          color: theme.hintColor.withValues(alpha: 0.6),
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ],
                                                 ),
                                               ],
@@ -2227,6 +2297,8 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                                                         menuClienteUsersRecord.prezzoAggiuntaManuale,
                                                     ingredientiManualiAttivi:
                                                         menuClienteUsersRecord.ingredientiManualiAttivi,
+                                                    solaConsultazione:
+                                                        widget.solaConsultazione,
                                                   ),
                                                 ),
                                               );
@@ -2434,7 +2506,8 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                                                             listViewPrezzoPiattiRecord.prezzo, formatType: FormatType.decimal, decimalType: DecimalType.periodDecimal, currency: '€'), textAlign: TextAlign.end, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600, color: theme.hintColor)),
                                                       ),
                                                     ),
-                                                    if (menuClienteUsersRecord.dispensaAttiva &&
+                                                    if (!widget.solaConsultazione) ...[
+                                                      if (menuClienteUsersRecord.dispensaAttiva &&
                                                           menuClienteUsersRecord.modifichePiattiAttive &&
                                                           widget.ristoranteRef != null)
                                                         Padding(
@@ -2462,49 +2535,59 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                                                             },
                                                           ),
                                                         ),
-                                                    Padding(
-                                                      padding:
-                                                          EdgeInsetsDirectional
-                                                              .fromSTEB(
-                                                                  0.0,
-                                                                  0.0,
-                                                                  5.0,
-                                                                  0.0),
-                                                      child:
-                                                          FlutterFlowIconButton(
-                                                        borderRadius: 25.0,
-                                                        buttonSize: 40.0,
-                                                        fillColor: theme.colorScheme.primary,
-                                                        icon: FaIcon(
-                                                          FontAwesomeIcons.plus,
-                                                          color: theme.colorScheme.onPrimary,
-                                                          size: 20.0,
+                                                      Padding(
+                                                        padding:
+                                                            EdgeInsetsDirectional
+                                                                .fromSTEB(
+                                                                    0.0,
+                                                                    0.0,
+                                                                    5.0,
+                                                                    0.0),
+                                                        child:
+                                                            FlutterFlowIconButton(
+                                                          borderRadius: 25.0,
+                                                          buttonSize: 40.0,
+                                                          fillColor: theme.colorScheme.primary,
+                                                          icon: FaIcon(
+                                                            FontAwesomeIcons.plus,
+                                                            color: theme.colorScheme.onPrimary,
+                                                            size: 20.0,
+                                                          ),
+                                                          onPressed: () async {
+                                                            FFAppState().addToCarrello(
+                                                                listViewPrezzoPiattiRecord
+                                                                    .reference);
+                                                            safeSetState(() {});
+                                                            FFAppState()
+                                                                    .totaleCarrello =
+                                                                FFAppState()
+                                                                        .totaleCarrello +
+                                                                    listViewPrezzoPiattiRecord
+                                                                        .prezzo;
+                                                            safeSetState(() {});
+                                                            FFAppState()
+                                                                .addToCarrelloNomi(
+                                                                    listViewPrezzoPiattiRecord
+                                                                        .nome);
+                                                            safeSetState(() {});
+                                                            FFAppState()
+                                                                .addToCarrelloPrezzi(
+                                                                    listViewPrezzoPiattiRecord
+                                                                        .prezzo);
+                                                            safeSetState(() {});
+                                                          },
                                                         ),
-                                                        onPressed: () async {
-                                                          FFAppState().addToCarrello(
-                                                              listViewPrezzoPiattiRecord
-                                                                  .reference);
-                                                          safeSetState(() {});
-                                                          FFAppState()
-                                                                  .totaleCarrello =
-                                                              FFAppState()
-                                                                      .totaleCarrello +
-                                                                  listViewPrezzoPiattiRecord
-                                                                      .prezzo;
-                                                          safeSetState(() {});
-                                                          FFAppState()
-                                                              .addToCarrelloNomi(
-                                                                  listViewPrezzoPiattiRecord
-                                                                      .nome);
-                                                          safeSetState(() {});
-                                                          FFAppState()
-                                                              .addToCarrelloPrezzi(
-                                                                  listViewPrezzoPiattiRecord
-                                                                      .prezzo);
-                                                          safeSetState(() {});
-                                                        },
                                                       ),
-                                                    ),
+                                                    ] else ...[
+                                                      Padding(
+                                                        padding: const EdgeInsets.only(right: 8.0),
+                                                        child: Icon(
+                                                          Icons.remove_red_eye_outlined,
+                                                          size: 18.0,
+                                                          color: theme.hintColor.withValues(alpha: 0.6),
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ],
                                                 ),
                                               ],

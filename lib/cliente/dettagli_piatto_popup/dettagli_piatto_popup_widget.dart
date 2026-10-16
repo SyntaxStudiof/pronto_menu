@@ -21,6 +21,7 @@ class DettagliPiattoPopupWidget extends StatefulWidget {
     this.modifichePiattiAttive = true,
     this.ingredientiManualiAttivi = false,
     this.prezzoAggiuntaManuale = 0.0,
+    this.solaConsultazione = false,
   });
 
   final PiattiRecord? piattoSelezionato;
@@ -31,6 +32,7 @@ class DettagliPiattoPopupWidget extends StatefulWidget {
   final bool modifichePiattiAttive;
   final bool ingredientiManualiAttivi;
   final double prezzoAggiuntaManuale;
+  final bool solaConsultazione;
 
   @override
   State<DettagliPiattoPopupWidget> createState() =>
@@ -378,107 +380,140 @@ class _DettagliPiattoPopupWidgetState extends State<DettagliPiattoPopupWidget> {
                   spacing: 10.0,
                   runSpacing: 8.0,
                   children: [
-                    if (widget.modifichePiattiAttive &&
-                        widget.ristoranteRef != null)
-                      OutlinedButton.icon(
-                        onPressed: () async {
-                          Navigator.of(context).pop();
-                          await ModalPersonalizzaPiattoWidget.show(
-                            context: context,
-                            piatto: widget.piattoSelezionato!,
-                            ristoranteRef: widget.ristoranteRef!,
-                            dispensaAttiva: widget.dispensaAttiva,
-                            prezzoAggiuntaManuale:
-                                widget.prezzoAggiuntaManuale,
-                            currentLang: widget.currentLang,
-                          );
-                        },
-                        icon: Icon(
-                          Icons.tune_rounded,
-                          size: 18.0,
-                          color: theme.colorScheme.primary,
-                        ),
-                        label: Text(
-                          TranslationService.getUi(
-                              'personalizza_piatto', widget.currentLang),
-                          style: TextStyle(
-                            color: theme.colorScheme.primary,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13.0,
+                    if (widget.solaConsultazione)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16.0, vertical: 10.0),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF673AB7).withValues(alpha: 0.10),
+                          borderRadius: BorderRadius.circular(12.0),
+                          border: Border.all(
+                            color: const Color(0xFF673AB7).withValues(alpha: 0.20),
                           ),
                         ),
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(
-                              color: theme.colorScheme.primary, width: 1.5),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.visibility_rounded,
+                              size: 16.0,
+                              color: Color(0xFF673AB7),
+                            ),
+                            SizedBox(width: 8.0),
+                            Text(
+                              'Menù in sola consultazione',
+                              style: TextStyle(
+                                fontSize: 13.0,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF673AB7),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    else ...[
+                      if (widget.modifichePiattiAttive &&
+                          widget.ristoranteRef != null)
+                        OutlinedButton.icon(
+                          onPressed: () async {
+                            Navigator.of(context).pop();
+                            await ModalPersonalizzaPiattoWidget.show(
+                              context: context,
+                              piatto: widget.piattoSelezionato!,
+                              ristoranteRef: widget.ristoranteRef!,
+                              dispensaAttiva: widget.dispensaAttiva,
+                              prezzoAggiuntaManuale:
+                                  widget.prezzoAggiuntaManuale,
+                              currentLang: widget.currentLang,
+                            );
+                          },
+                          icon: Icon(
+                            Icons.tune_rounded,
+                            size: 18.0,
+                            color: theme.colorScheme.primary,
+                          ),
+                          label: Text(
+                            TranslationService.getUi(
+                                'personalizza_piatto', widget.currentLang),
+                            style: TextStyle(
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13.0,
+                            ),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(
+                                color: theme.colorScheme.primary, width: 1.5),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 14.0, vertical: 10.0),
+                          ),
+                        ),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          final appState = FFAppState();
+                          appState.addToCarrello(
+                              widget.piattoSelezionato!.reference);
+                          appState.totaleCarrello = appState.totaleCarrello +
+                              widget.piattoSelezionato!.prezzo;
+                          appState.addToCarrelloNomi(
+                              widget.piattoSelezionato!.nome);
+                          appState.addToCarrelloPrezzi(
+                              widget.piattoSelezionato!.prezzo);
+
+                          Navigator.of(context).pop();
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Row(
+                                children: [
+                                  const Icon(Icons.check_circle_rounded,
+                                      color: Colors.white, size: 20.0),
+                                  const SizedBox(width: 8.0),
+                                  Expanded(
+                                    child: Text(
+                                      '${widget.piattoSelezionato!.nome} aggiunto al carrello!',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              backgroundColor: const Color(0xFF16A34A),
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.add_shopping_cart_rounded,
+                            size: 18.0),
+                        label: Text(
+                          TranslationService.getUi(
+                              'aggiungi_al_carrello', widget.currentLang),
+                          style: const TextStyle(
+                            fontSize: 13.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.colorScheme.primary,
+                          foregroundColor: theme.colorScheme.onPrimary,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12.0),
                           ),
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 14.0, vertical: 10.0),
+                              horizontal: 16.0, vertical: 10.0),
+                          elevation: 1.0,
                         ),
                       ),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        final appState = FFAppState();
-                        appState.addToCarrello(
-                            widget.piattoSelezionato!.reference);
-                        appState.totaleCarrello = appState.totaleCarrello +
-                            widget.piattoSelezionato!.prezzo;
-                        appState.addToCarrelloNomi(
-                            widget.piattoSelezionato!.nome);
-                        appState.addToCarrelloPrezzi(
-                            widget.piattoSelezionato!.prezzo);
-
-                        Navigator.of(context).pop();
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Row(
-                              children: [
-                                const Icon(Icons.check_circle_rounded,
-                                    color: Colors.white, size: 20.0),
-                                const SizedBox(width: 8.0),
-                                Expanded(
-                                  child: Text(
-                                    '${widget.piattoSelezionato!.nome} aggiunto al carrello!',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            backgroundColor: const Color(0xFF16A34A),
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12.0),
-                            ),
-                            duration: const Duration(seconds: 2),
-                          ),
-                        );
-                      },
-                      icon: const Icon(Icons.add_shopping_cart_rounded,
-                          size: 18.0),
-                      label: Text(
-                        TranslationService.getUi(
-                            'aggiungi_al_carrello', widget.currentLang),
-                        style: const TextStyle(
-                          fontSize: 13.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: theme.colorScheme.primary,
-                        foregroundColor: theme.colorScheme.onPrimary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.0),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 10.0),
-                        elevation: 1.0,
-                      ),
-                    ),
+                    ],
                   ],
                 ),
               ],

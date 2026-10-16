@@ -55,7 +55,7 @@ class _LoaderMenuWidgetState extends State<LoaderMenuWidget> {
         );
       } else {
         context.goNamed(
-          MenuClienteWidget.routeName,
+          HubClienteWidget.routeName,
           queryParameters: {
             'ristoranteRef': serializeParam(
               widget.ristoranteRef,

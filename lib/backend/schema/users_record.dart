@@ -176,6 +176,10 @@ class UsersRecord extends FirestoreRecord {
   String get fasceMutaforma => _fasceMutaforma ?? '';
   bool hasFasceMutaforma() => _fasceMutaforma != null;
 
+  bool? _mostraMenuDisattivati;
+  bool get mostraMenuDisattivati => _mostraMenuDisattivati ?? false;
+  bool hasMostraMenuDisattivati() => _mostraMenuDisattivati != null;
+
   void _initializeFields() {
     _email = snapshotData['email'] as String?;
     _displayName = snapshotData['display_name'] as String?;
@@ -213,6 +217,7 @@ class UsersRecord extends FirestoreRecord {
     _prezzoAggiuntaManuale = castToType<double>(snapshotData['prezzo_aggiunta_manuale']);
     _menuMutaformaAttivo = snapshotData['menu_mutaforma_attivo'] as bool?;
     _fasceMutaforma = snapshotData['fasce_mutaforma'] as String?;
+    _mostraMenuDisattivati = snapshotData['mostra_menu_disattivati'] as bool?;
   }
 
   static CollectionReference get collection =>
@@ -284,6 +289,7 @@ Map<String, dynamic> createUsersRecordData({
   double? prezzoAggiuntaManuale,
   bool? menuMutaformaAttivo,
   String? fasceMutaforma,
+  bool? mostraMenuDisattivati,
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
@@ -322,6 +328,7 @@ Map<String, dynamic> createUsersRecordData({
       'prezzo_aggiunta_manuale': prezzoAggiuntaManuale,
       'menu_mutaforma_attivo': menuMutaformaAttivo,
       'fasce_mutaforma': fasceMutaforma,
+      'mostra_menu_disattivati': mostraMenuDisattivati,
     }.withoutNulls,
   );
 
