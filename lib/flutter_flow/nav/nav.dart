@@ -499,6 +499,22 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
             ),
           ),
         ),
+        FFRoute(
+          name: QuizGameWidget.routeName,
+          path: QuizGameWidget.routePath,
+          builder: (context, params) => QuizGameWidget(
+            ristoranteRef: params.getParam(
+              'ristoranteRef',
+              ParamType.DocumentReference,
+              isList: false,
+              collectionNamePath: ['users'],
+            ),
+            tavoloPreimpostato: params.getParam(
+              'tavoloPreimpostato',
+              ParamType.String,
+            ),
+          ),
+        ),
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );
 

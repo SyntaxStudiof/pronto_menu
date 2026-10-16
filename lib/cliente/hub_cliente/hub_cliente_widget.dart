@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '/backend/backend.dart';
 import '/cliente/giochi/tris_game_widget.dart';
+import '/cliente/giochi/quiz_game_widget.dart';
 import '/cliente/jukebox_modal/jukebox_modal_widget.dart';
 import '/cliente/menu_cliente/menu_cliente_widget.dart';
 import '/cliente/menu_disattivati/menu_disattivati_widget.dart';
@@ -489,6 +490,34 @@ class _HubClienteWidgetState extends State<HubClienteWidget> {
                     onTap: () {
                       context.pushNamed(
                         TrisGameWidget.routeName,
+                        queryParameters: {
+                          'ristoranteRef': serializeParam(
+                            widget.ristoranteRef,
+                            ParamType.DocumentReference,
+                          ),
+                          'tavoloPreimpostato': serializeParam(
+                            FFAppState().numeroTavolo,
+                            ParamType.String,
+                          ),
+                        }.withoutNulls,
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 16.0),
+
+                  // OPZIONE 5: QUIZ AL TAVOLO
+                  _buildHubOptionCard(
+                    theme: theme,
+                    icon: Icons.lightbulb_rounded,
+                    iconColor: const Color(0xFFF59E0B),
+                    iconBgColor:
+                        const Color(0xFFF59E0B).withValues(alpha: 0.12),
+                    title: 'Quiz del Gusto & Curiosità',
+                    subtitle:
+                        'Rispondi a 5 domande sul cibo o sfida in tempo reale gli altri tavoli!',
+                    onTap: () {
+                      context.pushNamed(
+                        QuizGameWidget.routeName,
                         queryParameters: {
                           'ristoranteRef': serializeParam(
                             widget.ristoranteRef,

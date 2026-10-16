@@ -16,6 +16,7 @@ import 'schema/jukebox_requests_record.dart';
 import 'schema/dispensa_record.dart';
 import 'schema/action_logs_record.dart';
 import 'schema/tris_matches_record.dart';
+import 'schema/quiz_matches_record.dart';
 
 export 'dart:async' show StreamSubscription;
 export 'package:cloud_firestore/cloud_firestore.dart' hide Order;
@@ -35,6 +36,7 @@ export 'schema/jukebox_requests_record.dart';
 export 'schema/dispensa_record.dart';
 export 'schema/action_logs_record.dart';
 export 'schema/tris_matches_record.dart';
+export 'schema/quiz_matches_record.dart';
 
 /// Functions to query CategoriesRecords (as a Stream and as a Future).
 Future<int> queryCategoriesRecordCount({
@@ -438,6 +440,43 @@ Future<List<TrisMatchesRecord>> queryTrisMatchesRecordOnce({
     queryCollectionOnce(
       TrisMatchesRecord.collection,
       TrisMatchesRecord.fromSnapshot,
+      queryBuilder: queryBuilder,
+      limit: limit,
+      singleRecord: singleRecord,
+    );
+
+/// Functions to query QuizMatchesRecords (as a Stream and as a Future).
+Future<int> queryQuizMatchesRecordCount({
+  Query Function(Query)? queryBuilder,
+  int limit = -1,
+}) =>
+    queryCollectionCount(
+      QuizMatchesRecord.collection,
+      queryBuilder: queryBuilder,
+      limit: limit,
+    );
+
+Stream<List<QuizMatchesRecord>> queryQuizMatchesRecord({
+  Query Function(Query)? queryBuilder,
+  int limit = -1,
+  bool singleRecord = false,
+}) =>
+    queryCollection(
+      QuizMatchesRecord.collection,
+      QuizMatchesRecord.fromSnapshot,
+      queryBuilder: queryBuilder,
+      limit: limit,
+      singleRecord: singleRecord,
+    );
+
+Future<List<QuizMatchesRecord>> queryQuizMatchesRecordOnce({
+  Query Function(Query)? queryBuilder,
+  int limit = -1,
+  bool singleRecord = false,
+}) =>
+    queryCollectionOnce(
+      QuizMatchesRecord.collection,
+      QuizMatchesRecord.fromSnapshot,
       queryBuilder: queryBuilder,
       limit: limit,
       singleRecord: singleRecord,
