@@ -1,17 +1,11 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/api_requests/api_calls.dart';
-import '/flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'dart:ui';
 import '/index.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '/components/google_sign_in_button.dart';
 import 'auth_welcome_model.dart';
 export 'auth_welcome_model.dart';
 
@@ -55,6 +49,7 @@ class _AuthWelcomeWidgetState extends State<AuthWelcomeWidget> {
   @override
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
+    final theme = Theme.of(context);
 
     return GestureDetector(
       onTap: () {
@@ -63,7 +58,7 @@ class _AuthWelcomeWidgetState extends State<AuthWelcomeWidget> {
       },
       child: Scaffold(
         key: scaffoldKey,
-        backgroundColor: FFAppState().temaPrimaryBackground,
+        backgroundColor: theme.scaffoldBackgroundColor,
         body: SafeArea(
           top: true,
           child: Padding(
@@ -93,65 +88,17 @@ class _AuthWelcomeWidgetState extends State<AuthWelcomeWidget> {
                       children: [
                         TextSpan(
                           text: 'Pronto',
-                          style: FlutterFlowTheme.of(context)
-                              .displayMedium
-                              .override(
-                                font: GoogleFonts.outfit(
-                                  fontWeight: FlutterFlowTheme.of(context)
-                                      .displayMedium
-                                      .fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .displayMedium
-                                      .fontStyle,
-                                ),
-                                color: FFAppState().temaPrimaryText,
-                                letterSpacing: 0.0,
-                                fontWeight: FlutterFlowTheme.of(context)
-                                    .displayMedium
-                                    .fontWeight,
-                                fontStyle: FlutterFlowTheme.of(context)
-                                    .displayMedium
-                                    .fontStyle,
-                              ),
+                          style: theme.textTheme.displayMedium,
                         ),
                         TextSpan(
                           text: 'Menu',
-                          style:
-                              FlutterFlowTheme.of(context).bodyMedium.override(
-                                    font: GoogleFonts.outfit(
-                                      fontWeight: FontWeight.bold,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
-                                    color: FFAppState().temaPrimary,
-                                    fontSize: 45.0,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FontWeight.bold,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                  ),
+                          style: theme.textTheme.displayMedium?.copyWith(
+                            color: theme.colorScheme.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
                         )
                       ],
-                      style: FlutterFlowTheme.of(context).bodyMedium.override(
-                            font: GoogleFonts.openSans(
-                              fontWeight: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .fontWeight,
-                              fontStyle: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .fontStyle,
-                            ),
-                            fontSize: 45.0,
-                            letterSpacing: 0.0,
-                            fontWeight: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .fontWeight,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .fontStyle,
-                          ),
+                      style: theme.textTheme.displayMedium,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -166,95 +113,45 @@ class _AuthWelcomeWidgetState extends State<AuthWelcomeWidget> {
                     obscureText: false,
                     decoration: InputDecoration(
                       isDense: true,
-                      labelStyle:
-                          FlutterFlowTheme.of(context).labelMedium.override(
-                                font: GoogleFonts.openSans(
-                                  fontWeight: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .fontStyle,
-                                ),
-                                color: FFAppState().temaSecondaryText,
-                                letterSpacing: 0.0,
-                                fontWeight: FlutterFlowTheme.of(context)
-                                    .labelMedium
-                                    .fontWeight,
-                                fontStyle: FlutterFlowTheme.of(context)
-                                    .labelMedium
-                                    .fontStyle,
-                              ),
+                      labelStyle: theme.textTheme.labelMedium,
                       hintText: 'Inserisci la tua email',
-                      hintStyle:
-                          FlutterFlowTheme.of(context).bodyMedium.override(
-                                font: GoogleFonts.openSans(
-                                  fontWeight: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .fontStyle,
-                                ),
-                                color: FFAppState().temaSecondaryText,
-                                letterSpacing: 0.0,
-                                fontWeight: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .fontWeight,
-                                fontStyle: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .fontStyle,
-                              ),
+                      hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.hintColor,
+                      ),
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: FFAppState().temaSecondary,
+                          color: theme.dividerColor,
                           width: 1.0,
                         ),
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: FFAppState().temaPrimary,
+                          color: theme.colorScheme.primary,
                           width: 1.0,
                         ),
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       errorBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: FFAppState().temaError,
+                          color: theme.colorScheme.error,
                           width: 1.0,
                         ),
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       focusedErrorBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: FFAppState().temaError,
+                          color: theme.colorScheme.error,
                           width: 1.0,
                         ),
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       filled: true,
-                      fillColor: FFAppState().temaSecondaryBackground,
+                      fillColor: theme.cardColor,
                     ),
-                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                          font: GoogleFonts.openSans(
-                            fontWeight: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .fontWeight,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .fontStyle,
-                          ),
-                          color: FFAppState().temaPrimaryText,
-                          letterSpacing: 0.0,
-                          fontWeight: FlutterFlowTheme.of(context)
-                              .bodyMedium
-                              .fontWeight,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                        ),
+                    style: theme.textTheme.bodyMedium,
                     keyboardType: TextInputType.emailAddress,
-                    cursorColor: FFAppState().temaPrimary,
+                    cursorColor: theme.colorScheme.primary,
                     enableInteractiveSelection: true,
                     validator: _model.emailLoginTextControllerValidator
                         .asValidator(context),
@@ -272,75 +169,41 @@ class _AuthWelcomeWidgetState extends State<AuthWelcomeWidget> {
                       obscureText: !_model.passwordLoginVisibility,
                       decoration: InputDecoration(
                         isDense: true,
-                        labelStyle:
-                            FlutterFlowTheme.of(context).labelMedium.override(
-                                  font: GoogleFonts.openSans(
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .labelMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .labelMedium
-                                        .fontStyle,
-                                  ),
-                                  color: FFAppState().temaSecondaryText,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .fontStyle,
-                                ),
+                        labelStyle: theme.textTheme.labelMedium,
                         hintText: 'Inserisci la tua password',
-                        hintStyle:
-                            FlutterFlowTheme.of(context).bodyMedium.override(
-                                  font: GoogleFonts.openSans(
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                  ),
-                                  color: FFAppState().temaSecondaryText,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .fontStyle,
-                                ),
+                        hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.hintColor,
+                        ),
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(
-                            color: FFAppState().temaSecondary,
+                            color: theme.dividerColor,
                             width: 1.0,
                           ),
                           borderRadius: BorderRadius.circular(12.0),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderSide: BorderSide(
-                            color: FFAppState().temaPrimary,
+                            color: theme.colorScheme.primary,
                             width: 1.0,
                           ),
                           borderRadius: BorderRadius.circular(12.0),
                         ),
                         errorBorder: OutlineInputBorder(
                           borderSide: BorderSide(
-                            color: FFAppState().temaError,
+                            color: theme.colorScheme.error,
                             width: 1.0,
                           ),
                           borderRadius: BorderRadius.circular(12.0),
                         ),
                         focusedErrorBorder: OutlineInputBorder(
                           borderSide: BorderSide(
-                            color: FFAppState().temaError,
+                            color: theme.colorScheme.error,
                             width: 1.0,
                           ),
                           borderRadius: BorderRadius.circular(12.0),
                         ),
                         filled: true,
-                        fillColor: FFAppState().temaSecondaryBackground,
+                        fillColor: theme.cardColor,
                         suffixIcon: InkWell(
                           onTap: () async {
                             safeSetState(() => _model.passwordLoginVisibility =
@@ -351,30 +214,13 @@ class _AuthWelcomeWidgetState extends State<AuthWelcomeWidget> {
                             _model.passwordLoginVisibility
                                 ? Icons.visibility_outlined
                                 : Icons.visibility_off_outlined,
-                            color: FFAppState().temaPrimary,
+                            color: theme.colorScheme.primary,
                             size: 22,
                           ),
                         ),
                       ),
-                      style: FlutterFlowTheme.of(context).bodyMedium.override(
-                            font: GoogleFonts.openSans(
-                              fontWeight: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .fontWeight,
-                              fontStyle: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .fontStyle,
-                            ),
-                            color: FFAppState().temaPrimaryText,
-                            letterSpacing: 0.0,
-                            fontWeight: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .fontWeight,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .fontStyle,
-                          ),
-                      cursorColor: FFAppState().temaPrimary,
+                      style: theme.textTheme.bodyMedium,
+                      cursorColor: theme.colorScheme.primary,
                       enableInteractiveSelection: true,
                       validator: _model.passwordLoginTextControllerValidator
                           .asValidator(context),
@@ -396,25 +242,9 @@ class _AuthWelcomeWidgetState extends State<AuthWelcomeWidget> {
                       child: Text(
                         'Password dimenticata?',
                         textAlign: TextAlign.end,
-                        style: FlutterFlowTheme.of(context).titleSmall.override(
-                              font: GoogleFonts.outfit(
-                                fontWeight: FlutterFlowTheme.of(context)
-                                    .titleSmall
-                                    .fontWeight,
-                                fontStyle: FlutterFlowTheme.of(context)
-                                    .titleSmall
-                                    .fontStyle,
-                              ),
-                              color: FFAppState().temaAccent4,
-                              fontSize: 15.0,
-                              letterSpacing: 0.0,
-                              fontWeight: FlutterFlowTheme.of(context)
-                                  .titleSmall
-                                  .fontWeight,
-                              fontStyle: FlutterFlowTheme.of(context)
-                                  .titleSmall
-                                  .fontStyle,
-                            ),
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontSize: 15.0,
+                        ),
                       ),
                     ),
                   ),
@@ -460,29 +290,12 @@ class _AuthWelcomeWidgetState extends State<AuthWelcomeWidget> {
                           SnackBar(
                             content: Text(
                               'Attenzione! Devi prima verificare la tua email! Controlla la posta.',
-                              style: FlutterFlowTheme.of(context)
-                                  .titleMedium
-                                  .override(
-                                    font: GoogleFonts.outfit(
-                                      fontWeight: FlutterFlowTheme.of(context)
-                                          .titleMedium
-                                          .fontWeight,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .titleMedium
-                                          .fontStyle,
-                                    ),
-                                    color: FFAppState().temaPrimaryBackground,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .titleMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .titleMedium
-                                        .fontStyle,
-                                  ),
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                color: theme.colorScheme.onError,
+                              ),
                             ),
                             duration: Duration(milliseconds: 4000),
-                            backgroundColor: FFAppState().temaError,
+                            backgroundColor: theme.colorScheme.error,
                           ),
                         );
                         GoRouter.of(context).prepareAuthEvent();
@@ -498,77 +311,93 @@ class _AuthWelcomeWidgetState extends State<AuthWelcomeWidget> {
                           EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
                       iconPadding:
                           EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
-                      color: FFAppState().temaPrimary,
-                      textStyle:
-                          FlutterFlowTheme.of(context).titleSmall.override(
-                                font: GoogleFonts.outfit(
-                                  fontWeight: FontWeight.bold,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .titleSmall
-                                      .fontStyle,
-                                ),
-                                color: FFAppState().temaPrimaryBackground,
-                                letterSpacing: 0.0,
-                                fontWeight: FontWeight.bold,
-                                fontStyle: FlutterFlowTheme.of(context)
-                                    .titleSmall
-                                    .fontStyle,
-                              ),
+                      color: theme.colorScheme.primary,
+                      textStyle: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.onPrimary,
+                      ),
                       elevation: 2.0,
                       borderRadius: BorderRadius.circular(12.0),
                     ),
                   ),
                 ),
-                Align(
-                  alignment: AlignmentDirectional(0.0, 0.0),
-                  child: FlutterFlowIconButton(
-                    borderColor: FFAppState().temaAlternate,
-                    borderRadius: 12.0,
-                    borderWidth: 1.0,
-                    buttonSize: 50.0,
-                    fillColor: FFAppState().temaPrimary,
-                    icon: FaIcon(
-                      FontAwesomeIcons.google,
-                      color: FFAppState().temaPrimaryBackground,
-                      size: 24.0,
-                    ),
-                    onPressed: () async {
-                      GoRouter.of(context).prepareAuthEvent();
-                      final user = await authManager.signInWithGoogle(context);
-                      if (user == null) {
-                        return;
-                      }
-                      FFAppState().loginProvider = 'google.com';
-                      safeSetState(() {});
-                      if (valueOrDefault<bool>(
-                              currentUserDocument?.isPremium, false) ==
-                          true) {
-                        await InviaRubricaCall.call(
-                          emailUtente: currentUserEmail,
-                        );
-
-                        context.pushNamedAuth(
-                          HomeRistoratoreWidget.routeName,
-                          context.mounted,
-                          queryParameters: {
-                            'ristoranteRef': serializeParam(
-                              currentUserReference,
-                              ParamType.DocumentReference,
+                SizedBox(
+                  width: 280.0,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Divisore "oppure"
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Divider(
+                              color: theme.dividerColor.withValues(alpha: 0.2),
+                              height: 1.0,
                             ),
-                          }.withoutNulls,
-                        );
-                      } else {
-                        if (valueOrDefault<bool>(
-                                currentUserDocument?.isAdmin, false) ==
-                            true) {
-                          context.pushNamedAuth(
-                              AdminDashboardWidget.routeName, context.mounted);
-                        } else {
-                          context.pushNamedAuth(
-                              AbbonamentoWidget.routeName, context.mounted);
-                        }
-                      }
-                    },
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 14.0),
+                            child: Text(
+                              'oppure',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.hintColor,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Divider(
+                              color: theme.dividerColor.withValues(alpha: 0.2),
+                              height: 1.0,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16.0),
+
+                      // Bottone Continua con Google
+                      GoogleSignInButton(
+                        onTap: () async {
+                          GoRouter.of(context).prepareAuthEvent();
+                          final user =
+                              await authManager.signInWithGoogle(context);
+                          if (user == null) {
+                            return;
+                          }
+                          FFAppState().loginProvider = 'google.com';
+                          safeSetState(() {});
+                          if (valueOrDefault<bool>(
+                                  currentUserDocument?.isPremium, false) ==
+                              true) {
+                            await InviaRubricaCall.call(
+                              emailUtente: currentUserEmail,
+                            );
+
+                            context.pushNamedAuth(
+                              HomeRistoratoreWidget.routeName,
+                              context.mounted,
+                              queryParameters: {
+                                'ristoranteRef': serializeParam(
+                                  currentUserReference,
+                                  ParamType.DocumentReference,
+                                ),
+                              }.withoutNulls,
+                            );
+                          } else {
+                            if (valueOrDefault<bool>(
+                                    currentUserDocument?.isAdmin, false) ==
+                                true) {
+                              context.pushNamedAuth(
+                                  AdminDashboardWidget.routeName,
+                                  context.mounted);
+                            } else {
+                              context.pushNamedAuth(
+                                  AbbonamentoWidget.routeName, context.mounted);
+                            }
+                          }
+                        },
+                      ),
+                    ],
                   ),
                 ),
                 Padding(
@@ -579,24 +408,9 @@ class _AuthWelcomeWidgetState extends State<AuthWelcomeWidget> {
                     children: [
                       Text(
                         'Non hai un account? ',
-                        style: FlutterFlowTheme.of(context).bodyMedium.override(
-                              font: GoogleFonts.openSans(
-                                fontWeight: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .fontWeight,
-                                fontStyle: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .fontStyle,
-                              ),
-                              color: FFAppState().temaSecondaryText,
-                              letterSpacing: 0.0,
-                              fontWeight: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .fontWeight,
-                              fontStyle: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .fontStyle,
-                            ),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.hintColor,
+                        ),
                       ),
                       InkWell(
                         splashColor: Colors.transparent,
@@ -608,22 +422,11 @@ class _AuthWelcomeWidgetState extends State<AuthWelcomeWidget> {
                         },
                         child: Text(
                           'Registrati',
-                          style:
-                              FlutterFlowTheme.of(context).bodyMedium.override(
-                                    font: GoogleFonts.openSans(
-                                      fontWeight: FontWeight.bold,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
-                                    color: FFAppState().temaAccent4,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FontWeight.bold,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                    decoration: TextDecoration.underline,
-                                  ),
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            decoration: TextDecoration.underline,
+                            color: theme.colorScheme.primary,
+                          ),
                         ),
                       ),
                     ],

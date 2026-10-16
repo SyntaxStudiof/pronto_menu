@@ -1,14 +1,8 @@
-import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'popup_categoria_model.dart';
 export 'popup_categoria_model.dart';
@@ -43,7 +37,7 @@ class _PopupCategoriaWidgetState extends State<PopupCategoriaWidget> {
     super.initState();
     _model = createModel(context, () => PopupCategoriaModel());
 
-    _model.textController ??= TextEditingController(text: widget!.nomeAttuale);
+    _model.textController ??= TextEditingController(text: widget.nomeAttuale);
     _model.textFieldFocusNode ??= FocusNode();
 
     WidgetsBinding.instance.addPostFrameCallback((_) => safeSetState(() {}));
@@ -59,18 +53,18 @@ class _PopupCategoriaWidgetState extends State<PopupCategoriaWidget> {
   @override
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
+    final theme = Theme.of(context);
 
     return Padding(
-      padding: EdgeInsetsDirectional.fromSTEB(0.0, 20.0, 0.0, 5.0),
+      padding: const EdgeInsetsDirectional.fromSTEB(0.0, 20.0, 0.0, 5.0),
       child: Container(
-        width: 301.4,
-        height: 300.1,
+        width: 320.0,
         decoration: BoxDecoration(
-          color: FFAppState().temaSecondary,
-          borderRadius: BorderRadius.circular(12.0),
+          color: theme.cardColor,
+          borderRadius: BorderRadius.circular(16.0),
         ),
         child: Padding(
-          padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 40.0),
+          padding: const EdgeInsetsDirectional.fromSTEB(16.0, 20.0, 16.0, 24.0),
           child: SingleChildScrollView(
             controller: _model.columnController,
             child: Column(
@@ -78,19 +72,9 @@ class _PopupCategoriaWidgetState extends State<PopupCategoriaWidget> {
               children: [
                 Text(
                   'Opzioni categoria',
-                  style: FlutterFlowTheme.of(context).titleLarge.override(
-                        font: GoogleFonts.outfit(
-                          fontWeight: FontWeight.bold,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).titleLarge.fontStyle,
-                        ),
-                        color: FFAppState().temaPrimaryText,
-                        fontSize: 20.0,
-                        letterSpacing: 0.0,
-                        fontWeight: FontWeight.bold,
-                        fontStyle:
-                            FlutterFlowTheme.of(context).titleLarge.fontStyle,
-                      ),
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 Container(
                   width: 280.0,
@@ -102,95 +86,44 @@ class _PopupCategoriaWidgetState extends State<PopupCategoriaWidget> {
                     obscureText: false,
                     decoration: InputDecoration(
                       isDense: true,
-                      labelStyle:
-                          FlutterFlowTheme.of(context).labelMedium.override(
-                                font: GoogleFonts.openSans(
-                                  fontWeight: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .fontStyle,
-                                ),
-                                color: FFAppState().temaSecondaryText,
-                                letterSpacing: 0.0,
-                                fontWeight: FlutterFlowTheme.of(context)
-                                    .labelMedium
-                                    .fontWeight,
-                                fontStyle: FlutterFlowTheme.of(context)
-                                    .labelMedium
-                                    .fontStyle,
-                              ),
-                      hintText: 'TextField',
-                      hintStyle:
-                          FlutterFlowTheme.of(context).bodyMedium.override(
-                                font: GoogleFonts.openSans(
-                                  fontWeight: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .fontStyle,
-                                ),
-                                color: FFAppState().temaSecondaryText,
-                                letterSpacing: 0.0,
-                                fontWeight: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .fontWeight,
-                                fontStyle: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .fontStyle,
-                              ),
+                      hintText: 'Nome categoria',
+                      hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.hintColor,
+                      ),
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: FFAppState().temaSecondary,
+                          color: theme.dividerColor.withValues(alpha: 0.2),
                           width: 1.0,
                         ),
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: FFAppState().temaPrimary,
-                          width: 1.0,
+                          color: theme.colorScheme.primary,
+                          width: 1.5,
                         ),
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       errorBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: FFAppState().temaError,
+                          color: theme.colorScheme.error,
                           width: 1.0,
                         ),
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       focusedErrorBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: FFAppState().temaError,
-                          width: 1.0,
+                          color: theme.colorScheme.error,
+                          width: 1.5,
                         ),
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       filled: true,
-                      fillColor: FFAppState().temaSecondaryBackground,
+                      fillColor: theme.scaffoldBackgroundColor,
                     ),
-                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                          font: GoogleFonts.openSans(
-                            fontWeight: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .fontWeight,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .fontStyle,
-                          ),
-                          color: FFAppState().temaPrimaryText,
-                          letterSpacing: 0.0,
-                          fontWeight: FlutterFlowTheme.of(context)
-                              .bodyMedium
-                              .fontWeight,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                        ),
+                    style: theme.textTheme.bodyMedium,
                     textAlign: TextAlign.center,
-                    cursorColor: FFAppState().temaPrimary,
+                    cursorColor: theme.colorScheme.primary,
                     enableInteractiveSelection: true,
                     validator:
                         _model.textControllerValidator.asValidator(context),
@@ -198,7 +131,7 @@ class _PopupCategoriaWidgetState extends State<PopupCategoriaWidget> {
                 ),
                 FFButtonWidget(
                   onPressed: () async {
-                    await widget!.refCategoria!
+                    await widget.refCategoria!
                         .update(createCategoriesRecordData(
                       name: _model.textController.text,
                     ));
@@ -209,24 +142,10 @@ class _PopupCategoriaWidgetState extends State<PopupCategoriaWidget> {
                     width: 280.0,
                     height: 45.0,
                     padding:
-                        EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
+                        const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
                     iconPadding:
-                        EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
-                    color: FFAppState().temaPrimary,
-                    textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                          font: GoogleFonts.outfit(
-                            fontWeight: FontWeight.w500,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .titleSmall
-                                .fontStyle,
-                          ),
-                          color: FFAppState().temaPrimaryBackground,
-                          letterSpacing: 0.0,
-                          fontWeight: FontWeight.w500,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).titleSmall.fontStyle,
-                        ),
-                    elevation: 2.0,
+                        const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                    elevation: 0.0,
                     borderRadius: BorderRadius.circular(12.0),
                   ),
                 ),
@@ -236,19 +155,19 @@ class _PopupCategoriaWidgetState extends State<PopupCategoriaWidget> {
                           context: context,
                           builder: (alertDialogContext) {
                             return AlertDialog(
-                              title: Text('Attenzione!'),
-                              content: Text(
+                              title: const Text('Attenzione!'),
+                              content: const Text(
                                   'Sei sicuro di voler eliminare questa categoria? Verranno eliminati anche i piatti al suo interno!'),
                               actions: [
                                 TextButton(
                                   onPressed: () =>
                                       Navigator.pop(alertDialogContext, false),
-                                  child: Text('Annulla'),
+                                  child: const Text('Annulla'),
                                 ),
                                 TextButton(
                                   onPressed: () =>
                                       Navigator.pop(alertDialogContext, true),
-                                  child: Text('Si, conferma'),
+                                  child: const Text('Si, conferma'),
                                 ),
                               ],
                             );
@@ -259,7 +178,7 @@ class _PopupCategoriaWidgetState extends State<PopupCategoriaWidget> {
                       _model.piattiDaEliminare = await queryPiattiRecordOnce(
                         queryBuilder: (piattiRecord) => piattiRecord.where(
                           'Categoria',
-                          isEqualTo: widget!.refCategoria?.id,
+                          isEqualTo: widget.refCategoria?.id,
                         ),
                       );
                       for (int loop1Index = 0;
@@ -269,7 +188,7 @@ class _PopupCategoriaWidgetState extends State<PopupCategoriaWidget> {
                             _model.piattiDaEliminare![loop1Index];
                         await currentLoop1Item.reference.delete();
                       }
-                      await widget!.refCategoria!.delete();
+                      await widget.refCategoria!.delete();
                       Navigator.pop(context);
                       context.safePop();
                     }
@@ -281,32 +200,19 @@ class _PopupCategoriaWidgetState extends State<PopupCategoriaWidget> {
                     width: 280.0,
                     height: 45.0,
                     padding:
-                        EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
+                        const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
                     iconPadding:
-                        EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
-                    color: FFAppState().temaError,
-                    textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                          font: GoogleFonts.outfit(
-                            fontWeight: FlutterFlowTheme.of(context)
-                                .titleSmall
-                                .fontWeight,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .titleSmall
-                                .fontStyle,
-                          ),
-                          color: FFAppState().temaPrimaryBackground,
-                          letterSpacing: 0.0,
-                          fontWeight: FlutterFlowTheme.of(context)
-                              .titleSmall
-                              .fontWeight,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).titleSmall.fontStyle,
-                        ),
-                    elevation: 2.0,
+                        const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                    color: theme.colorScheme.error,
+                    textStyle: theme.textTheme.labelLarge?.copyWith(
+                      color: theme.colorScheme.onError,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    elevation: 0.0,
                     borderRadius: BorderRadius.circular(12.0),
                   ),
                 ),
-              ].divide(SizedBox(height: 16.0)),
+              ].divide(const SizedBox(height: 16.0)),
             ),
           ),
         ),

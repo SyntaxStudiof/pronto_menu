@@ -27,6 +27,12 @@ class MenuClienteModel extends FlutterFlowModel<MenuClienteWidget> {
 
   DocumentReference? categoriaSelezionataRef;
 
+  Set<String> filtriMagiciAttivi = {};
+  Set<String> allergeniEsclusi = {};
+
+  int get totalActiveFilters =>
+      filtriMagiciAttivi.length + allergeniEsclusi.length;
+
   ///  State fields for stateful widgets in this page.
 
   // Stores action output result for [Backend Call - Read Document] action in MenuCliente widget.

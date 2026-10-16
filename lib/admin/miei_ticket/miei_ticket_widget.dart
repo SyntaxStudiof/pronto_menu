@@ -1,13 +1,9 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'miei_ticket_model.dart';
 export 'miei_ticket_model.dart';
@@ -46,6 +42,7 @@ class _MieiTicketWidgetState extends State<MieiTicketWidget> {
   @override
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
+    final theme = Theme.of(context);
 
     return GestureDetector(
       onTap: () {
@@ -54,9 +51,9 @@ class _MieiTicketWidgetState extends State<MieiTicketWidget> {
       },
       child: Scaffold(
         key: scaffoldKey,
-        backgroundColor: FFAppState().temaPrimaryBackground,
+        backgroundColor: theme.scaffoldBackgroundColor,
         appBar: AppBar(
-          backgroundColor: FFAppState().temaPrimary,
+          backgroundColor: theme.appBarTheme.backgroundColor ?? theme.cardColor,
           automaticallyImplyLeading: false,
           leading: FlutterFlowIconButton(
             borderColor: Colors.transparent,
@@ -65,8 +62,8 @@ class _MieiTicketWidgetState extends State<MieiTicketWidget> {
             buttonSize: 60.0,
             icon: Icon(
               Icons.arrow_back_rounded,
-              color: FFAppState().temaPrimaryText,
-              size: 30.0,
+              color: theme.appBarTheme.foregroundColor ?? theme.iconTheme.color,
+              size: 24.0,
             ),
             onPressed: () async {
               context.pop();
@@ -75,25 +72,15 @@ class _MieiTicketWidgetState extends State<MieiTicketWidget> {
           title: Text(
             'Miei tickets',
             textAlign: TextAlign.center,
-            style: FlutterFlowTheme.of(context).headlineMedium.override(
-                  font: GoogleFonts.outfit(
-                    fontWeight:
-                        FlutterFlowTheme.of(context).headlineMedium.fontWeight,
-                    fontStyle:
-                        FlutterFlowTheme.of(context).headlineMedium.fontStyle,
-                  ),
-                  color: FFAppState().temaPrimaryText,
+            style: theme.appBarTheme.titleTextStyle ??
+                theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
                   fontSize: 22.0,
-                  letterSpacing: 0.0,
-                  fontWeight:
-                      FlutterFlowTheme.of(context).headlineMedium.fontWeight,
-                  fontStyle:
-                      FlutterFlowTheme.of(context).headlineMedium.fontStyle,
                 ),
           ),
-          actions: [],
+          actions: const [],
           centerTitle: true,
-          elevation: 2.0,
+          elevation: theme.appBarTheme.elevation ?? 2.0,
         ),
         body: SafeArea(
           top: true,
@@ -120,7 +107,7 @@ class _MieiTicketWidgetState extends State<MieiTicketWidget> {
                           width: 50.0,
                           height: 50.0,
                           child: SpinKitPulse(
-                            color: FlutterFlowTheme.of(context).primary,
+                            color: theme.colorScheme.primary,
                             size: 50.0,
                           ),
                         ),
@@ -128,6 +115,78 @@ class _MieiTicketWidgetState extends State<MieiTicketWidget> {
                     }
                     List<TicketsRecord> listViewTicketsRecordList =
                         snapshot.data!;
+
+                    if (listViewTicketsRecordList.isEmpty) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24.0,
+                          vertical: 48.0,
+                        ),
+                        child: Center(
+                          child: Container(
+                            width: double.infinity,
+                            constraints: const BoxConstraints(maxWidth: 420.0),
+                            padding: const EdgeInsets.all(28.0),
+                            decoration: BoxDecoration(
+                              color: theme.cardColor,
+                              borderRadius: BorderRadius.circular(24.0),
+                              border: Border.all(
+                                color:
+                                    theme.dividerColor.withValues(alpha: 0.15),
+                                width: 1.0,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 16.0,
+                                  color: Colors.black.withValues(alpha: 0.04),
+                                  offset: const Offset(0.0, 4.0),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 76.0,
+                                  height: 76.0,
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.primary
+                                        .withValues(alpha: 0.12),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Icon(
+                                    Icons.chat_bubble_outline_rounded,
+                                    color: theme.colorScheme.primary,
+                                    size: 36.0,
+                                  ),
+                                ),
+                                const SizedBox(height: 20.0),
+                                Text(
+                                  'Nessun ticket inviato',
+                                  textAlign: TextAlign.center,
+                                  style: theme.textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 19.0,
+                                    letterSpacing: -0.3,
+                                  ),
+                                ),
+                                const SizedBox(height: 8.0),
+                                Text(
+                                  'Non hai ancora inviato nessuna richiesta di assistenza. Se hai bisogno di aiuto o riscontri un problema, puoi aprire un nuovo ticket.',
+                                  textAlign: TextAlign.center,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: theme.hintColor,
+                                    height: 1.5,
+                                    fontSize: 14.0,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    }
 
                     return ListView.builder(
                       padding: EdgeInsets.zero,
@@ -139,11 +198,11 @@ class _MieiTicketWidgetState extends State<MieiTicketWidget> {
                         final listViewTicketsRecord =
                             listViewTicketsRecordList[listViewIndex];
                         return Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
                               16.0, 16.0, 16.0, 0.0),
                           child: Card(
                             clipBehavior: Clip.antiAliasWithSaveLayer,
-                            color: FFAppState().temaSecondaryBackground,
+                            color: theme.cardColor,
                             elevation: 2.0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12.0),
@@ -152,99 +211,42 @@ class _MieiTicketWidgetState extends State<MieiTicketWidget> {
                               mainAxisSize: MainAxisSize.max,
                               children: [
                                 Padding(
-                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
                                       0.0, 10.0, 0.0, 0.0),
                                   child: Text(
                                     listViewTicketsRecord.titolo,
-                                    style: FlutterFlowTheme.of(context)
-                                        .titleMedium
-                                        .override(
-                                          font: GoogleFonts.outfit(
-                                            fontWeight: FontWeight.bold,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .titleMedium
-                                                    .fontStyle,
-                                          ),
-                                          color: FFAppState().temaPrimaryText,
-                                          fontSize: 18.0,
-                                          letterSpacing: 0.0,
-                                          fontWeight: FontWeight.bold,
-                                          fontStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .titleMedium
-                                                  .fontStyle,
-                                        ),
+                                    style: theme.textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18.0,
+                                    ),
                                   ),
                                 ),
                                 Text(
                                   listViewTicketsRecord.descrizione,
-                                  style: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .override(
-                                        font: GoogleFonts.openSans(
-                                          fontWeight: FontWeight.w500,
-                                          fontStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyMedium
-                                                  .fontStyle,
-                                        ),
-                                        color: FFAppState().temaPrimaryText,
-                                        letterSpacing: 0.0,
-                                        fontWeight: FontWeight.w500,
-                                        fontStyle: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .fontStyle,
-                                      ),
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                                 Text(
                                   listViewTicketsRecord.stato,
-                                  style: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .override(
-                                        font: GoogleFonts.openSans(
-                                          fontWeight: FontWeight.w500,
-                                          fontStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyMedium
-                                                  .fontStyle,
-                                        ),
-                                        color: FFAppState().temaPrimary,
-                                        letterSpacing: 0.0,
-                                        fontWeight: FontWeight.w500,
-                                        fontStyle: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .fontStyle,
-                                      ),
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: theme.colorScheme.primary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                                 if (listViewTicketsRecord.stato == 'Risolto')
                                   Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                    padding: const EdgeInsetsDirectional.fromSTEB(
                                         0.0, 0.0, 0.0, 10.0),
                                     child: Text(
                                       listViewTicketsRecord.rispostaAdmin,
-                                      style: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .override(
-                                            font: GoogleFonts.openSans(
-                                              fontWeight: FontWeight.w500,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .fontStyle,
-                                            ),
-                                            color: FFAppState().temaSecondary,
-                                            fontSize: 16.0,
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.w500,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .bodyMedium
-                                                    .fontStyle,
-                                          ),
+                                      style: theme.textTheme.bodyMedium?.copyWith(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 16.0,
+                                      ),
                                     ),
                                   ),
-                              ].divide(SizedBox(height: 12.0)),
+                              ].divide(const SizedBox(height: 12.0)),
                             ),
                           ),
                         );

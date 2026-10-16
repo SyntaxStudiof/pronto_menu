@@ -2,16 +2,12 @@ import '/auth/firebase_auth/auth_util.dart';
 import '/backend/api_requests/api_calls.dart';
 import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'dart:ui';
 import '/index.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'supporto_ristoratore_model.dart';
 export 'supporto_ristoratore_model.dart';
@@ -63,6 +59,7 @@ class _SupportoRistoratoreWidgetState extends State<SupportoRistoratoreWidget> {
   @override
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
+    final theme = Theme.of(context);
 
     return GestureDetector(
       onTap: () {
@@ -71,9 +68,9 @@ class _SupportoRistoratoreWidgetState extends State<SupportoRistoratoreWidget> {
       },
       child: Scaffold(
         key: scaffoldKey,
-        backgroundColor: FFAppState().temaPrimaryBackground,
+        backgroundColor: theme.scaffoldBackgroundColor,
         appBar: AppBar(
-          backgroundColor: FFAppState().temaSecondaryBackground,
+          backgroundColor: theme.appBarTheme.backgroundColor ?? theme.cardColor,
           automaticallyImplyLeading: false,
           leading: FlutterFlowIconButton(
             borderColor: Colors.transparent,
@@ -82,7 +79,7 @@ class _SupportoRistoratoreWidgetState extends State<SupportoRistoratoreWidget> {
             buttonSize: 40.0,
             icon: Icon(
               Icons.arrow_back_rounded,
-              color: FFAppState().temaPrimaryText,
+              color: theme.appBarTheme.foregroundColor ?? theme.iconTheme.color,
               size: 24.0,
             ),
             onPressed: () async {
@@ -90,12 +87,12 @@ class _SupportoRistoratoreWidgetState extends State<SupportoRistoratoreWidget> {
                 HomeRistoratoreWidget.routeName,
                 queryParameters: {
                   'ristoranteRef': serializeParam(
-                    widget!.ristoranteRef,
+                    widget.ristoranteRef,
                     ParamType.DocumentReference,
                   ),
                 }.withoutNulls,
                 extra: <String, dynamic>{
-                  '__transition_info__': TransitionInfo(
+                  '__transition_info__': const TransitionInfo(
                     hasTransition: true,
                     transitionType: PageTransitionType.leftToRight,
                   ),
@@ -103,31 +100,45 @@ class _SupportoRistoratoreWidgetState extends State<SupportoRistoratoreWidget> {
               );
             },
           ),
-          title: Text(
-            'Supporto',
-            style: FlutterFlowTheme.of(context).titleSmall.override(
-                  font: GoogleFonts.outfit(
-                    fontWeight:
-                        FlutterFlowTheme.of(context).titleSmall.fontWeight,
-                    fontStyle:
-                        FlutterFlowTheme.of(context).titleSmall.fontStyle,
-                  ),
-                  color: FFAppState().temaPrimaryText,
-                  fontSize: 22.0,
-                  letterSpacing: 0.0,
-                  fontWeight:
-                      FlutterFlowTheme.of(context).titleSmall.fontWeight,
-                  fontStyle: FlutterFlowTheme.of(context).titleSmall.fontStyle,
+          title: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 36.0,
+                height: 36.0,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10.0),
                 ),
+                alignment: Alignment.center,
+                child: Icon(
+                  Icons.help_outline_rounded,
+                  color: theme.colorScheme.primary,
+                  size: 20.0,
+                ),
+              ),
+              const SizedBox(width: 10.0),
+              Text(
+                'Supporto',
+                style: theme.appBarTheme.titleTextStyle ??
+                    theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20.0,
+                      letterSpacing: -0.4,
+                    ),
+              ),
+            ],
           ),
-          actions: [],
           centerTitle: true,
-          elevation: 2.0,
+          actions: const [
+            SizedBox(width: 48.0),
+          ],
+          elevation: 0.0,
         ),
         body: SafeArea(
           top: true,
           child: Align(
-            alignment: AlignmentDirectional(0.0, -1.0),
+            alignment: const AlignmentDirectional(0.0, -1.0),
             child: SingleChildScrollView(
               controller: _model.columnController1,
               child: Column(
@@ -136,57 +147,32 @@ class _SupportoRistoratoreWidgetState extends State<SupportoRistoratoreWidget> {
                 children: [
                   Padding(
                     padding:
-                        EdgeInsetsDirectional.fromSTEB(0.0, 10.0, 0.0, 10.0),
+                        const EdgeInsetsDirectional.fromSTEB(0.0, 10.0, 0.0, 10.0),
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                           'Crea nuovo ticket',
-                          style:
-                              FlutterFlowTheme.of(context).bodyMedium.override(
-                                    font: GoogleFonts.openSans(
-                                      fontWeight: FontWeight.bold,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
-                                    color: FFAppState().temaPrimaryText,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FontWeight.bold,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                  ),
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         Switch.adaptive(
                           value: _model.switchValue!,
                           onChanged: (newValue) async {
-                            safeSetState(() => _model.switchValue = newValue!);
+                            safeSetState(() => _model.switchValue = newValue);
                           },
-                          activeColor: FFAppState().temaPrimary,
-                          activeTrackColor: FFAppState().temaAccent1,
-                          inactiveTrackColor: FFAppState().temaAlternate,
-                          inactiveThumbColor:
-                              FFAppState().temaSecondaryBackground,
+                          activeColor: theme.colorScheme.primary,
+                          activeTrackColor: theme.colorScheme.primary.withValues(alpha: 0.38),
+                          inactiveTrackColor: theme.dividerColor,
+                          inactiveThumbColor: theme.cardColor,
                         ),
                         Text(
                           'Visualizza i ticket',
-                          style:
-                              FlutterFlowTheme.of(context).bodyMedium.override(
-                                    font: GoogleFonts.openSans(
-                                      fontWeight: FontWeight.bold,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
-                                    color: FFAppState().temaPrimaryText,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FontWeight.bold,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                  ),
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
@@ -195,7 +181,7 @@ class _SupportoRistoratoreWidgetState extends State<SupportoRistoratoreWidget> {
                     width: 300.0,
                     child: Divider(
                       thickness: 2.0,
-                      color: FFAppState().temaAlternate,
+                      color: theme.dividerColor,
                     ),
                   ),
                   if (_model.switchValue == false)
@@ -205,104 +191,37 @@ class _SupportoRistoratoreWidgetState extends State<SupportoRistoratoreWidget> {
                         RichText(
                           textScaler: MediaQuery.of(context).textScaler,
                           text: TextSpan(
+                            style: theme.textTheme.bodyMedium,
                             children: [
                               TextSpan(
                                 text: 'Compila ',
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      font: GoogleFonts.openSans(
-                                        fontWeight: FontWeight.bold,
-                                        fontStyle: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .fontStyle,
-                                      ),
-                                      color: FFAppState().temaPrimaryText,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.bold,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                               TextSpan(
                                 text: 'i campi sottostanti e ',
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      font: GoogleFonts.openSans(
-                                        fontWeight: FontWeight.w500,
-                                        fontStyle: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .fontStyle,
-                                      ),
-                                      color: FFAppState().temaPrimaryText,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.w500,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                               TextSpan(
                                 text: 'invia ',
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      font: GoogleFonts.openSans(
-                                        fontWeight: FontWeight.bold,
-                                        fontStyle: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .fontStyle,
-                                      ),
-                                      color: FFAppState().temaPrimaryText,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.bold,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                               TextSpan(
                                 text: 'la tua richiesta',
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      font: GoogleFonts.openSans(
-                                        fontWeight: FontWeight.w500,
-                                        fontStyle: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .fontStyle,
-                                      ),
-                                      color: FFAppState().temaPrimaryText,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.w500,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                ),
                               )
                             ],
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  font: GoogleFonts.openSans(
-                                    fontWeight: FontWeight.w500,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                  ),
-                                  color: FFAppState().temaPrimaryText,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FontWeight.w500,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .fontStyle,
-                                ),
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        Container(
+                        SizedBox(
                           width: 300.0,
                           child: TextFormField(
                             controller: _model.titoloTicketTextController,
@@ -312,106 +231,52 @@ class _SupportoRistoratoreWidgetState extends State<SupportoRistoratoreWidget> {
                             obscureText: false,
                             decoration: InputDecoration(
                               isDense: true,
-                              labelStyle: FlutterFlowTheme.of(context)
-                                  .labelMedium
-                                  .override(
-                                    font: GoogleFonts.openSans(
-                                      fontWeight: FlutterFlowTheme.of(context)
-                                          .labelMedium
-                                          .fontWeight,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .labelMedium
-                                          .fontStyle,
-                                    ),
-                                    color: FFAppState().temaSecondaryText,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .labelMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .labelMedium
-                                        .fontStyle,
-                                  ),
+                              labelText: 'Oggetto del problema',
+                              labelStyle: theme.textTheme.labelMedium,
                               hintText: 'Oggetto del problema',
-                              hintStyle: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .override(
-                                    font: GoogleFonts.openSans(
-                                      fontWeight: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontWeight,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
-                                    color: FFAppState().temaSecondaryText,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                  ),
+                              hintStyle: theme.textTheme.labelMedium?.copyWith(
+                                color: theme.hintColor,
+                              ),
                               enabledBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: FFAppState().temaSecondary,
+                                  color: theme.dividerColor,
                                   width: 1.0,
                                 ),
                                 borderRadius: BorderRadius.circular(12.0),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: FFAppState().temaPrimary,
-                                  width: 1.0,
+                                  color: theme.colorScheme.primary,
+                                  width: 1.5,
                                 ),
                                 borderRadius: BorderRadius.circular(12.0),
                               ),
                               errorBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: FFAppState().temaError,
+                                  color: theme.colorScheme.error,
                                   width: 1.0,
                                 ),
                                 borderRadius: BorderRadius.circular(12.0),
                               ),
                               focusedErrorBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: FFAppState().temaError,
-                                  width: 1.0,
+                                  color: theme.colorScheme.error,
+                                  width: 1.5,
                                 ),
                                 borderRadius: BorderRadius.circular(12.0),
                               ),
                               filled: true,
-                              fillColor: FFAppState().temaSecondaryBackground,
+                              fillColor: theme.cardColor,
                             ),
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  font: GoogleFonts.openSans(
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                  ),
-                                  color: FFAppState().temaPrimaryText,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .fontStyle,
-                                ),
-                            cursorColor: FFAppState().temaPrimary,
+                            style: theme.textTheme.bodyMedium,
+                            cursorColor: theme.colorScheme.primary,
                             enableInteractiveSelection: true,
                             validator: _model
                                 .titoloTicketTextControllerValidator
                                 .asValidator(context),
                           ),
                         ),
-                        Container(
+                        SizedBox(
                           width: 300.0,
                           child: TextFormField(
                             controller: _model.descrizioneTicketTextController,
@@ -421,100 +286,46 @@ class _SupportoRistoratoreWidgetState extends State<SupportoRistoratoreWidget> {
                             obscureText: false,
                             decoration: InputDecoration(
                               isDense: true,
-                              labelStyle: FlutterFlowTheme.of(context)
-                                  .labelMedium
-                                  .override(
-                                    font: GoogleFonts.openSans(
-                                      fontWeight: FlutterFlowTheme.of(context)
-                                          .labelMedium
-                                          .fontWeight,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .labelMedium
-                                          .fontStyle,
-                                    ),
-                                    color: FFAppState().temaSecondaryText,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .labelMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .labelMedium
-                                        .fontStyle,
-                                  ),
+                              labelText: 'Descrivi il problema',
+                              labelStyle: theme.textTheme.labelMedium,
                               hintText: 'Descrivi il problema nel dettaglio...',
-                              hintStyle: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .override(
-                                    font: GoogleFonts.openSans(
-                                      fontWeight: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontWeight,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
-                                    color: FFAppState().temaSecondaryText,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                  ),
+                              hintStyle: theme.textTheme.labelMedium?.copyWith(
+                                color: theme.hintColor,
+                              ),
                               enabledBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: FFAppState().temaSecondary,
+                                  color: theme.dividerColor,
                                   width: 1.0,
                                 ),
                                 borderRadius: BorderRadius.circular(12.0),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: FFAppState().temaPrimary,
-                                  width: 1.0,
+                                  color: theme.colorScheme.primary,
+                                  width: 1.5,
                                 ),
                                 borderRadius: BorderRadius.circular(12.0),
                               ),
                               errorBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: FFAppState().temaError,
+                                  color: theme.colorScheme.error,
                                   width: 1.0,
                                 ),
                                 borderRadius: BorderRadius.circular(12.0),
                               ),
                               focusedErrorBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                  color: FFAppState().temaError,
-                                  width: 1.0,
+                                  color: theme.colorScheme.error,
+                                  width: 1.5,
                                 ),
                                 borderRadius: BorderRadius.circular(12.0),
                               ),
                               filled: true,
-                              fillColor: FFAppState().temaSecondaryBackground,
+                              fillColor: theme.cardColor,
                             ),
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  font: GoogleFonts.openSans(
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                  ),
-                                  color: FFAppState().temaPrimaryText,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .fontStyle,
-                                ),
+                            style: theme.textTheme.bodyMedium,
                             maxLines: 5,
-                            cursorColor: FFAppState().temaPrimary,
+                            cursorColor: theme.colorScheme.primary,
                             enableInteractiveSelection: true,
                             validator: _model
                                 .descrizioneTicketTextControllerValidator
@@ -543,32 +354,13 @@ class _SupportoRistoratoreWidgetState extends State<SupportoRistoratoreWidget> {
                               SnackBar(
                                 content: Text(
                                   'Ticket inviato con successo! Ti risponderemo per email a breve.',
-                                  style: FlutterFlowTheme.of(context)
-                                      .titleSmall
-                                      .override(
-                                        font: GoogleFonts.outfit(
-                                          fontWeight:
-                                              FlutterFlowTheme.of(context)
-                                                  .titleSmall
-                                                  .fontWeight,
-                                          fontStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .titleSmall
-                                                  .fontStyle,
-                                        ),
-                                        color:
-                                            FFAppState().temaPrimaryBackground,
-                                        letterSpacing: 0.0,
-                                        fontWeight: FlutterFlowTheme.of(context)
-                                            .titleSmall
-                                            .fontWeight,
-                                        fontStyle: FlutterFlowTheme.of(context)
-                                            .titleSmall
-                                            .fontStyle,
-                                      ),
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: theme.colorScheme.onPrimary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
-                                duration: Duration(milliseconds: 4000),
-                                backgroundColor: FFAppState().temaPrimary,
+                                duration: const Duration(milliseconds: 4000),
+                                backgroundColor: theme.colorScheme.primary,
                               ),
                             );
                             safeSetState(() {
@@ -580,36 +372,22 @@ class _SupportoRistoratoreWidgetState extends State<SupportoRistoratoreWidget> {
                           options: FFButtonOptions(
                             width: 280.0,
                             height: 45.0,
-                            padding: EdgeInsetsDirectional.fromSTEB(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
                                 16.0, 0.0, 16.0, 0.0),
-                            iconPadding: EdgeInsetsDirectional.fromSTEB(
+                            iconPadding: const EdgeInsetsDirectional.fromSTEB(
                                 0.0, 0.0, 0.0, 0.0),
-                            color: FFAppState().temaPrimary,
-                            textStyle: FlutterFlowTheme.of(context)
-                                .titleSmall
-                                .override(
-                                  font: GoogleFonts.outfit(
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .titleSmall
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .titleSmall
-                                        .fontStyle,
-                                  ),
-                                  color: FFAppState().temaPrimaryBackground,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FlutterFlowTheme.of(context)
-                                      .titleSmall
-                                      .fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .titleSmall
-                                      .fontStyle,
-                                ),
+                            color: theme.colorScheme.primary,
+                            textStyle: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 15.0,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.3,
+                            ),
                             elevation: 2.0,
                             borderRadius: BorderRadius.circular(12.0),
                           ),
                         ),
-                      ].divide(SizedBox(height: 12.0)),
+                      ].divide(const SizedBox(height: 12.0)),
                     ),
                   if (_model.switchValue == true)
                     SingleChildScrollView(
@@ -635,8 +413,7 @@ class _SupportoRistoratoreWidgetState extends State<SupportoRistoratoreWidget> {
                                     width: 50.0,
                                     height: 50.0,
                                     child: SpinKitPulse(
-                                      color:
-                                          FlutterFlowTheme.of(context).primary,
+                                      color: theme.colorScheme.primary,
                                       size: 50.0,
                                     ),
                                   ),
@@ -655,12 +432,11 @@ class _SupportoRistoratoreWidgetState extends State<SupportoRistoratoreWidget> {
                                   final listViewTicketsRecord =
                                       listViewTicketsRecordList[listViewIndex];
                                   return Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                    padding: const EdgeInsetsDirectional.fromSTEB(
                                         16.0, 16.0, 16.0, 0.0),
                                     child: Card(
                                       clipBehavior: Clip.antiAliasWithSaveLayer,
-                                      color:
-                                          FFAppState().temaSecondaryBackground,
+                                      color: theme.cardColor,
                                       elevation: 2.0,
                                       shape: RoundedRectangleBorder(
                                         borderRadius:
@@ -671,136 +447,59 @@ class _SupportoRistoratoreWidgetState extends State<SupportoRistoratoreWidget> {
                                         children: [
                                           Padding(
                                             padding:
-                                                EdgeInsetsDirectional.fromSTEB(
+                                                const EdgeInsetsDirectional.fromSTEB(
                                                     0.0, 10.0, 0.0, 0.0),
                                             child: Text(
                                               listViewTicketsRecord.titolo,
-                                              style: FlutterFlowTheme.of(
-                                                      context)
-                                                  .titleMedium
-                                                  .override(
-                                                    font: GoogleFonts.outfit(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontStyle:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .titleMedium
-                                                              .fontStyle,
-                                                    ),
-                                                    color: FFAppState()
-                                                        .temaPrimaryText,
-                                                    fontSize: 18.0,
-                                                    letterSpacing: 0.0,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontStyle:
-                                                        FlutterFlowTheme.of(
-                                                                context)
-                                                            .titleMedium
-                                                            .fontStyle,
-                                                  ),
+                                              style: theme.textTheme.titleMedium?.copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 18.0,
+                                              ),
                                             ),
                                           ),
                                           Text(
                                             listViewTicketsRecord.descrizione,
-                                            style: FlutterFlowTheme.of(context)
-                                                .bodyMedium
-                                                .override(
-                                                  font: GoogleFonts.openSans(
-                                                    fontWeight: FontWeight.w500,
-                                                    fontStyle:
-                                                        FlutterFlowTheme.of(
-                                                                context)
-                                                            .bodyMedium
-                                                            .fontStyle,
-                                                  ),
-                                                  color: FFAppState()
-                                                      .temaPrimaryText,
-                                                  letterSpacing: 0.0,
-                                                  fontWeight: FontWeight.w500,
-                                                  fontStyle:
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .bodyMedium
-                                                          .fontStyle,
-                                                ),
+                                            style: theme.textTheme.bodyMedium?.copyWith(
+                                              fontWeight: FontWeight.w500,
+                                            ),
                                           ),
                                           SizedBox(
                                             width: 200.0,
                                             child: Divider(
                                               thickness: 2.0,
-                                              color: FFAppState().temaAlternate,
+                                              color: theme.dividerColor,
                                             ),
                                           ),
                                           Text(
                                             listViewTicketsRecord.stato,
-                                            style: FlutterFlowTheme.of(context)
-                                                .bodyMedium
-                                                .override(
-                                                  font: GoogleFonts.openSans(
-                                                    fontWeight: FontWeight.w500,
-                                                    fontStyle:
-                                                        FlutterFlowTheme.of(
-                                                                context)
-                                                            .bodyMedium
-                                                            .fontStyle,
-                                                  ),
-                                                  color:
-                                                      FFAppState().temaPrimary,
-                                                  letterSpacing: 0.0,
-                                                  fontWeight: FontWeight.w500,
-                                                  fontStyle:
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .bodyMedium
-                                                          .fontStyle,
-                                                ),
+                                            style: theme.textTheme.bodyMedium?.copyWith(
+                                              color: theme.colorScheme.primary,
+                                              fontWeight: FontWeight.w600,
+                                            ),
                                           ),
                                           SizedBox(
                                             width: 200.0,
                                             child: Divider(
                                               thickness: 2.0,
-                                              color: FFAppState().temaAlternate,
+                                              color: theme.dividerColor,
                                             ),
                                           ),
                                           if (listViewTicketsRecord.stato ==
                                               'Risolto')
                                             Padding(
-                                              padding: EdgeInsetsDirectional
+                                              padding: const EdgeInsetsDirectional
                                                   .fromSTEB(
                                                       0.0, 0.0, 0.0, 10.0),
                                               child: Text(
                                                 listViewTicketsRecord
                                                     .rispostaAdmin,
-                                                style: FlutterFlowTheme.of(
-                                                        context)
-                                                    .bodyMedium
-                                                    .override(
-                                                      font:
-                                                          GoogleFonts.openSans(
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        fontStyle:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyMedium
-                                                                .fontStyle,
-                                                      ),
-                                                      color: FFAppState()
-                                                          .temaTertiary,
-                                                      fontSize: 16.0,
-                                                      letterSpacing: 0.0,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      fontStyle:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyMedium
-                                                              .fontStyle,
-                                                    ),
+                                                style: theme.textTheme.bodyMedium?.copyWith(
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 16.0,
+                                                ),
                                               ),
                                             ),
-                                        ].divide(SizedBox(height: 12.0)),
+                                        ].divide(const SizedBox(height: 12.0)),
                                       ),
                                     ),
                                   );

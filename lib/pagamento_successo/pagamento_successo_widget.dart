@@ -1,17 +1,10 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
-import 'dart:ui';
 import '/index.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-import 'package:provider/provider.dart';
 import 'pagamento_successo_model.dart';
 export 'pagamento_successo_model.dart';
 
@@ -43,15 +36,17 @@ class _PagamentoSuccessoWidgetState extends State<PagamentoSuccessoWidget> {
         haUsatoProva: true,
       ));
 
-      context.pushNamed(
-        HomeRistoratoreWidget.routeName,
-        queryParameters: {
-          'ristoranteRef': serializeParam(
-            currentUserReference,
-            ParamType.DocumentReference,
-          ),
-        }.withoutNulls,
-      );
+      if (mounted) {
+        context.pushNamed(
+          HomeRistoratoreWidget.routeName,
+          queryParameters: {
+            'ristoranteRef': serializeParam(
+              currentUserReference,
+              ParamType.DocumentReference,
+            ),
+          }.withoutNulls,
+        );
+      }
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) => safeSetState(() {}));
@@ -66,6 +61,8 @@ class _PagamentoSuccessoWidgetState extends State<PagamentoSuccessoWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
@@ -73,31 +70,21 @@ class _PagamentoSuccessoWidgetState extends State<PagamentoSuccessoWidget> {
       },
       child: Scaffold(
         key: scaffoldKey,
-        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+        backgroundColor: theme.scaffoldBackgroundColor,
         body: SafeArea(
           top: true,
           child: Align(
-            alignment: AlignmentDirectional(0.0, 0.0),
+            alignment: const AlignmentDirectional(0.0, 0.0),
             child: Column(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   'Pagamento andato a buon fine!\nStiamo sbloccando il tuo menu...',
-                  style: FlutterFlowTheme.of(context).bodyMedium.override(
-                        font: GoogleFonts.openSans(
-                          fontWeight: FlutterFlowTheme.of(context)
-                              .bodyMedium
-                              .fontWeight,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                        ),
-                        letterSpacing: 0.0,
-                        fontWeight:
-                            FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                        fontStyle:
-                            FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                      ),
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 CircularPercentIndicator(
                   percent: 1.0,
@@ -105,30 +92,16 @@ class _PagamentoSuccessoWidgetState extends State<PagamentoSuccessoWidget> {
                   lineWidth: 12.0,
                   animation: true,
                   animateFromLastPercent: true,
-                  progressColor: FlutterFlowTheme.of(context).primary,
-                  backgroundColor: FlutterFlowTheme.of(context).accent4,
+                  progressColor: theme.colorScheme.primary,
+                  backgroundColor: theme.dividerColor,
                   center: Text(
                     '100%',
-                    style: FlutterFlowTheme.of(context).headlineSmall.override(
-                          font: GoogleFonts.outfit(
-                            fontWeight: FlutterFlowTheme.of(context)
-                                .headlineSmall
-                                .fontWeight,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .headlineSmall
-                                .fontStyle,
-                          ),
-                          letterSpacing: 0.0,
-                          fontWeight: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .fontWeight,
-                          fontStyle: FlutterFlowTheme.of(context)
-                              .headlineSmall
-                              .fontStyle,
-                        ),
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ].divide(SizedBox(height: 20.0)),
+              ].divide(const SizedBox(height: 20.0)),
             ),
           ),
         ),

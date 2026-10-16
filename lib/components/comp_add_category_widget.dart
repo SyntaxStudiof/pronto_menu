@@ -1,13 +1,8 @@
-import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'comp_add_category_model.dart';
 export 'comp_add_category_model.dart';
@@ -54,12 +49,13 @@ class _CompAddCategoryWidgetState extends State<CompAddCategoryWidget> {
   @override
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
+    final theme = Theme.of(context);
 
     return Container(
       width: MediaQuery.sizeOf(context).width * 1.0,
       height: 300.0,
       decoration: BoxDecoration(
-        color: FFAppState().temaSecondary,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(20.0),
       ),
       child: Padding(
@@ -70,12 +66,12 @@ class _CompAddCategoryWidgetState extends State<CompAddCategoryWidget> {
             mainAxisSize: MainAxisSize.max,
             children: [
               Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 15.0),
+                padding: EdgeInsetsDirectional.fromSTEB(0.0, 12.0, 0.0, 15.0),
                 child: Container(
-                  width: 50.0,
-                  height: 5.0,
+                  width: 40.0,
+                  height: 4.0,
                   decoration: BoxDecoration(
-                    color: FFAppState().temaAccent3,
+                    color: theme.dividerColor.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(10.0),
                   ),
                 ),
@@ -83,20 +79,9 @@ class _CompAddCategoryWidgetState extends State<CompAddCategoryWidget> {
               Text(
                 'Nuova Categoria',
                 textAlign: TextAlign.center,
-                style: FlutterFlowTheme.of(context).titleLarge.override(
-                      font: GoogleFonts.outfit(
-                        fontWeight:
-                            FlutterFlowTheme.of(context).titleLarge.fontWeight,
-                        fontStyle:
-                            FlutterFlowTheme.of(context).titleLarge.fontStyle,
-                      ),
-                      color: FFAppState().temaPrimaryText,
-                      letterSpacing: 0.0,
-                      fontWeight:
-                          FlutterFlowTheme.of(context).titleLarge.fontWeight,
-                      fontStyle:
-                          FlutterFlowTheme.of(context).titleLarge.fontStyle,
-                    ),
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               Padding(
                 padding: EdgeInsetsDirectional.fromSTEB(0.0, 20.0, 0.0, 0.0),
@@ -110,94 +95,43 @@ class _CompAddCategoryWidgetState extends State<CompAddCategoryWidget> {
                     obscureText: false,
                     decoration: InputDecoration(
                       isDense: true,
-                      labelStyle:
-                          FlutterFlowTheme.of(context).labelMedium.override(
-                                font: GoogleFonts.openSans(
-                                  fontWeight: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .fontStyle,
-                                ),
-                                color: FFAppState().temaSecondaryText,
-                                letterSpacing: 0.0,
-                                fontWeight: FlutterFlowTheme.of(context)
-                                    .labelMedium
-                                    .fontWeight,
-                                fontStyle: FlutterFlowTheme.of(context)
-                                    .labelMedium
-                                    .fontStyle,
-                              ),
                       hintText: 'Es. Pizze, Bevande, Antipasti',
-                      hintStyle:
-                          FlutterFlowTheme.of(context).bodyMedium.override(
-                                font: GoogleFonts.openSans(
-                                  fontWeight: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .fontStyle,
-                                ),
-                                color: FFAppState().temaSecondaryText,
-                                letterSpacing: 0.0,
-                                fontWeight: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .fontWeight,
-                                fontStyle: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .fontStyle,
-                              ),
+                      hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.hintColor,
+                      ),
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: FFAppState().temaSecondary,
+                          color: theme.dividerColor.withValues(alpha: 0.2),
                           width: 1.0,
                         ),
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: FFAppState().temaPrimary,
-                          width: 1.0,
+                          color: theme.colorScheme.primary,
+                          width: 1.5,
                         ),
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       errorBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: FFAppState().temaError,
+                          color: theme.colorScheme.error,
                           width: 1.0,
                         ),
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       focusedErrorBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: FFAppState().temaError,
-                          width: 1.0,
+                          color: theme.colorScheme.error,
+                          width: 1.5,
                         ),
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       filled: true,
-                      fillColor: FFAppState().temaSecondaryBackground,
+                      fillColor: theme.scaffoldBackgroundColor,
                     ),
-                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                          font: GoogleFonts.openSans(
-                            fontWeight: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .fontWeight,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .fontStyle,
-                          ),
-                          color: FFAppState().temaPrimaryText,
-                          letterSpacing: 0.0,
-                          fontWeight: FlutterFlowTheme.of(context)
-                              .bodyMedium
-                              .fontWeight,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                        ),
-                    cursorColor: FFAppState().temaPrimary,
+                    style: theme.textTheme.bodyMedium,
+                    cursorColor: theme.colorScheme.primary,
                     enableInteractiveSelection: true,
                     validator: _model.textFieldTextControllerValidator
                         .asValidator(context),
@@ -213,7 +147,7 @@ class _CompAddCategoryWidgetState extends State<CompAddCategoryWidget> {
                         .set(createCategoriesRecordData(
                           name: _model.textFieldTextController.text,
                           createdAt: getCurrentTimestamp,
-                          proprietario: widget!.ristoranteRef,
+                          proprietario: widget.ristoranteRef,
                           ordineCategoria: 99,
                         ));
                     Navigator.pop(context);
@@ -226,25 +160,7 @@ class _CompAddCategoryWidgetState extends State<CompAddCategoryWidget> {
                         EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
                     iconPadding:
                         EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
-                    color: FFAppState().temaPrimary,
-                    textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                          font: GoogleFonts.outfit(
-                            fontWeight: FlutterFlowTheme.of(context)
-                                .titleSmall
-                                .fontWeight,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .titleSmall
-                                .fontStyle,
-                          ),
-                          color: FFAppState().temaPrimaryBackground,
-                          letterSpacing: 0.0,
-                          fontWeight: FlutterFlowTheme.of(context)
-                              .titleSmall
-                              .fontWeight,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).titleSmall.fontStyle,
-                        ),
-                    elevation: 2.0,
+                    elevation: 0.0,
                     borderRadius: BorderRadius.circular(12.0),
                   ),
                 ),

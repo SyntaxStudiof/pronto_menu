@@ -66,6 +66,21 @@ class PiattiRecord extends FirestoreRecord {
   DocumentReference? get sottocategoriaRef => _sottocategoriaRef;
   bool hasSottocategoriaRef() => _sottocategoriaRef != null;
 
+  // "allergeni" field.
+  List<String>? _allergeni;
+  List<String> get allergeni => _allergeni ?? const [];
+  bool hasAllergeni() => _allergeni != null;
+
+  // "intolleranze" field (Filtri magici).
+  List<String>? _intolleranze;
+  List<String> get intolleranze => _intolleranze ?? const [];
+  bool hasIntolleranze() => _intolleranze != null;
+
+  // "traduzioni" field (Mappa traduzioni per lingua: en, fr, de, es).
+  Map<String, dynamic>? _traduzioni;
+  Map<String, dynamic> get traduzioni => _traduzioni ?? const {};
+  bool hasTraduzioni() => _traduzioni != null;
+
   void _initializeFields() {
     _nome = snapshotData['Nome'] as String?;
     _prezzo = castToType<double>(snapshotData['Prezzo']);
@@ -78,6 +93,9 @@ class PiattiRecord extends FirestoreRecord {
     _dataCestinamento = snapshotData['dataCestinamento'] as DateTime?;
     _sottocategoriaRef =
         snapshotData['sottocategoria_ref'] as DocumentReference?;
+    _allergeni = getDataList(snapshotData['allergeni']);
+    _intolleranze = getDataList(snapshotData['intolleranze']);
+    _traduzioni = snapshotData['traduzioni'] as Map<String, dynamic>?;
   }
 
   static CollectionReference get collection =>
@@ -124,6 +142,9 @@ Map<String, dynamic> createPiattiRecordData({
   bool? isCestinato,
   DateTime? dataCestinamento,
   DocumentReference? sottocategoriaRef,
+  List<String>? allergeni,
+  List<String>? intolleranze,
+  Map<String, dynamic>? traduzioni,
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
@@ -137,6 +158,9 @@ Map<String, dynamic> createPiattiRecordData({
       'isCestinato': isCestinato,
       'dataCestinamento': dataCestinamento,
       'sottocategoria_ref': sottocategoriaRef,
+      'allergeni': allergeni,
+      'intolleranze': intolleranze,
+      'traduzioni': traduzioni,
     }.withoutNulls,
   );
 
@@ -148,6 +172,7 @@ class PiattiRecordDocumentEquality implements Equality<PiattiRecord> {
 
   @override
   bool equals(PiattiRecord? e1, PiattiRecord? e2) {
+    const listEquality = ListEquality();
     return e1?.nome == e2?.nome &&
         e1?.prezzo == e2?.prezzo &&
         e1?.categoria == e2?.categoria &&
@@ -157,7 +182,9 @@ class PiattiRecordDocumentEquality implements Equality<PiattiRecord> {
         e1?.foto == e2?.foto &&
         e1?.isCestinato == e2?.isCestinato &&
         e1?.dataCestinamento == e2?.dataCestinamento &&
-        e1?.sottocategoriaRef == e2?.sottocategoriaRef;
+        e1?.sottocategoriaRef == e2?.sottocategoriaRef &&
+        listEquality.equals(e1?.allergeni, e2?.allergeni) &&
+        listEquality.equals(e1?.intolleranze, e2?.intolleranze);
   }
 
   @override
@@ -171,7 +198,9 @@ class PiattiRecordDocumentEquality implements Equality<PiattiRecord> {
         e?.foto,
         e?.isCestinato,
         e?.dataCestinamento,
-        e?.sottocategoriaRef
+        e?.sottocategoriaRef,
+        e?.allergeni,
+        e?.intolleranze
       ]);
 
   @override

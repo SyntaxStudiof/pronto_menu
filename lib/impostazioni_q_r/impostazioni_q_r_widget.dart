@@ -1,14 +1,9 @@
 import '/auth/firebase_auth/auth_util.dart';
-import '/flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
-import 'dart:ui';
-import 'package:flutter/gestures.dart';
+import '/index.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'impostazioni_q_r_model.dart';
 export 'impostazioni_q_r_model.dart';
 
@@ -45,6 +40,12 @@ class _ImpostazioniQRWidgetState extends State<ImpostazioniQRWidget> {
   @override
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
+    final theme = Theme.of(context);
+
+    final menuWebUrl =
+        'https://prontomenu-6d485.web.app/loaderMenu?ristoranteRef=$currentUserUid';
+    final downloadQrUrl =
+        'https://api.qrserver.com/v1/create-qr-code/?size=1024x1024&data=${Uri.encodeComponent(menuWebUrl)}';
 
     return GestureDetector(
       onTap: () {
@@ -53,191 +54,270 @@ class _ImpostazioniQRWidgetState extends State<ImpostazioniQRWidget> {
       },
       child: Scaffold(
         key: scaffoldKey,
-        backgroundColor: FFAppState().temaPrimaryBackground,
+        backgroundColor: theme.scaffoldBackgroundColor,
         appBar: AppBar(
-          backgroundColor: FFAppState().temaSecondaryBackground,
+          backgroundColor: theme.appBarTheme.backgroundColor ?? theme.cardColor,
           automaticallyImplyLeading: false,
-          leading: FlutterFlowIconButton(
-            borderColor: Colors.transparent,
-            borderRadius: 30.0,
-            borderWidth: 1.0,
-            buttonSize: 40.0,
+          leading: IconButton(
             icon: Icon(
               Icons.arrow_back_rounded,
-              color: FFAppState().temaPrimaryText,
+              color: theme.appBarTheme.foregroundColor ?? theme.iconTheme.color,
               size: 24.0,
             ),
             onPressed: () async {
               context.pop();
             },
           ),
-          title: Text(
-            'Impostazioni QR',
-            style: FlutterFlowTheme.of(context).titleSmall.override(
-                  font: GoogleFonts.outfit(
-                    fontWeight:
-                        FlutterFlowTheme.of(context).titleSmall.fontWeight,
-                    fontStyle:
-                        FlutterFlowTheme.of(context).titleSmall.fontStyle,
-                  ),
-                  color: FFAppState().temaPrimaryText,
-                  fontSize: 22.0,
-                  letterSpacing: 0.0,
-                  fontWeight:
-                      FlutterFlowTheme.of(context).titleSmall.fontWeight,
-                  fontStyle: FlutterFlowTheme.of(context).titleSmall.fontStyle,
+          title: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 36.0,
+                height: 36.0,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10.0),
                 ),
+                alignment: Alignment.center,
+                child: Icon(
+                  Icons.qr_code_2_rounded,
+                  color: theme.colorScheme.primary,
+                  size: 20.0,
+                ),
+              ),
+              const SizedBox(width: 12.0),
+              Text(
+                'QR Code Menu',
+                style: theme.appBarTheme.titleTextStyle ??
+                    theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20.0,
+                      letterSpacing: -0.4,
+                    ),
+              ),
+            ],
           ),
-          actions: [],
+          actions: const [
+            SizedBox(width: 48.0),
+          ],
           centerTitle: true,
-          elevation: 2.0,
+          elevation: 0.0,
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(1.0),
+            child: Container(
+              color: theme.dividerColor.withValues(alpha: 0.5),
+              height: 1.0,
+            ),
+          ),
         ),
         body: SafeArea(
           top: true,
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Align(
-                alignment: AlignmentDirectional(0.0, 0.0),
-                child: Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 20.0),
-                  child: RichText(
-                    textScaler: MediaQuery.of(context).textScaler,
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: 'Il tuo Menu Digitale\n',
-                          style:
-                              FlutterFlowTheme.of(context).titleLarge.override(
-                                    font: GoogleFonts.outfit(
-                                      fontWeight: FontWeight.bold,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .titleLarge
-                                          .fontStyle,
-                                    ),
-                                    color: FFAppState().temaPrimaryText,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FontWeight.bold,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .titleLarge
-                                        .fontStyle,
-                                  ),
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 480.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Main QR Card
+                    Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: theme.cardColor,
+                        borderRadius: BorderRadius.circular(24.0),
+                        border: Border.all(
+                          color: theme.dividerColor.withValues(alpha: 0.5),
+                          width: 1.0,
                         ),
-                        TextSpan(
-                          text: 'Mostra o scarica questo QR Code',
-                          style:
-                              FlutterFlowTheme.of(context).titleMedium.override(
-                                    font: GoogleFonts.outfit(
-                                      fontWeight: FlutterFlowTheme.of(context)
-                                          .titleMedium
-                                          .fontWeight,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .titleMedium
-                                          .fontStyle,
-                                    ),
-                                    color: FFAppState().temaPrimaryText,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .titleMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .titleMedium
-                                        .fontStyle,
-                                  ),
-                        )
-                      ],
-                      style: FlutterFlowTheme.of(context).bodyMedium.override(
-                            font: GoogleFonts.openSans(
-                              fontWeight: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .fontWeight,
-                              fontStyle: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .fontStyle,
-                            ),
-                            color: FFAppState().temaPrimaryText,
-                            letterSpacing: 0.0,
-                            fontWeight: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .fontWeight,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .fontStyle,
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 20.0,
+                            color: Colors.black.withValues(alpha: 0.05),
+                            offset: const Offset(0.0, 4.0),
                           ),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8.0),
-                child: Image.network(
-                  'https://api.qrserver.com/v1/create-qr-code/?size=512x512&data=https://pronto-menu-f0och1.flutterflow.app/loaderMenu?ristoranteRef=${currentUserUid}',
-                  width: 250.0,
-                  height: 250.0,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(0.0, 20.0, 0.0, 0.0),
-                child: FFButtonWidget(
-                  onPressed: () async {
-                    await launchURL(
-                        'https://api.qrserver.com/v1/create-qr-code/?size=512x512&data=https://pronto-menu-f0och1.flutterflow.app/MenuCliente?ristoranteRef=${currentUserUid}');
-                  },
-                  text: 'Apri QR code',
-                  options: FFButtonOptions(
-                    width: 160.0,
-                    height: 40.0,
-                    padding:
-                        EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
-                    iconPadding:
-                        EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
-                    color: FFAppState().temaPrimary,
-                    textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                          font: GoogleFonts.outfit(
-                            fontWeight: FlutterFlowTheme.of(context)
-                                .titleSmall
-                                .fontWeight,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .titleSmall
-                                .fontStyle,
-                          ),
-                          color: FFAppState().temaPrimaryBackground,
-                          letterSpacing: 0.0,
-                          fontWeight: FlutterFlowTheme.of(context)
-                              .titleSmall
-                              .fontWeight,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).titleSmall.fontStyle,
-                        ),
-                    elevation: 2.0,
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(0.0, 3.0, 0.0, 0.0),
-                child: Text(
-                  'Dopo averlo aperta\ntieni premuto sull\'immagine per salvarla',
-                  textAlign: TextAlign.center,
-                  style: FlutterFlowTheme.of(context).bodyMedium.override(
-                        font: GoogleFonts.openSans(
-                          fontWeight: FontWeight.w500,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                        ),
-                        color: FFAppState().temaSecondaryText,
-                        fontSize: 10.0,
-                        letterSpacing: 0.0,
-                        fontWeight: FontWeight.w500,
-                        fontStyle:
-                            FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                        ],
                       ),
+                      padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 24.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Badge circolare QR
+                          Container(
+                            width: 52.0,
+                            height: 52.0,
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.qr_code_2_rounded,
+                              color: theme.colorScheme.primary,
+                              size: 28.0,
+                            ),
+                          ),
+                          const SizedBox(height: 16.0),
+                          Text(
+                            'Il tuo Menu Digitale',
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 22.0,
+                              letterSpacing: -0.4,
+                            ),
+                          ),
+                          const SizedBox(height: 6.0),
+                          Text(
+                            'I clienti inquadrano questo codice con la fotocamera per sfogliare il menu ed ordinare.',
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.hintColor,
+                              height: 1.4,
+                            ),
+                          ),
+                          const SizedBox(height: 28.0),
+                          // Frame elegante del QR Code (QR code always needs a white container to be scannable)
+                          Container(
+                            padding: const EdgeInsets.all(12.0),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20.0),
+                              border: Border.all(
+                                color: theme.dividerColor,
+                                width: 1.5,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 12.0,
+                                  color: Colors.black.withValues(alpha: 0.03),
+                                  offset: const Offset(0.0, 2.0),
+                                ),
+                              ],
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12.0),
+                              child: QrImageView(
+                                data: menuWebUrl,
+                                version: QrVersions.auto,
+                                size: 190.0,
+                                backgroundColor: Colors.white,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 24.0),
+                          // Bottone Azione Apri / Scarica
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed: () async {
+                                await launchURL(downloadQrUrl);
+                              },
+                              icon: Icon(
+                                Icons.open_in_new_rounded,
+                                color: theme.colorScheme.onPrimary,
+                                size: 18.0,
+                              ),
+                              label: Text(
+                                'Apri e scarica QR code (HD)',
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.labelLarge?.copyWith(
+                                  color: theme.colorScheme.onPrimary,
+                                  fontSize: 14.5,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: theme.colorScheme.primary,
+                                foregroundColor: theme.colorScheme.onPrimary,
+                                elevation: 0.0,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16.0,
+                                  vertical: 13.0,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14.0),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12.0),
+                          // Bottone per vedere il menu come cliente
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              onPressed: () async {
+                                context.pushNamed(
+                                  MenuClienteWidget.routeName,
+                                  queryParameters: {
+                                    'ristoranteRef': serializeParam(
+                                      currentUserReference,
+                                      ParamType.DocumentReference,
+                                    ),
+                                    'isAnteprima': serializeParam(
+                                      true,
+                                      ParamType.bool,
+                                    ),
+                                  }.withoutNulls,
+                                );
+                              },
+                              icon: Icon(
+                                Icons.visibility_rounded,
+                                color: theme.colorScheme.primary,
+                                size: 18.0,
+                              ),
+                              label: Text(
+                                'Vedi il menu come cliente',
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.labelLarge?.copyWith(
+                                  color: theme.colorScheme.primary,
+                                  fontSize: 14.5,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(
+                                  color: theme.colorScheme.primary,
+                                  width: 1.5,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16.0,
+                                  vertical: 13.0,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14.0),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 14.0),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.info_outline_rounded,
+                                color: theme.hintColor,
+                                size: 15.0,
+                              ),
+                              const SizedBox(width: 6.0),
+                              Flexible(
+                                child: Text(
+                                  'Tieni premuto sull\'immagine aperta per salvarla',
+                                  textAlign: TextAlign.center,
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: theme.hintColor,
+                                    fontSize: 12.0,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),

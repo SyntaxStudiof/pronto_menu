@@ -63,6 +63,7 @@ class _SmistamentoLoginWidgetState extends State<SmistamentoLoginWidget> {
   @override
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
+    final theme = Theme.of(context);
 
     return GestureDetector(
       onTap: () {
@@ -71,7 +72,7 @@ class _SmistamentoLoginWidgetState extends State<SmistamentoLoginWidget> {
       },
       child: Scaffold(
         key: scaffoldKey,
-        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+        backgroundColor: theme.scaffoldBackgroundColor,
         body: SafeArea(
           top: true,
           child: Align(
@@ -86,8 +87,8 @@ class _SmistamentoLoginWidgetState extends State<SmistamentoLoginWidget> {
                   lineWidth: 40.0,
                   animation: true,
                   animateFromLastPercent: true,
-                  progressColor: FFAppState().temaPrimary,
-                  backgroundColor: FFAppState().temaSecondary,
+                  progressColor: theme.colorScheme.primary,
+                  backgroundColor: theme.colorScheme.secondary,
                 ),
               ],
             ),

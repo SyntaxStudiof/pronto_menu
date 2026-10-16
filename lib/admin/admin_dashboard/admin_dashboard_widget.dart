@@ -1,6 +1,5 @@
 import '/admin/admin_drawer_menu/admin_drawer_menu_widget.dart';
 import '/backend/backend.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'dart:ui';
@@ -10,7 +9,6 @@ import 'package:easy_debounce/easy_debounce.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart' as gorouter;
 import 'package:provider/provider.dart';
 import 'admin_dashboard_model.dart';
@@ -52,6 +50,7 @@ class _AdminDashboardWidgetState extends State<AdminDashboardWidget> {
   @override
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
+    final theme = Theme.of(context);
 
     return StreamBuilder<List<UsersRecord>>(
       stream: queryUsersRecord(
@@ -63,13 +62,12 @@ class _AdminDashboardWidgetState extends State<AdminDashboardWidget> {
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Scaffold(
-            backgroundColor: FFAppState().temaPrimaryBackground,
             body: Center(
               child: Padding(
-                padding: EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16.0),
                 child: Text(
                   'Errore caricamento dati: ${snapshot.error}',
-                  style: FlutterFlowTheme.of(context).bodyMedium,
+                  style: theme.textTheme.bodyMedium,
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -79,13 +77,12 @@ class _AdminDashboardWidgetState extends State<AdminDashboardWidget> {
 
         if (!snapshot.hasData) {
           return Scaffold(
-            backgroundColor: FFAppState().temaPrimaryBackground,
             body: Center(
               child: SizedBox(
                 width: 50.0,
                 height: 50.0,
                 child: SpinKitPulse(
-                  color: FlutterFlowTheme.of(context).primary,
+                  color: theme.colorScheme.primary,
                   size: 50.0,
                 ),
               ),
@@ -101,373 +98,408 @@ class _AdminDashboardWidgetState extends State<AdminDashboardWidget> {
           },
           child: Scaffold(
             key: scaffoldKey,
-            backgroundColor: FFAppState().temaPrimaryBackground,
             endDrawer: Drawer(
-              elevation: 16.0,
+              width: 320.0,
+              backgroundColor: Colors.transparent,
+              elevation: 0.0,
               child: wrapWithModel(
                 model: _model.adminDrawerMenuModel,
                 updateCallback: () => safeSetState(() {}),
-                child: AdminDrawerMenuWidget(),
+                child: const AdminDrawerMenuWidget(),
               ),
             ),
             appBar: AppBar(
-              backgroundColor: FFAppState().temaSecondaryBackground,
-              iconTheme: IconThemeData(color: FFAppState().temaPrimaryText),
               automaticallyImplyLeading: false,
-              title: Text(
-                'Dashboard Admin',
-                style: FlutterFlowTheme.of(context).headlineMedium.override(
-                      font: GoogleFonts.outfit(
-                        fontWeight: FlutterFlowTheme.of(context)
-                            .headlineMedium
-                            .fontWeight,
-                        fontStyle: FlutterFlowTheme.of(context)
-                            .headlineMedium
-                            .fontStyle,
-                      ),
-                      color: FFAppState().temaPrimaryText,
-                      fontSize: 22.0,
-                      letterSpacing: 0.0,
-                      fontWeight: FlutterFlowTheme.of(context)
-                          .headlineMedium
-                          .fontWeight,
-                      fontStyle:
-                          FlutterFlowTheme.of(context).headlineMedium.fontStyle,
+              leading: const SizedBox(width: 48.0),
+              title: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 36.0,
+                    height: 36.0,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(10.0),
                     ),
+                    alignment: Alignment.center,
+                    child: Icon(
+                      Icons.admin_panel_settings_rounded,
+                      color: theme.colorScheme.primary,
+                      size: 20.0,
+                    ),
+                  ),
+                  const SizedBox(width: 10.0),
+                  Text(
+                    'Dashboard Admin',
+                    style: theme.appBarTheme.titleTextStyle ??
+                        theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 19.0,
+                          letterSpacing: -0.4,
+                        ),
+                  ),
+                ],
               ),
-              actions: [],
-              centerTitle: false,
-              elevation: 2.0,
+              actions: [
+                IconButton(
+                  icon: const Icon(
+                    Icons.menu_rounded,
+                    size: 24.0,
+                  ),
+                  onPressed: () => scaffoldKey.currentState?.openEndDrawer(),
+                ),
+              ],
+              centerTitle: true,
+              elevation: 0.0,
+              bottom: PreferredSize(
+                preferredSize: const Size.fromHeight(1.0),
+                child: Divider(
+                  height: 1.0,
+                  thickness: 1.0,
+                  color: theme.dividerColor.withValues(alpha: 0.5),
+                ),
+              ),
             ),
             body: SafeArea(
               top: true,
               child: Align(
-                alignment: AlignmentDirectional(0.0, 0.0),
+                alignment: const AlignmentDirectional(0.0, -1.0),
                 child: SingleChildScrollView(
                   controller: _model.columnController,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(),
-                        child: Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(
-                              0.0, 10.0, 0.0, 0.0),
-                          child: Text(
-                            'Totale Ristoranti: ${formatNumber(
-                              adminDashboardUsersRecordList.length,
-                              formatType: FormatType.compact,
-                            )}',
-                            style: FlutterFlowTheme.of(context)
-                                .titleSmall
-                                .override(
-                                  font: GoogleFonts.outfit(
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .titleSmall
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .titleSmall
-                                        .fontStyle,
-                                  ),
-                                  color: FFAppState().temaPrimary,
-                                  fontSize: 16.0,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FlutterFlowTheme.of(context)
-                                      .titleSmall
-                                      .fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .titleSmall
-                                      .fontStyle,
-                                ),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding:
-                            EdgeInsetsDirectional.fromSTEB(0.0, 15.0, 0.0, 0.0),
-                        child: Text(
-                          'Benvenuto Capo',
-                          textAlign: TextAlign.center,
-                          style: FlutterFlowTheme.of(context)
-                              .headlineLarge
-                              .override(
-                                font: GoogleFonts.outfit(
-                                  fontWeight: FontWeight.bold,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .headlineLarge
-                                      .fontStyle,
-                                ),
-                                color: FFAppState().temaPrimaryText,
-                                letterSpacing: 0.0,
-                                fontWeight: FontWeight.bold,
-                                fontStyle: FlutterFlowTheme.of(context)
-                                    .headlineLarge
-                                    .fontStyle,
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 28.0),
+                  child: Center(
+                    child: Container(
+                      width: double.infinity,
+                      constraints: const BoxConstraints(maxWidth: 720.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.max,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(24.0),
+                            decoration: BoxDecoration(
+                              color: theme.cardColor,
+                              borderRadius: BorderRadius.circular(20.0),
+                              border: Border.all(
+                                color: theme.dividerColor.withValues(alpha: 0.6),
+                                width: 1.0,
                               ),
-                        ),
-                      ),
-                      Padding(
-                        padding:
-                            EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 15.0),
-                        child: Text(
-                          'Ecco tutti gli utenti di ProntoMenu',
-                          style:
-                              FlutterFlowTheme.of(context).bodyMedium.override(
-                                    font: GoogleFonts.openSans(
-                                      fontWeight: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontWeight,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
-                                    color: FFAppState().temaPrimaryText,
-                                    fontSize: 10.0,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                  ),
-                        ),
-                      ),
-                      Padding(
-                        padding:
-                            EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 15.0),
-                        child: Container(
-                          width: 200.0,
-                          child: TextFormField(
-                            controller: _model.barraRicercaTextController,
-                            focusNode: _model.barraRicercaFocusNode,
-                            onChanged: (_) => EasyDebounce.debounce(
-                              '_model.barraRicercaTextController',
-                              Duration(milliseconds: 500),
-                              () => safeSetState(() {}),
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 20.0,
+                                  color: Colors.black.withValues(alpha: 0.04),
+                                  offset: const Offset(0.0, 4.0),
+                                ),
+                              ],
                             ),
-                            autofocus: false,
-                            enabled: true,
-                            obscureText: false,
-                            decoration: InputDecoration(
-                              isDense: true,
-                              labelStyle: FlutterFlowTheme.of(context)
-                                  .labelMedium
-                                  .override(
-                                    font: GoogleFonts.openSans(
-                                      fontWeight: FlutterFlowTheme.of(context)
-                                          .labelMedium
-                                          .fontWeight,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .labelMedium
-                                          .fontStyle,
-                                    ),
-                                    color: FFAppState().temaSecondaryText,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .labelMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .labelMedium
-                                        .fontStyle,
-                                  ),
-                              hintText: 'Cerca per email o ristorante...',
-                              hintStyle: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .override(
-                                    font: GoogleFonts.openSans(
-                                      fontWeight: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontWeight,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
-                                    color: FFAppState().temaSecondaryText,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                  ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: FFAppState().temaSecondary,
-                                  width: 1.0,
-                                ),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: FFAppState().temaPrimary,
-                                  width: 1.0,
-                                ),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: FFAppState().temaError,
-                                  width: 1.0,
-                                ),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                              focusedErrorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: FFAppState().temaError,
-                                  width: 1.0,
-                                ),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                              filled: true,
-                              fillColor: FFAppState().temaSecondaryBackground,
-                            ),
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  font: GoogleFonts.openSans(
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                  ),
-                                  color: FFAppState().temaPrimaryText,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .fontStyle,
-                                ),
-                            keyboardType: TextInputType.emailAddress,
-                            cursorColor: FlutterFlowTheme.of(context).primary,
-                            enableInteractiveSelection: true,
-                            validator: _model
-                                .barraRicercaTextControllerValidator
-                                .asValidator(context),
-                          ),
-                        ),
-                      ),
-                      Builder(
-                        builder: (context) {
-                          final utentiFiltrati = functions
-                              .cercaRistoranti(
-                                  adminDashboardUsersRecordList.toList(),
-                                  _model.barraRicercaTextController.text)
-                              .toList();
-
-                          return ListView.builder(
-                            padding: EdgeInsets.zero,
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            scrollDirection: Axis.vertical,
-                            itemCount: utentiFiltrati.length,
-                            itemBuilder: (context, utentiFiltratiIndex) {
-                              final utentiFiltratiItem =
-                                  utentiFiltrati[utentiFiltratiIndex];
-                              return InkWell(
-                                splashColor: Colors.transparent,
-                                focusColor: Colors.transparent,
-                                hoverColor: Colors.transparent,
-                                highlightColor: Colors.transparent,
-                                onTap: () async {
-                                  context.pushNamed(
-                                    AdminDettaglioRistoranteWidget.routeName,
-                                    queryParameters: {
-                                      'utenteRef': serializeParam(
-                                        utentiFiltratiItem.reference,
-                                        ParamType.DocumentReference,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Benvenuto Capo \u{1F44B}',
+                                        style: theme.textTheme.headlineMedium?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                    }.withoutNulls,
+                                      const SizedBox(height: 4.0),
+                                      Text(
+                                        'Gestione e monitoraggio di tutti i ristoranti registrati',
+                                        style: theme.textTheme.bodyMedium?.copyWith(
+                                          color: theme.textTheme.bodySmall?.color ??
+                                              theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                                    borderRadius: BorderRadius.circular(14.0),
+                                    border: Border.all(
+                                      color: theme.colorScheme.primary.withValues(alpha: 0.20),
+                                      width: 1.0,
+                                    ),
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        formatNumber(
+                                          adminDashboardUsersRecordList.length,
+                                          formatType: FormatType.compact,
+                                        ),
+                                        style: theme.textTheme.headlineSmall?.copyWith(
+                                          color: theme.colorScheme.primary,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        'Ristoranti',
+                                        style: theme.textTheme.labelMedium?.copyWith(
+                                          color: theme.colorScheme.primary,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 20.0),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: theme.cardColor,
+                              borderRadius: BorderRadius.circular(16.0),
+                              border: Border.all(
+                                color: theme.dividerColor.withValues(alpha: 0.6),
+                                width: 1.0,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 14.0,
+                                  color: Colors.black.withValues(alpha: 0.03),
+                                  offset: const Offset(0.0, 3.0),
+                                ),
+                              ],
+                            ),
+                            child: TextFormField(
+                              controller: _model.barraRicercaTextController,
+                              focusNode: _model.barraRicercaFocusNode,
+                              onChanged: (_) => EasyDebounce.debounce(
+                                '_model.barraRicercaTextController',
+                                const Duration(milliseconds: 400),
+                                () => safeSetState(() {}),
+                              ),
+                              autofocus: false,
+                              enabled: true,
+                              obscureText: false,
+                              decoration: InputDecoration(
+                                isDense: false,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                                prefixIcon: Icon(
+                                  Icons.search_rounded,
+                                  color: theme.colorScheme.primary,
+                                  size: 22.0,
+                                ),
+                                suffixIcon: (_model.barraRicercaTextController?.text.isNotEmpty ?? false)
+                                    ? IconButton(
+                                        icon: const Icon(Icons.clear_rounded, size: 20.0),
+                                        onPressed: () {
+                                          _model.barraRicercaTextController?.clear();
+                                          safeSetState(() {});
+                                        },
+                                      )
+                                    : null,
+                                hintText: 'Cerca per email o nome ristorante...',
+                                border: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                errorBorder: InputBorder.none,
+                                focusedErrorBorder: InputBorder.none,
+                                filled: false,
+                              ),
+                              style: theme.textTheme.bodyMedium,
+                              keyboardType: TextInputType.emailAddress,
+                              cursorColor: theme.colorScheme.primary,
+                              enableInteractiveSelection: true,
+                              validator: _model.barraRicercaTextControllerValidator.asValidator(context),
+                            ),
+                          ),
+                          const SizedBox(height: 24.0),
+                          Builder(
+                            builder: (context) {
+                              final utentiFiltrati = functions
+                                  .cercaRistoranti(
+                                      adminDashboardUsersRecordList.toList(),
+                                      _model.barraRicercaTextController.text)
+                                  .toList();
+
+                              if (utentiFiltrati.isEmpty) {
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 48.0),
+                                  decoration: BoxDecoration(
+                                    color: theme.cardColor,
+                                    borderRadius: BorderRadius.circular(20.0),
+                                    border: Border.all(
+                                      color: theme.dividerColor.withValues(alpha: 0.6),
+                                      width: 1.0,
+                                    ),
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        width: 64.0,
+                                        height: 64.0,
+                                        decoration: BoxDecoration(
+                                          color: theme.dividerColor.withValues(alpha: 0.2),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          Icons.storefront_outlined,
+                                          size: 32.0,
+                                          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16.0),
+                                      Text(
+                                        'Nessun ristorante trovato',
+                                        style: theme.textTheme.titleMedium?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 6.0),
+                                      Text(
+                                        'Prova a modificare i termini di ricerca',
+                                        style: theme.textTheme.bodyMedium?.copyWith(
+                                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
+
+                              return ListView.separated(
+                                padding: EdgeInsets.zero,
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                scrollDirection: Axis.vertical,
+                                itemCount: utentiFiltrati.length,
+                                separatorBuilder: (context, _) => const SizedBox(height: 12.0),
+                                itemBuilder: (context, utentiFiltratiIndex) {
+                                  final utentiFiltratiItem = utentiFiltrati[utentiFiltratiIndex];
+                                  final initialLetter = utentiFiltratiItem.displayName.isNotEmpty
+                                      ? utentiFiltratiItem.displayName[0].toUpperCase()
+                                      : 'R';
+
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      color: theme.cardColor,
+                                      borderRadius: BorderRadius.circular(16.0),
+                                      border: Border.all(
+                                        color: theme.dividerColor.withValues(alpha: 0.6),
+                                        width: 1.0,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          blurRadius: 10.0,
+                                          color: Colors.black.withValues(alpha: 0.03),
+                                          offset: const Offset(0.0, 2.0),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      borderRadius: BorderRadius.circular(16.0),
+                                      child: InkWell(
+                                        borderRadius: BorderRadius.circular(16.0),
+                                        onTap: () async {
+                                          context.pushNamed(
+                                            AdminDettaglioRistoranteWidget.routeName,
+                                            queryParameters: {
+                                              'utenteRef': serializeParam(
+                                                utentiFiltratiItem.reference,
+                                                ParamType.DocumentReference,
+                                              ),
+                                            }.withoutNulls,
+                                          );
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+                                          child: Row(
+                                            children: [
+                                              Container(
+                                                width: 44.0,
+                                                height: 44.0,
+                                                decoration: BoxDecoration(
+                                                  color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                                                  borderRadius: BorderRadius.circular(12.0),
+                                                ),
+                                                alignment: Alignment.center,
+                                                child: utentiFiltratiItem.photoUrl.isNotEmpty
+                                                    ? ClipRRect(
+                                                        borderRadius: BorderRadius.circular(12.0),
+                                                        child: Image.network(
+                                                          utentiFiltratiItem.photoUrl,
+                                                          width: 44.0,
+                                                          height: 44.0,
+                                                          fit: BoxFit.cover,
+                                                          errorBuilder: (_, __, ___) => Text(
+                                                            initialLetter,
+                                                            style: theme.textTheme.titleMedium?.copyWith(
+                                                              color: theme.colorScheme.primary,
+                                                              fontWeight: FontWeight.bold,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      )
+                                                    : Text(
+                                                        initialLetter,
+                                                        style: theme.textTheme.titleMedium?.copyWith(
+                                                          color: theme.colorScheme.primary,
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
+                                                      ),
+                                              ),
+                                              const SizedBox(width: 14.0),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      utentiFiltratiItem.displayName.isNotEmpty
+                                                          ? utentiFiltratiItem.displayName
+                                                          : 'Ristorante senza nome',
+                                                      style: theme.textTheme.titleSmall?.copyWith(
+                                                        fontWeight: FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 2.0),
+                                                    Text(
+                                                      utentiFiltratiItem.email,
+                                                      style: theme.textTheme.bodyMedium?.copyWith(
+                                                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              const SizedBox(width: 10.0),
+                                              Container(
+                                                width: 32.0,
+                                                height: 32.0,
+                                                decoration: BoxDecoration(
+                                                  color: theme.dividerColor.withValues(alpha: 0.2),
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: Icon(
+                                                  Icons.chevron_right_rounded,
+                                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                                  size: 20.0,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                                   );
                                 },
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: ListTile(
-                                    title: Text(
-                                      utentiFiltratiItem.displayName,
-                                      style: FlutterFlowTheme.of(context)
-                                          .titleLarge
-                                          .override(
-                                            font: GoogleFonts.outfit(
-                                              fontWeight:
-                                                  FlutterFlowTheme.of(context)
-                                                      .titleLarge
-                                                      .fontWeight,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .titleLarge
-                                                      .fontStyle,
-                                            ),
-                                            color: FFAppState()
-                                                .temaPrimaryText,
-                                            letterSpacing: 0.0,
-                                            fontWeight:
-                                                FlutterFlowTheme.of(context)
-                                                    .titleLarge
-                                                    .fontWeight,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .titleLarge
-                                                    .fontStyle,
-                                          ),
-                                    ),
-                                    subtitle: Text(
-                                      utentiFiltratiItem.email,
-                                      style: FlutterFlowTheme.of(context)
-                                          .labelMedium
-                                          .override(
-                                            font: GoogleFonts.openSans(
-                                              fontWeight:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelMedium
-                                                      .fontWeight,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .labelMedium
-                                                      .fontStyle,
-                                            ),
-                                            color: FFAppState()
-                                                .temaSecondaryText,
-                                            letterSpacing: 0.0,
-                                            fontWeight:
-                                                FlutterFlowTheme.of(context)
-                                                    .labelMedium
-                                                    .fontWeight,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .labelMedium
-                                                    .fontStyle,
-                                          ),
-                                    ),
-                                    trailing: Icon(
-                                      Icons.arrow_forward_ios_rounded,
-                                      color: FFAppState().temaSecondaryText,
-                                      size: 24.0,
-                                    ),
-                                    tileColor:
-                                        FFAppState().temaSecondaryBackground,
-                                    dense: false,
-                                    contentPadding:
-                                        EdgeInsetsDirectional.fromSTEB(
-                                            12.0, 0.0, 12.0, 0.0),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(8.0),
-                                    ),
-                                  ),
-                                ),
                               );
                             },
-                          );
-                        },
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),

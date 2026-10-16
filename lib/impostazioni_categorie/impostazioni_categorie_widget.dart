@@ -1,17 +1,11 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'dart:ui';
 import '/custom_code/actions/index.dart' as actions;
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'impostazioni_categorie_model.dart';
 export 'impostazioni_categorie_model.dart';
@@ -66,6 +60,7 @@ class _ImpostazioniCategorieWidgetState
   @override
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
+    final theme = Theme.of(context);
 
     return GestureDetector(
       onTap: () {
@@ -74,10 +69,9 @@ class _ImpostazioniCategorieWidgetState
       },
       child: Scaffold(
         key: scaffoldKey,
-        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
         appBar: AppBar(
-          backgroundColor: FFAppState().temaSecondaryBackground,
           automaticallyImplyLeading: false,
+          elevation: 0.0,
           leading: FlutterFlowIconButton(
             borderColor: Colors.transparent,
             borderRadius: 24.0,
@@ -85,33 +79,45 @@ class _ImpostazioniCategorieWidgetState
             buttonSize: 40.0,
             icon: Icon(
               Icons.arrow_back_rounded,
-              color: FFAppState().temaPrimaryText,
-              size: 30.0,
+              size: 24.0,
             ),
             onPressed: () async {
               context.safePop();
             },
           ),
-          title: Text(
-            'Ordina categorie',
-            style: FlutterFlowTheme.of(context).titleSmall.override(
-                  font: GoogleFonts.outfit(
-                    fontWeight:
-                        FlutterFlowTheme.of(context).titleSmall.fontWeight,
-                    fontStyle:
-                        FlutterFlowTheme.of(context).titleSmall.fontStyle,
-                  ),
-                  color: FFAppState().temaPrimaryText,
-                  fontSize: 22.0,
-                  letterSpacing: 0.0,
-                  fontWeight:
-                      FlutterFlowTheme.of(context).titleSmall.fontWeight,
-                  fontStyle: FlutterFlowTheme.of(context).titleSmall.fontStyle,
+          title: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 36.0,
+                height: 36.0,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10.0),
                 ),
+                alignment: Alignment.center,
+                child: Icon(
+                  Icons.format_list_bulleted_rounded,
+                  color: theme.colorScheme.primary,
+                  size: 20.0,
+                ),
+              ),
+              const SizedBox(width: 10.0),
+              Text(
+                'Ordina categorie',
+                style: theme.appBarTheme.titleTextStyle ??
+                    theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20.0,
+                      letterSpacing: -0.4,
+                    ),
+              ),
+            ],
           ),
-          actions: [],
+          actions: const [
+            SizedBox(width: 48.0),
+          ],
           centerTitle: true,
-          elevation: 2.0,
         ),
         body: SafeArea(
           top: true,
@@ -129,33 +135,20 @@ class _ImpostazioniCategorieWidgetState
                     children: [
                       Icon(
                         Icons.info_outlined,
-                        color: FFAppState().temaSecondaryText,
-                        size: 9.0,
+                        size: 14.0,
+                        color: theme.textTheme.bodySmall?.color,
                       ),
+                      SizedBox(width: 4.0),
                       Text(
                         'Tieni premuto e sposta le categorie nell\'ordine che preferisci',
                         textAlign: TextAlign.center,
-                        style: FlutterFlowTheme.of(context).bodyMedium.override(
-                              font: GoogleFonts.openSans(
-                                fontWeight: FontWeight.w500,
-                                fontStyle: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .fontStyle,
-                              ),
-                              color: FFAppState().temaSecondaryText,
-                              fontSize: 11.0,
-                              letterSpacing: 0.0,
-                              fontWeight: FontWeight.w500,
-                              fontStyle: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .fontStyle,
-                            ),
+                        style: theme.textTheme.bodySmall,
                       ),
                     ],
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(0.0, 10.0, 0.0, 20.0),
+                  padding: EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 20.0),
                   child: Builder(
                     builder: (context) {
                       final categoriaItem = _model.listaCategorie.toList();
@@ -182,35 +175,19 @@ class _ImpostazioniCategorieWidgetState
                                 width: double.infinity,
                                 height: 60.0,
                                 decoration: BoxDecoration(
-                                  color: FFAppState().temaSecondaryBackground,
+                                  color: theme.cardColor,
                                   borderRadius: BorderRadius.circular(12.0),
+                                  border: Border.all(
+                                    color: theme.dividerColor.withValues(alpha: 0.1),
+                                  ),
                                 ),
                                 alignment: AlignmentDirectional(0.0, 0.0),
                                 child: Text(
                                   categoriaItemItem.name,
                                   textAlign: TextAlign.center,
-                                  style: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .override(
-                                        font: GoogleFonts.openSans(
-                                          fontWeight:
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyMedium
-                                                  .fontWeight,
-                                          fontStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyMedium
-                                                  .fontStyle,
-                                        ),
-                                        color: FFAppState().temaPrimaryText,
-                                        letterSpacing: 0.0,
-                                        fontWeight: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .fontWeight,
-                                        fontStyle: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .fontStyle,
-                                      ),
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
                             ),
@@ -243,56 +220,18 @@ class _ImpostazioniCategorieWidgetState
                       SnackBar(
                         content: Text(
                           'Ordine salvato con successo!',
-                          style:
-                              FlutterFlowTheme.of(context).titleLarge.override(
-                                    font: GoogleFonts.outfit(
-                                      fontWeight: FlutterFlowTheme.of(context)
-                                          .titleLarge
-                                          .fontWeight,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .titleLarge
-                                          .fontStyle,
-                                    ),
-                                    color: FFAppState().temaPrimaryBackground,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .titleLarge
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .titleLarge
-                                        .fontStyle,
-                                  ),
                         ),
                         duration: Duration(milliseconds: 4000),
-                        backgroundColor: FFAppState().temaTertiary,
                       ),
                     );
                   },
                   text: 'Salva Ordine',
                   options: FFButtonOptions(
-                    height: 40.0,
+                    height: 44.0,
                     padding:
-                        EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
+                        EdgeInsetsDirectional.fromSTEB(24.0, 0.0, 24.0, 0.0),
                     iconPadding:
                         EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
-                    color: FFAppState().temaPrimary,
-                    textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                          font: GoogleFonts.outfit(
-                            fontWeight: FlutterFlowTheme.of(context)
-                                .titleSmall
-                                .fontWeight,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .titleSmall
-                                .fontStyle,
-                          ),
-                          color: FFAppState().temaPrimaryBackground,
-                          letterSpacing: 0.0,
-                          fontWeight: FlutterFlowTheme.of(context)
-                              .titleSmall
-                              .fontWeight,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).titleSmall.fontStyle,
-                        ),
                     elevation: 0.0,
                     borderRadius: BorderRadius.circular(12.0),
                   ),

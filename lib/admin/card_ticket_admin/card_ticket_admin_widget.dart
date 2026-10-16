@@ -1,14 +1,9 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'card_ticket_admin_model.dart';
 export 'card_ticket_admin_model.dart';
@@ -65,422 +60,295 @@ class _CardTicketAdminWidgetState extends State<CardTicketAdminWidget> {
   @override
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
+    final theme = Theme.of(context);
 
-    return Padding(
-      padding: EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 16.0),
-      child: Card(
-        clipBehavior: Clip.antiAliasWithSaveLayer,
-        color: FFAppState().temaSecondary,
-        elevation: 2.0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.0),
+    final isAperto = widget.ticketCorrente?.stato == 'Aperto';
+
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(20.0),
+        border: Border.all(
+          color: theme.dividerColor.withValues(alpha: 0.5),
+          width: 1.0,
         ),
-        child: SingleChildScrollView(
-          controller: _model.columnController,
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 16.0,
+            color: Colors.black.withValues(alpha: 0.04),
+            offset: const Offset(0.0, 4.0),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(22.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(0.0, 10.0, 0.0, 0.0),
+              Expanded(
                 child: Text(
                   valueOrDefault<String>(
-                    widget!.ticketCorrente?.titolo,
-                    'Titolo',
+                    widget.ticketCorrente?.titolo,
+                    'Senza titolo',
                   ),
-                  textAlign: TextAlign.center,
-                  style: FlutterFlowTheme.of(context).titleMedium.override(
-                        font: GoogleFonts.outfit(
-                          fontWeight: FontWeight.bold,
-                          fontStyle: FlutterFlowTheme.of(context)
-                              .titleMedium
-                              .fontStyle,
-                        ),
-                        color: FFAppState().temaPrimaryText,
-                        fontSize: 18.0,
-                        letterSpacing: 0.0,
-                        fontWeight: FontWeight.bold,
-                        fontStyle:
-                            FlutterFlowTheme.of(context).titleMedium.fontStyle,
-                      ),
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18.0,
+                    letterSpacing: -0.3,
+                  ),
                 ),
               ),
-              RichText(
-                textScaler: MediaQuery.of(context).textScaler,
-                text: TextSpan(
-                  children: [
-                    TextSpan(
-                      text: 'Descrizione problema:\n',
-                      style: TextStyle(
-                        color: FFAppState().temaPrimaryText,
-                      ),
-                    ),
-                    TextSpan(
-                      text: valueOrDefault<String>(
-                        widget!.ticketCorrente?.descrizione,
-                        'Descrizione',
-                      ),
-                      style: FlutterFlowTheme.of(context).bodyMedium.override(
-                            font: GoogleFonts.openSans(
-                              fontWeight: FontWeight.w500,
-                              fontStyle: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .fontStyle,
-                            ),
-                            color: FFAppState().temaPrimaryText,
-                            letterSpacing: 0.0,
-                            fontWeight: FontWeight.w500,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .fontStyle,
-                          ),
-                    )
-                  ],
-                  style: FlutterFlowTheme.of(context).bodyMedium.override(
-                        font: GoogleFonts.openSans(
-                          fontWeight: FontWeight.w500,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                        ),
-                        color: FFAppState().temaPrimaryText,
-                        letterSpacing: 0.0,
-                        fontWeight: FontWeight.w500,
-                        fontStyle:
-                            FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                      ),
+              const SizedBox(width: 12.0),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 5.0),
+                decoration: BoxDecoration(
+                  color: isAperto ? const Color(0xFFFEF3E2) : const Color(0xFFE6F4EA),
+                  borderRadius: BorderRadius.circular(20.0),
+                  border: Border.all(
+                    color: isAperto ? const Color(0xFFFFD8A8) : const Color(0xFFB7EB8F),
+                    width: 1.0,
+                  ),
                 ),
-                textAlign: TextAlign.center,
-              ),
-              RichText(
-                textScaler: MediaQuery.of(context).textScaler,
-                text: TextSpan(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    TextSpan(
-                      text: 'Stato ticket:\n',
-                      style: TextStyle(
-                        color: FFAppState().temaPrimary,
+                    Container(
+                      width: 7.0,
+                      height: 7.0,
+                      decoration: BoxDecoration(
+                        color: isAperto ? const Color(0xFFE37400) : const Color(0xFF137333),
+                        shape: BoxShape.circle,
                       ),
                     ),
-                    TextSpan(
-                      text: valueOrDefault<String>(
-                        widget!.ticketCorrente?.stato,
+                    const SizedBox(width: 6.0),
+                    Text(
+                      valueOrDefault<String>(
+                        widget.ticketCorrente?.stato,
                         'Stato',
                       ),
-                      style: FlutterFlowTheme.of(context).bodyMedium.override(
-                            font: GoogleFonts.openSans(
-                              fontWeight: FontWeight.w500,
-                              fontStyle: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .fontStyle,
-                            ),
-                            color: FFAppState().temaPrimary,
-                            letterSpacing: 0.0,
-                            fontWeight: FontWeight.w500,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .fontStyle,
-                          ),
-                    )
-                  ],
-                  style: FlutterFlowTheme.of(context).bodyMedium.override(
-                        font: GoogleFonts.openSans(
-                          fontWeight: FontWeight.w500,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                        ),
-                        color: FFAppState().temaPrimary,
-                        letterSpacing: 0.0,
-                        fontWeight: FontWeight.w500,
-                        fontStyle:
-                            FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                      ),
-                ),
-                textAlign: TextAlign.center,
-              ),
-              StreamBuilder<UsersRecord>(
-                stream: UsersRecord.getDocument(widget!.parameter4!),
-                builder: (context, snapshot) {
-                  // Customize what your widget looks like when it's loading.
-                  if (!snapshot.hasData) {
-                    return Center(
-                      child: SizedBox(
-                        width: 50.0,
-                        height: 50.0,
-                        child: SpinKitPulse(
-                          color: FlutterFlowTheme.of(context).primary,
-                          size: 50.0,
-                        ),
-                      ),
-                    );
-                  }
-
-                  final emailUsersRecord = snapshot.data!;
-
-                  return RichText(
-                    textScaler: MediaQuery.of(context).textScaler,
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: 'Email:\n',
-                          style: TextStyle(
-                            color: FFAppState().temaPrimaryText,
-                          ),
-                        ),
-                        TextSpan(
-                          text: emailUsersRecord.email,
-                          style:
-                              FlutterFlowTheme.of(context).bodyMedium.override(
-                                    font: GoogleFonts.openSans(
-                                      fontWeight: FontWeight.w600,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
-                                    color: FFAppState().temaPrimaryText,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FontWeight.w600,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                  ),
-                        )
-                      ],
-                      style: FlutterFlowTheme.of(context).bodyMedium.override(
-                            font: GoogleFonts.openSans(
-                              fontWeight: FontWeight.w600,
-                              fontStyle: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .fontStyle,
-                            ),
-                            color: FFAppState().temaPrimaryText,
-                            letterSpacing: 0.0,
-                            fontWeight: FontWeight.w600,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .fontStyle,
-                          ),
-                    ),
-                    textAlign: TextAlign.center,
-                  );
-                },
-              ),
-              if (widget!.ticketCorrente?.stato == 'Aperto')
-                Column(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Padding(
-                      padding:
-                          EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 10.0),
-                      child: Container(
-                        width: 280.0,
-                        child: TextFormField(
-                          controller: _model.testoRispostaTextController,
-                          focusNode: _model.testoRispostaFocusNode,
-                          autofocus: false,
-                          enabled: true,
-                          obscureText: false,
-                          decoration: InputDecoration(
-                            isDense: true,
-                            labelStyle: FlutterFlowTheme.of(context)
-                                .labelMedium
-                                .override(
-                                  font: GoogleFonts.openSans(
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .labelMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .labelMedium
-                                        .fontStyle,
-                                  ),
-                                  color: FFAppState().temaSecondaryText,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .fontStyle,
-                                ),
-                            hintText: 'Scrivi qui la tua risposta...',
-                            hintStyle: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  font: GoogleFonts.openSans(
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                  ),
-                                  color: FFAppState().temaSecondaryText,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .fontStyle,
-                                ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: FFAppState().temaSecondary,
-                                width: 1.0,
-                              ),
-                              borderRadius: BorderRadius.circular(12.0),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: FFAppState().temaPrimary,
-                                width: 1.0,
-                              ),
-                              borderRadius: BorderRadius.circular(12.0),
-                            ),
-                            errorBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: FFAppState().temaError,
-                                width: 1.0,
-                              ),
-                              borderRadius: BorderRadius.circular(12.0),
-                            ),
-                            focusedErrorBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: FFAppState().temaError,
-                                width: 1.0,
-                              ),
-                              borderRadius: BorderRadius.circular(12.0),
-                            ),
-                            filled: true,
-                            fillColor: FFAppState().temaSecondaryBackground,
-                          ),
-                          style:
-                              FlutterFlowTheme.of(context).bodyMedium.override(
-                                    font: GoogleFonts.openSans(
-                                      fontWeight: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontWeight,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
-                                    color: FFAppState().temaPrimaryText,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                  ),
-                          cursorColor: FFAppState().temaPrimary,
-                          enableInteractiveSelection: true,
-                          validator: _model.testoRispostaTextControllerValidator
-                              .asValidator(context),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding:
-                          EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 10.0),
-                      child: FFButtonWidget(
-                        onPressed: () async {
-                          await widget!.ticketCorrente!.reference
-                              .update(createTicketsRecordData(
-                            rispostaAdmin:
-                                _model.testoRispostaTextController.text,
-                            stato: 'Risolto',
-                          ));
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Risposta inviata al ristoratore!',
-                                style: FlutterFlowTheme.of(context)
-                                    .titleSmall
-                                    .override(
-                                      font: GoogleFonts.outfit(
-                                        fontWeight: FlutterFlowTheme.of(context)
-                                            .titleSmall
-                                            .fontWeight,
-                                        fontStyle: FlutterFlowTheme.of(context)
-                                            .titleSmall
-                                            .fontStyle,
-                                      ),
-                                      color: FFAppState().temaPrimaryBackground,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FlutterFlowTheme.of(context)
-                                          .titleSmall
-                                          .fontWeight,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .titleSmall
-                                          .fontStyle,
-                                    ),
-                              ),
-                              duration: Duration(milliseconds: 4000),
-                              backgroundColor: FFAppState().temaPrimary,
-                            ),
-                          );
-                        },
-                        text: 'Invia Risposta',
-                        options: FFButtonOptions(
-                          width: 280.0,
-                          height: 45.0,
-                          padding: EdgeInsetsDirectional.fromSTEB(
-                              16.0, 0.0, 16.0, 0.0),
-                          iconPadding: EdgeInsetsDirectional.fromSTEB(
-                              0.0, 0.0, 0.0, 0.0),
-                          color: FFAppState().temaPrimary,
-                          textStyle:
-                              FlutterFlowTheme.of(context).titleSmall.override(
-                                    font: GoogleFonts.outfit(
-                                      fontWeight: FlutterFlowTheme.of(context)
-                                          .titleSmall
-                                          .fontWeight,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .titleSmall
-                                          .fontStyle,
-                                    ),
-                                    color: FFAppState().temaPrimaryBackground,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .titleSmall
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .titleSmall
-                                        .fontStyle,
-                                  ),
-                          elevation: 2.0,
-                          borderRadius: BorderRadius.circular(12.0),
-                        ),
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: isAperto ? const Color(0xFFB05A00) : const Color(0xFF0F5A27),
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
                 ),
-              if (widget!.ticketCorrente?.stato == 'Risolto')
-                Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 10.0),
-                  child: Text(
-                    valueOrDefault<String>(
-                      widget!.ticketCorrente?.rispostaAdmin,
-                      'Risposta dell\'admin',
-                    ),
-                    textAlign: TextAlign.center,
-                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                          font: GoogleFonts.openSans(
-                            fontWeight: FontWeight.w500,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .fontStyle,
-                          ),
-                          color: FFAppState().temaPrimaryText,
-                          letterSpacing: 0.0,
-                          fontWeight: FontWeight.w500,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                        ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12.0),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(14.0),
+            decoration: BoxDecoration(
+              color: theme.scaffoldBackgroundColor,
+              borderRadius: BorderRadius.circular(14.0),
+              border: Border.all(
+                color: theme.dividerColor.withValues(alpha: 0.5),
+                width: 1.0,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'DESCRIZIONE PROBLEMA',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.hintColor,
+                    fontSize: 11.0,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.6,
                   ),
                 ),
-            ].divide(SizedBox(height: 12.0)),
+                const SizedBox(height: 6.0),
+                Text(
+                  valueOrDefault<String>(
+                    widget.ticketCorrente?.descrizione,
+                    'Nessuna descrizione fornita',
+                  ),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontSize: 14.5,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
+          const SizedBox(height: 12.0),
+          if (widget.parameter4 != null)
+            StreamBuilder<UsersRecord>(
+              stream: UsersRecord.getDocument(widget.parameter4!),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const SizedBox.shrink();
+                }
+                final emailUsersRecord = snapshot.data!;
+                return Row(
+                  children: [
+                    Icon(
+                      Icons.mail_outline_rounded,
+                      size: 16.0,
+                      color: theme.hintColor,
+                    ),
+                    const SizedBox(width: 6.0),
+                    Text(
+                      'Ristoratore: ',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.hintColor,
+                        fontSize: 13.0,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      emailUsersRecord.email,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        fontSize: 13.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          const SizedBox(height: 16.0),
+          if (widget.ticketCorrente?.stato == 'Aperto')
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                TextFormField(
+                  controller: _model.testoRispostaTextController,
+                  focusNode: _model.testoRispostaFocusNode,
+                  autofocus: false,
+                  enabled: true,
+                  obscureText: false,
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    contentPadding: const EdgeInsets.all(14.0),
+                    hintText: 'Scrivi qui la risposta per il ristoratore...',
+                    hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.hintColor,
+                      fontSize: 14.0,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: theme.dividerColor.withValues(alpha: 0.5),
+                        width: 1.0,
+                      ),
+                      borderRadius: BorderRadius.circular(14.0),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: theme.colorScheme.primary,
+                        width: 1.5,
+                      ),
+                      borderRadius: BorderRadius.circular(14.0),
+                    ),
+                    filled: true,
+                    fillColor: theme.scaffoldBackgroundColor,
+                  ),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontSize: 14.5,
+                  ),
+                  cursorColor: theme.colorScheme.primary,
+                  validator: _model.testoRispostaTextControllerValidator.asValidator(context),
+                ),
+                const SizedBox(height: 12.0),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: FFButtonWidget(
+                    onPressed: () async {
+                      if (_model.testoRispostaTextController.text.trim().isEmpty) {
+                        return;
+                      }
+                      await widget.ticketCorrente!.reference.update(createTicketsRecordData(
+                        rispostaAdmin: _model.testoRispostaTextController.text,
+                        stato: 'Risolto',
+                      ));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Risposta inviata al ristoratore!',
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              color: theme.colorScheme.onPrimary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          duration: const Duration(milliseconds: 3000),
+                          backgroundColor: theme.colorScheme.primary,
+                        ),
+                      );
+                    },
+                    text: 'Invia Risposta',
+                    options: FFButtonOptions(
+                      height: 44.0,
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                      color: theme.colorScheme.primary,
+                      textStyle: theme.textTheme.titleSmall?.copyWith(
+                        color: theme.colorScheme.onPrimary,
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      elevation: 0.0,
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          if (widget.ticketCorrente?.stato == 'Risolto')
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(14.0),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE8F5E9),
+                borderRadius: BorderRadius.circular(14.0),
+                border: Border.all(
+                  color: const Color(0xFFC8E6C9),
+                  width: 1.0,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.check_circle_rounded,
+                        color: Color(0xFF2E7D32),
+                        size: 16.0,
+                      ),
+                      const SizedBox(width: 6.0),
+                      Text(
+                        'RISPOSTA FORNITA DALL\'ADMIN',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: const Color(0xFF2E7D32),
+                          fontSize: 11.0,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.6,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6.0),
+                  Text(
+                    valueOrDefault<String>(
+                      widget.ticketCorrente?.rispostaAdmin,
+                      'Nessun messaggio di risposta registrato.',
+                    ),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: const Color(0xFF1B5E20),
+                      fontSize: 14.0,
+                      height: 1.35,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
       ),
     );
   }

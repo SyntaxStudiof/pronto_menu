@@ -1,13 +1,8 @@
 import '/backend/firebase_storage/storage.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/flutter_flow/upload_data.dart';
-import 'dart:ui';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'popup_foto_piatto_model.dart';
 export 'popup_foto_piatto_model.dart';
@@ -46,67 +41,45 @@ class _PopupFotoPiattoWidgetState extends State<PopupFotoPiattoWidget> {
   @override
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
+    final theme = Theme.of(context);
+
+    final hasFoto = FFAppState().fotoInMemoria.isNotEmpty;
 
     return Container(
       width: MediaQuery.sizeOf(context).width * 1.0,
-      height: 250.0,
+      height: hasFoto ? 295.0 : 240.0,
       decoration: BoxDecoration(
-        color: FFAppState().temaSecondaryBackground,
+        color: theme.cardColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20.0)),
       ),
       child: Padding(
-        padding: EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           mainAxisSize: MainAxisSize.max,
           children: [
             RichText(
               textScaler: MediaQuery.of(context).textScaler,
               text: TextSpan(
+                style: theme.textTheme.bodySmall?.copyWith(
+                  height: 1.4,
+                ),
                 children: [
                   TextSpan(
                     text: '💡 Consiglio: ',
-                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                          font: GoogleFonts.openSans(
-                            fontWeight: FontWeight.bold,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .fontStyle,
-                          ),
-                          color: FFAppState().temaSecondaryText,
-                          fontSize: 12.0,
-                          letterSpacing: 0.0,
-                          fontWeight: FontWeight.bold,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                        ),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  TextSpan(
+                  const TextSpan(
                     text:
                         'Per un risultato ottimale, utilizza foto in formato orizzontale con il piatto ben centrato. Evita foto verticali per non perdere dettagli.',
-                    style: TextStyle(
-                      color: FFAppState().temaSecondaryText,
-                    ),
                   )
                 ],
-                style: FlutterFlowTheme.of(context).bodyMedium.override(
-                      font: GoogleFonts.openSans(
-                        fontWeight:
-                            FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                        fontStyle:
-                            FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                      ),
-                      color: FFAppState().temaSecondaryText,
-                      fontSize: 12.0,
-                      letterSpacing: 0.0,
-                      fontWeight:
-                          FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                      fontStyle:
-                          FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                    ),
               ),
               textAlign: TextAlign.center,
             ),
             Padding(
-              padding: EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 0.0),
+              padding: const EdgeInsetsDirectional.fromSTEB(0.0, 24.0, 0.0, 0.0),
               child: FFButtonWidget(
                 onPressed: () async {
                   final selectedMedia = await selectMediaWithSourceBottomSheet(
@@ -169,31 +142,36 @@ class _PopupFotoPiattoWidgetState extends State<PopupFotoPiattoWidget> {
                 text: 'Scegli foto dalla galleria',
                 options: FFButtonOptions(
                   width: 280.0,
-                  height: 45.0,
-                  padding: EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
-                  iconPadding:
-                      EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
-                  color: FFAppState().temaPrimary,
-                  textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                        font: GoogleFonts.outfit(
-                          fontWeight: FlutterFlowTheme.of(context)
-                              .titleSmall
-                              .fontWeight,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).titleSmall.fontStyle,
-                        ),
-                        color: FFAppState().temaPrimaryBackground,
-                        letterSpacing: 0.0,
-                        fontWeight:
-                            FlutterFlowTheme.of(context).titleSmall.fontWeight,
-                        fontStyle:
-                            FlutterFlowTheme.of(context).titleSmall.fontStyle,
-                      ),
-                  elevation: 2.0,
-                  borderRadius: BorderRadius.circular(8.0),
+                  height: 48.0,
+                  padding: const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
+                  iconPadding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                  elevation: 0.0,
+                  borderRadius: BorderRadius.circular(12.0),
                 ),
               ),
             ),
+            if (hasFoto) ...[
+              const SizedBox(height: 12.0),
+              TextButton.icon(
+                onPressed: () {
+                  FFAppState().fotoInMemoria = '';
+                  safeSetState(() {});
+                  Navigator.pop(context);
+                },
+                icon: Icon(
+                  Icons.delete_outline_rounded,
+                  color: theme.colorScheme.error,
+                  size: 18.0,
+                ),
+                label: Text(
+                  'Elimina foto attuale',
+                  style: TextStyle(
+                    color: theme.colorScheme.error,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Collegamento Spotify - ProntoMenu</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+    body {
+      background: #0f1416;
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .card {
+      background: #1a2226;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 40px 32px;
+      max-width: 440px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    }
+    .icon-container {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      margin: 0 auto 24px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: rgba(29, 185, 84, 0.15);
+      color: #1DB954;
+    }
+    .icon-container.error {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+    }
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 4px solid rgba(29, 185, 84, 0.2);
+      border-top-color: #1DB954;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      letter-spacing: -0.3px;
+    }
+    p {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 15px;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+    .btn {
+      display: inline-block;
+      width: 100%;
+      padding: 14px 20px;
+      background: #1DB954;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 16px;
+      border-radius: 12px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn:hover {
+      background: #1aa34a;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div id="iconBox" class="icon-container">
+      <div class="spinner" id="spinner"></div>
+      <svg id="successIcon" style="display:none; width:46px; height:46px;" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+      </svg>
+      <svg id="errorIcon" style="display:none; width:46px; height:46px;" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+      </svg>
+    </div>
+
+    <h1 id="title">Collegamento Spotify in corso...</h1>
+    <p id="message">Stiamo connettendo il tuo locale con Spotify Connect. Rimani su questa schermata per qualche istante.</p>
+
+    <button id="closeBtn" class="btn" style="display:none;" onclick="handleClose()">Torna all'App ProntoMenu</button>
+  </div>
+
+  <script>
+    const FIREBASE_API_KEY = "AIzaSyCfQPRsNprlqs7NvBcOGDLcMxz_9VFqpbs";
+    const FIREBASE_PROJECT_ID = "prontomenu-6d485";
+    const SPOTIFY_CLIENT_ID = "5eaaea0591574f8d921ac68e07958885";
+    const REDIRECT_URI = "https://prontomenu-6d485.web.app/spotify-callback";
+
+    function handleClose() {
+      if (window.opener) {
+        window.close();
+      } else {
+        window.location.href = "/";
+      }
+    }
+
+    async function processAuth() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+      const state = urlParams.get('state');
+      const error = urlParams.get('error');
+
+      const titleEl = document.getElementById('title');
+      const msgEl = document.getElementById('message');
+      const spinner = document.getElementById('spinner');
+      const successIcon = document.getElementById('successIcon');
+      const errorIcon = document.getElementById('errorIcon');
+      const iconBox = document.getElementById('iconBox');
+      const closeBtn = document.getElementById('closeBtn');
+
+      if (error) {
+        spinner.style.display = 'none';
+        iconBox.classList.add('error');
+        errorIcon.style.display = 'block';
+        titleEl.textContent = 'Collegamento Annullato';
+        msgEl.textContent = 'Hai annullato l\'autorizzazione Spotify o si è verificato un problema (' + error + ').';
+        closeBtn.style.display = 'block';
+        return;
+      }
+
+      if (!code || !state) {
+        spinner.style.display = 'none';
+        iconBox.classList.add('error');
+        errorIcon.style.display = 'block';
+        titleEl.textContent = 'Parametri non validi';
+        msgEl.textContent = 'Codice o stato di autorizzazione mancante. Riprova dalle impostazioni dell\'app.';
+        closeBtn.style.display = 'block';
+        return;
+      }
+
+      try {
+        titleEl.textContent = 'Verifica autorizzazione...';
+
+        // 1. Leggi la sessione creata dall'app per ottenere codeVerifier e userId
+        const sessionUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/spotify_auth_sessions/${state}?key=${FIREBASE_API_KEY}`;
+        const sessionRes = await fetch(sessionUrl);
+        
+        if (!sessionRes.ok) {
+          throw new Error('Sessione non trovata su Firestore. Codice: ' + sessionRes.status);
+        }
+
+        const sessionJson = await sessionRes.json();
+        const codeVerifier = sessionJson.fields?.codeVerifier?.stringValue;
+        const userId = sessionJson.fields?.userId?.stringValue;
+
+        if (!codeVerifier) {
+          throw new Error('Verificatore PKCE non trovato nella sessione.');
+        }
+
+        titleEl.textContent = 'Connessione a Spotify...';
+
+        // 2. Scambia il code con i token Spotify
+        const tokenRes = await fetch('https://accounts.spotify.com/api/token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: new URLSearchParams({
+            grant_type: 'authorization_code',
+            client_id: SPOTIFY_CLIENT_ID,
+            code: code,
+            redirect_uri: REDIRECT_URI,
+            code_verifier: codeVerifier
+          })
+        });
+
+        if (!tokenRes.ok) {
+          const errBody = await tokenRes.text();
+          throw new Error('Errore risposta Spotify: ' + tokenRes.status + ' - ' + errBody);
+        }
+
+        const tokens = await tokenRes.json();
+        const accessToken = tokens.access_token;
+        const refreshToken = tokens.refresh_token || '';
+        const expiresIn = tokens.expires_in || 3600;
+
+        titleEl.textContent = 'Sincronizzazione finale...';
+
+        // 3. Aggiorna lo stato della sessione su Firestore affinché l'app mobile rilevi il successo immediato
+        const updateSessionUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/spotify_auth_sessions/${state}?updateMask.fieldPaths=status&updateMask.fieldPaths=accessToken&updateMask.fieldPaths=refreshToken&updateMask.fieldPaths=expiresIn&key=${FIREBASE_API_KEY}`;
+        
+        await fetch(updateSessionUrl, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            fields: {
+              status: { stringValue: 'completed' },
+              accessToken: { stringValue: accessToken },
+              refreshToken: { stringValue: refreshToken },
+              expiresIn: { integerValue: expiresIn }
+            }
+          })
+        });
+
+        // 4. Se presente userId, tenta anche l'aggiornamento diretto del documento utente
+        if (userId) {
+          try {
+            const updateUserUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/users/${userId}?updateMask.fieldPaths=spotify_access_token&updateMask.fieldPaths=spotify_refresh_token&key=${FIREBASE_API_KEY}`;
+            await fetch(updateUserUrl, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                fields: {
+                  spotify_access_token: { stringValue: accessToken },
+                  spotify_refresh_token: { stringValue: refreshToken }
+                }
+              })
+            });
+          } catch (e) {
+            console.log('Aggiornamento diretto opzionale:', e);
+          }
+        }
+
+        // 5. Mostra schermata di successo
+        spinner.style.display = 'none';
+        successIcon.style.display = 'block';
+        titleEl.textContent = 'Spotify collegato con successo!';
+        msgEl.innerHTML = 'Il tuo account Spotify è ora sincronizzato con ProntoMenu.<br><br><b>Puoi chiudere questa scheda del browser e tornare alla tua app.</b>';
+        closeBtn.style.display = 'block';
+
+      } catch (err) {
+        console.error(err);
+        spinner.style.display = 'none';
+        iconBox.classList.add('error');
+        errorIcon.style.display = 'block';
+        titleEl.textContent = 'Errore di collegamento';
+        msgEl.textContent = err.message || 'Si è verificato un errore imprevisto.';
+        closeBtn.style.display = 'block';
+      }
+    }
+
+    processAuth();
+  </script>
+</body>
+</html>

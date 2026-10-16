@@ -33,7 +33,7 @@ List<String>? raggruppaPiatti(List<String>? listaPiattiOriginale) {
 
   List<String> risultato = [];
   conteggio.forEach((piatto, quantita) {
-    risultato.add('$quantita $piatto');
+    risultato.add('(N.$quantita) $piatto');
   });
 
   return risultato;
@@ -44,24 +44,46 @@ List<String>? raggruppaPiattiDaStringa(String? testoPiattiCompleto) {
     return [];
   }
 
-  // Dividiamo il testo lungo usando la virgola e lo spazio come separatore
-  // (es. "Margherita, Salumi" diventa ["Margherita", "Salumi"])
-  List<String> listaPiattiGrezza = testoPiattiCompleto.split(', ');
+  // Dividiamo il testo rispettando eventuali modifiche racchiuse tra parentesi
+  // (es. "Margherita (+ Prosciutto, Funghi), Marinara")
+  List<String> listaPiattiGrezza = [];
+  int parenthesisDepth = 0;
+  StringBuffer current = StringBuffer();
+
+  for (int i = 0; i < testoPiattiCompleto.length; i++) {
+    final char = testoPiattiCompleto[i];
+    if (char == '(' || char == '[') {
+      parenthesisDepth++;
+      current.write(char);
+    } else if (char == ')' || char == ']') {
+      if (parenthesisDepth > 0) parenthesisDepth--;
+      current.write(char);
+    } else if (char == ',' && parenthesisDepth == 0) {
+      listaPiattiGrezza.add(current.toString().trim());
+      current.clear();
+      if (i + 1 < testoPiattiCompleto.length && testoPiattiCompleto[i + 1] == ' ') {
+        i++;
+      }
+    } else {
+      current.write(char);
+    }
+  }
+  if (current.isNotEmpty && current.toString().trim().isNotEmpty) {
+    listaPiattiGrezza.add(current.toString().trim());
+  }
 
   Map<String, int> conteggio = {};
 
   for (String piatto in listaPiattiGrezza) {
-    // Rimuoviamo eventuali spazi extra e puliamo il testo
     String piattoPulito = piatto.trim();
     if (piattoPulito.isNotEmpty) {
       conteggio[piattoPulito] = (conteggio[piattoPulito] ?? 0) + 1;
     }
   }
 
-  // Creiamo la lista finale raggruppata (es. "2 Margherita")
   List<String> risultato = [];
   conteggio.forEach((piatto, quantita) {
-    risultato.add('$quantita $piatto');
+    risultato.add('(N.$quantita) $piatto');
   });
 
   return risultato;

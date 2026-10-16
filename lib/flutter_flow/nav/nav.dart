@@ -259,6 +259,10 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
               isList: false,
               collectionNamePath: ['users'],
             ),
+            isAnteprima: params.getParam(
+              'isAnteprima',
+              ParamType.bool,
+            ) ?? false,
           ),
         ),
         FFRoute(
@@ -289,13 +293,35 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
         FFRoute(
           name: CambiaColoreWidget.routeName,
           path: CambiaColoreWidget.routePath,
-          builder: (context, params) => CambiaColoreWidget(
+          builder: (context, params) => PersonalizzazioneWidget(
             ristoranteRef: params.getParam(
               'ristoranteRef',
               ParamType.DocumentReference,
               isList: false,
               collectionNamePath: ['users'],
             ),
+            initialTab: 1,
+          ),
+        ),
+        FFRoute(
+          name: SceltaStileWidget.routeName,
+          path: SceltaStileWidget.routePath,
+          builder: (context, params) => const PersonalizzazioneWidget(initialTab: 0),
+        ),
+        FFRoute(
+          name: PersonalizzazioneWidget.routeName,
+          path: PersonalizzazioneWidget.routePath,
+          builder: (context, params) => PersonalizzazioneWidget(
+            ristoranteRef: params.getParam(
+              'ristoranteRef',
+              ParamType.DocumentReference,
+              isList: false,
+              collectionNamePath: ['users'],
+            ),
+            initialTab: params.getParam(
+              'initialTab',
+              ParamType.int,
+            ) ?? 0,
           ),
         ),
         FFRoute(
@@ -333,6 +359,33 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           builder: (context, params) => ImpostazioniCategorieWidget(),
         ),
         FFRoute(
+          name: ImpostazioniSottocategorieWidget.routeName,
+          path: ImpostazioniSottocategorieWidget.routePath,
+          builder: (context, params) => ImpostazioniSottocategorieWidget(),
+        ),
+        FFRoute(
+          name: ImpostazioniJukeboxWidget.routeName,
+          path: ImpostazioniJukeboxWidget.routePath,
+          requireAuth: true,
+          builder: (context, params) => const ImpostazioniJukeboxWidget(),
+        ),
+        FFRoute(
+          name: ImpostazioniMutaformaWidget.routeName,
+          path: ImpostazioniMutaformaWidget.routePath,
+          requireAuth: true,
+          builder: (context, params) => const ImpostazioniMutaformaWidget(),
+        ),
+        FFRoute(
+          name: SpotifyCallbackWidget.routeName,
+          path: SpotifyCallbackWidget.routePath,
+          requireAuth: false,
+          builder: (context, params) => SpotifyCallbackWidget(
+            code: params.getParam('code', ParamType.String),
+            state: params.getParam('state', ParamType.String),
+            error: params.getParam('error', ParamType.String),
+          ),
+        ),
+        FFRoute(
           name: AdminDashboardWidget.routeName,
           path: AdminDashboardWidget.routePath,
           builder: (context, params) => AdminDashboardWidget(),
@@ -368,6 +421,19 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: PaginaAbbonamentoWidget.routeName,
           path: PaginaAbbonamentoWidget.routePath,
           builder: (context, params) => PaginaAbbonamentoWidget(),
+        ),
+        FFRoute(
+          name: GestioneDispensaWidget.routeName,
+          path: GestioneDispensaWidget.routePath,
+          requireAuth: true,
+          builder: (context, params) => GestioneDispensaWidget(
+            ristoranteRef: params.getParam(
+              'ristoranteRef',
+              ParamType.DocumentReference,
+              isList: false,
+              collectionNamePath: ['users'],
+            ),
+          ),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );

@@ -43,27 +43,21 @@ class _CompCarrelloWidgetState extends State<CompCarrelloWidget> {
   @override
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
+    final theme = Theme.of(context);
 
     return Padding(
       padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 15.0, 0.0),
       child: badges.Badge(
         badgeContent: Text(
           FFAppState().Carrello.length.toString(),
-          style: FlutterFlowTheme.of(context).titleSmall.override(
-                font: GoogleFonts.outfit(
-                  fontWeight:
-                      FlutterFlowTheme.of(context).titleSmall.fontWeight,
-                  fontStyle: FlutterFlowTheme.of(context).titleSmall.fontStyle,
-                ),
-                color: FFAppState().temaPrimaryText,
-                letterSpacing: 0.0,
-                fontWeight: FlutterFlowTheme.of(context).titleSmall.fontWeight,
-                fontStyle: FlutterFlowTheme.of(context).titleSmall.fontStyle,
-              ),
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: theme.colorScheme.onPrimary,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         showBadge: true,
         shape: badges.BadgeShape.circle,
-        badgeColor: FFAppState().temaTertiary,
+        badgeColor: theme.colorScheme.primary,
         elevation: 4.0,
         padding: EdgeInsetsDirectional.fromSTEB(8.0, 8.0, 8.0, 8.0),
         position: badges.BadgePosition.topEnd(),
@@ -73,7 +67,7 @@ class _CompCarrelloWidgetState extends State<CompCarrelloWidget> {
           padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 5.0, 0.0),
           child: Icon(
             Icons.shopping_cart_outlined,
-            color: FFAppState().temaPrimary,
+            color: theme.colorScheme.primary,
             size: 24.0,
           ),
         ),

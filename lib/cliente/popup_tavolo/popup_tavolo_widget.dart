@@ -1,3 +1,4 @@
+import '/services/translation_service.dart';
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
@@ -18,9 +19,11 @@ class PopupTavoloWidget extends StatefulWidget {
   const PopupTavoloWidget({
     super.key,
     this.ristoranteRef,
+    this.currentLang = 'it',
   });
 
   final DocumentReference? ristoranteRef;
+  final String currentLang;
 
   @override
   State<PopupTavoloWidget> createState() => _PopupTavoloWidgetState();
@@ -56,10 +59,11 @@ class _PopupTavoloWidgetState extends State<PopupTavoloWidget> {
   @override
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
+    final theme = Theme.of(context);
 
     return Container(
       decoration: BoxDecoration(
-        color: FFAppState().temaSecondary,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(12.0),
       ),
       child: Padding(
@@ -86,95 +90,45 @@ class _PopupTavoloWidgetState extends State<PopupTavoloWidget> {
                     obscureText: false,
                     decoration: InputDecoration(
                       isDense: true,
-                      labelStyle:
-                          FlutterFlowTheme.of(context).labelMedium.override(
-                                font: GoogleFonts.openSans(
-                                  fontWeight: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .fontStyle,
-                                ),
-                                color: FFAppState().temaSecondaryText,
-                                letterSpacing: 0.0,
-                                fontWeight: FlutterFlowTheme.of(context)
-                                    .labelMedium
-                                    .fontWeight,
-                                fontStyle: FlutterFlowTheme.of(context)
-                                    .labelMedium
-                                    .fontStyle,
-                              ),
-                      hintText: 'Inserisci numero tavolo',
-                      hintStyle:
-                          FlutterFlowTheme.of(context).bodyMedium.override(
-                                font: GoogleFonts.openSans(
-                                  fontWeight: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .fontStyle,
-                                ),
-                                color: FFAppState().temaSecondaryText,
-                                letterSpacing: 0.0,
-                                fontWeight: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .fontWeight,
-                                fontStyle: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .fontStyle,
-                              ),
+                      labelStyle: theme.textTheme.labelMedium,
+                      hintText: TranslationService.getUi('inserisci_tavolo', widget.currentLang),
+                      hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.hintColor,
+                      ),
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: FFAppState().temaSecondary,
+                          color: theme.dividerColor,
                           width: 1.0,
                         ),
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: FFAppState().temaPrimary,
+                          color: theme.colorScheme.primary,
                           width: 1.0,
                         ),
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       errorBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: FFAppState().temaError,
+                          color: theme.colorScheme.error,
                           width: 1.0,
                         ),
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       focusedErrorBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: FFAppState().temaError,
+                          color: theme.colorScheme.error,
                           width: 1.0,
                         ),
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       filled: true,
-                      fillColor: FFAppState().temaSecondaryBackground,
+                      fillColor: theme.scaffoldBackgroundColor,
                     ),
-                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                          font: GoogleFonts.openSans(
-                            fontWeight: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .fontWeight,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .fontStyle,
-                          ),
-                          color: FFAppState().temaPrimaryText,
-                          letterSpacing: 0.0,
-                          fontWeight: FlutterFlowTheme.of(context)
-                              .bodyMedium
-                              .fontWeight,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                        ),
+                    style: theme.textTheme.bodyMedium,
                     keyboardType: TextInputType.number,
-                    cursorColor: FFAppState().temaPrimary,
+                    cursorColor: theme.colorScheme.primary,
                     enableInteractiveSelection: true,
                     validator:
                         _model.textControllerValidator.asValidator(context),
@@ -209,68 +163,44 @@ class _PopupTavoloWidgetState extends State<PopupTavoloWidget> {
                           FFAppState().Carrello = [];
                           FFAppState().totaleCarrello = 0.0;
                           FFAppState().CarrelloNomi = [];
+                          FFAppState().CarrelloPrezzi = [];
                           safeSetState(() {});
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
                                 'Ordine inviato con successo! Lo stiamo preparando per te.',
-                                style: FlutterFlowTheme.of(context)
-                                    .titleSmall
-                                    .override(
-                                      font: GoogleFonts.outfit(
-                                        fontWeight: FontWeight.w600,
-                                        fontStyle: FlutterFlowTheme.of(context)
-                                            .titleSmall
-                                            .fontStyle,
-                                      ),
-                                      color: FlutterFlowTheme.of(context)
-                                          .primaryBackground,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.w600,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .titleSmall
-                                          .fontStyle,
-                                    ),
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: theme.colorScheme.onPrimary,
+                                ),
                               ),
                               duration: Duration(milliseconds: 3000),
-                              backgroundColor:
-                                  FlutterFlowTheme.of(context).primary,
+                              backgroundColor: theme.colorScheme.primary,
                             ),
                           );
                           FFAppState().Carrello = [];
                           FFAppState().CarrelloNomi = [];
+                          FFAppState().CarrelloPrezzi = [];
                           safeSetState(() {});
                         },
-                  text: 'Conferma Ordine',
+                  text: TranslationService.getUi('conferma_ordine', widget.currentLang),
                   options: FFButtonOptions(
                     width: 280.0,
-                    height: 45.0,
+                    height: 48.0,
                     padding:
-                        EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
-                    iconPadding:
-                        EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
-                    color: FFAppState().temaPrimary,
-                    textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                          font: GoogleFonts.outfit(
-                            fontWeight: FlutterFlowTheme.of(context)
-                                .titleSmall
-                                .fontWeight,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .titleSmall
-                                .fontStyle,
-                          ),
-                          color: FFAppState().temaPrimaryBackground,
-                          letterSpacing: 0.0,
-                          fontWeight: FlutterFlowTheme.of(context)
-                              .titleSmall
-                              .fontWeight,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).titleSmall.fontStyle,
-                        ),
+                        const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
+                    iconPadding: EdgeInsets.zero,
+                    color: theme.colorScheme.primary,
+                    textStyle: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.3,
+                    ),
                     elevation: 2.0,
-                    borderRadius: BorderRadius.circular(8.0),
-                    disabledColor: FFAppState().temaAlternate,
-                    disabledTextColor: FFAppState().temaSecondaryText,
+                    borderRadius: BorderRadius.circular(12.0),
+                    disabledColor: theme.disabledColor,
+                    disabledTextColor: theme.hintColor,
                   ),
                 ),
               ),

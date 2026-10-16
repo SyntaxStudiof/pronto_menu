@@ -27,6 +27,9 @@ class CreaPiattoModel extends FlutterFlowModel<CreaPiattoWidget> {
   String fotoInMemoria =
       'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/pronto-menu-f0och1/assets/i4ccmvv80eni/IMG_8006.png';
 
+  List<String> intolleranzeSelezionate = [];
+  List<String> allergeniSelezionati = [];
+
   ///  State fields for stateful widgets in this page.
 
   // State field(s) for Column widget.

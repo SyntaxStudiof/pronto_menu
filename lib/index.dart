@@ -32,6 +32,8 @@ export '/impostazioni_utente/impostazioni_utente_widget.dart'
 export '/loader_menu/loader_menu_widget.dart' show LoaderMenuWidget;
 export '/impostazioni_categorie/impostazioni_categorie_widget.dart'
     show ImpostazioniCategorieWidget;
+export '/impostazioni_sottocategorie/impostazioni_sottocategorie_widget.dart'
+    show ImpostazioniSottocategorieWidget;
 export '/admin/admin_dashboard/admin_dashboard_widget.dart'
     show AdminDashboardWidget;
 export '/smistamento_login/smistamento_login_widget.dart'
@@ -43,3 +45,15 @@ export '/pagamento_successo/pagamento_successo_widget.dart'
 export '/abbonamento/abbonamento_widget.dart' show AbbonamentoWidget;
 export '/pagina_abbonamento/pagina_abbonamento_widget.dart'
     show PaginaAbbonamentoWidget;
+export '/scelta_stile/scelta_stile_widget.dart' show SceltaStileWidget;
+export '/personalizzazione/personalizzazione_widget.dart'
+    show PersonalizzazioneWidget;
+export '/impostazioni_jukebox/impostazioni_jukebox_widget.dart'
+    show ImpostazioniJukeboxWidget;
+export '/impostazioni_jukebox/spotify_callback_widget.dart'
+    show SpotifyCallbackWidget;
+export '/dispensa/gestione_dispensa/gestione_dispensa_widget.dart'
+    show GestioneDispensaWidget;
+export '/impostazioni_mutaforma/impostazioni_mutaforma_widget.dart'
+    show ImpostazioniMutaformaWidget;
+

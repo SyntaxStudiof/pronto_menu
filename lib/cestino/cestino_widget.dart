@@ -2,16 +2,12 @@ import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/components/cestino_vuoto_widget.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
-import 'dart:ui';
 import '/custom_code/actions/index.dart' as actions;
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'cestino_model.dart';
 export 'cestino_model.dart';
@@ -50,6 +46,7 @@ class _CestinoWidgetState extends State<CestinoWidget> {
   @override
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
+    final theme = Theme.of(context);
 
     return GestureDetector(
       onTap: () {
@@ -58,25 +55,24 @@ class _CestinoWidgetState extends State<CestinoWidget> {
       },
       child: Scaffold(
         key: scaffoldKey,
-        backgroundColor: FFAppState().temaPrimaryBackground,
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
             var confirmDialogResponse = await showDialog<bool>(
                   context: context,
                   builder: (alertDialogContext) {
                     return AlertDialog(
-                      title: Text(
+                      title: const Text(
                           'Sei sicuro di voler svuotare tutto il cestino? L\'azione è irreversibile.'),
                       actions: [
                         TextButton(
                           onPressed: () =>
                               Navigator.pop(alertDialogContext, false),
-                          child: Text('Annulla'),
+                          child: const Text('Annulla'),
                         ),
                         TextButton(
                           onPressed: () =>
                               Navigator.pop(alertDialogContext, true),
-                          child: Text('Conferma'),
+                          child: const Text('Conferma'),
                         ),
                       ],
                     );
@@ -89,50 +85,59 @@ class _CestinoWidgetState extends State<CestinoWidget> {
               );
             }
           },
-          backgroundColor: FFAppState().temaError,
-          elevation: 8.0,
-          child: Icon(
+          elevation: 2.0,
+          child: const Icon(
             Icons.delete,
-            color: FFAppState().temaPrimaryBackground,
-            size: 30.0,
+            size: 28.0,
           ),
         ),
         appBar: AppBar(
-          backgroundColor: FFAppState().temaSecondaryBackground,
           automaticallyImplyLeading: false,
           leading: FlutterFlowIconButton(
-            borderColor: Colors.transparent,
             borderRadius: 30.0,
-            borderWidth: 1.0,
             buttonSize: 40.0,
-            icon: Icon(
+            icon: const Icon(
               Icons.arrow_back_rounded,
-              color: FFAppState().temaPrimaryText,
               size: 24.0,
             ),
             onPressed: () async {
               context.pop();
             },
           ),
-          title: Text(
-            'Cestino',
-            style: FlutterFlowTheme.of(context).titleSmall.override(
-                  font: GoogleFonts.outfit(
-                    fontWeight:
-                        FlutterFlowTheme.of(context).titleSmall.fontWeight,
-                    fontStyle:
-                        FlutterFlowTheme.of(context).titleSmall.fontStyle,
-                  ),
-                  fontSize: 22.0,
-                  letterSpacing: 0.0,
-                  fontWeight:
-                      FlutterFlowTheme.of(context).titleSmall.fontWeight,
-                  fontStyle: FlutterFlowTheme.of(context).titleSmall.fontStyle,
+          title: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 36.0,
+                height: 36.0,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10.0),
                 ),
+                alignment: Alignment.center,
+                child: Icon(
+                  Icons.delete_outline_rounded,
+                  color: theme.colorScheme.primary,
+                  size: 20.0,
+                ),
+              ),
+              const SizedBox(width: 10.0),
+              Text(
+                'Cestino',
+                style: theme.appBarTheme.titleTextStyle ??
+                    theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20.0,
+                      letterSpacing: -0.4,
+                    ),
+              ),
+            ],
           ),
-          actions: [],
+          actions: const [
+            SizedBox(width: 48.0),
+          ],
           centerTitle: true,
-          elevation: 2.0,
+          elevation: 0.0,
         ),
         body: SafeArea(
           top: true,
@@ -140,25 +145,13 @@ class _CestinoWidgetState extends State<CestinoWidget> {
             mainAxisSize: MainAxisSize.max,
             children: [
               Padding(
-                padding: EdgeInsetsDirectional.fromSTEB(12.0, 12.0, 12.0, 12.0),
+                padding: const EdgeInsetsDirectional.fromSTEB(12.0, 16.0, 12.0, 16.0),
                 child: Text(
                   'Avrai 7 giorni per ripristinare i tuoi piatti,\ndopo tale tempo verranno definitivamente eliminati',
                   textAlign: TextAlign.center,
-                  style: FlutterFlowTheme.of(context).bodyMedium.override(
-                        font: GoogleFonts.openSans(
-                          fontWeight: FlutterFlowTheme.of(context)
-                              .bodyMedium
-                              .fontWeight,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                        ),
-                        color: FFAppState().temaSecondaryText,
-                        letterSpacing: 0.0,
-                        fontWeight:
-                            FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                        fontStyle:
-                            FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                      ),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
                 ),
               ),
               StreamBuilder<List<PiattiRecord>>(
@@ -181,7 +174,7 @@ class _CestinoWidgetState extends State<CestinoWidget> {
                         width: 50.0,
                         height: 50.0,
                         child: SpinKitPulse(
-                          color: FlutterFlowTheme.of(context).primary,
+                          color: theme.colorScheme.primary,
                           size: 50.0,
                         ),
                       ),
@@ -189,7 +182,7 @@ class _CestinoWidgetState extends State<CestinoWidget> {
                   }
                   List<PiattiRecord> listViewPiattiRecordList = snapshot.data!;
                   if (listViewPiattiRecordList.isEmpty) {
-                    return Center(
+                    return const Center(
                       child: CestinoVuotoWidget(),
                     );
                   }
@@ -203,44 +196,58 @@ class _CestinoWidgetState extends State<CestinoWidget> {
                       final listViewPiattiRecord =
                           listViewPiattiRecordList[listViewIndex];
                       return Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(
-                            10.0, 10.0, 10.0, 10.0),
-                        child: Material(
-                          color: Colors.transparent,
-                          elevation: 2.0,
+                        padding: const EdgeInsetsDirectional.fromSTEB(
+                            10.0, 6.0, 10.0, 6.0),
+                        child: Card(
+                          elevation: 0.0,
+                          margin: EdgeInsets.zero,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: FFAppState().temaSecondaryBackground,
-                              borderRadius: BorderRadius.circular(12.0),
+                            borderRadius: BorderRadius.circular(14.0),
+                            side: BorderSide(
+                              color: theme.dividerColor.withValues(alpha: 0.6),
+                              width: 1.0,
                             ),
-                            child: Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(
-                                  10.0, 0.0, 10.0, 0.0),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(12.0),
-                                    child: CachedNetworkImage(
-                                      fadeInDuration:
-                                          Duration(milliseconds: 500),
-                                      fadeOutDuration:
-                                          Duration(milliseconds: 500),
-                                      imageUrl: valueOrDefault<String>(
-                                        listViewPiattiRecord.foto,
-                                        'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/pronto-menu-f0och1/assets/2n9hc9ugo68c/Immagine_standard.png',
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                12.0, 10.0, 12.0, 10.0),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  child: CachedNetworkImage(
+                                    fadeInDuration:
+                                        const Duration(milliseconds: 300),
+                                    fadeOutDuration:
+                                        const Duration(milliseconds: 300),
+                                    imageUrl: valueOrDefault<String>(
+                                      listViewPiattiRecord.foto,
+                                      'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/pronto-menu-f0och1/assets/2n9hc9ugo68c/Immagine_standard.png',
+                                    ),
+                                    width: 60.0,
+                                    height: 60.0,
+                                    fit: BoxFit.cover,
+                                    errorWidget: (context, url, error) =>
+                                        Container(
+                                      color: theme.dividerColor
+                                          .withValues(alpha: 0.1),
+                                      alignment: Alignment.center,
+                                      child: Icon(
+                                        Icons.restaurant_outlined,
+                                        color: theme.iconTheme.color
+                                                ?.withValues(alpha: 0.5) ??
+                                            theme.hintColor,
+                                        size: 24.0,
                                       ),
-                                      width: 60.0,
-                                      height: 60.0,
-                                      fit: BoxFit.cover,
                                     ),
                                   ),
-                                  Column(
+                                ),
+                                const SizedBox(width: 14.0),
+                                Expanded(
+                                  child: Column(
                                     mainAxisSize: MainAxisSize.max,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     crossAxisAlignment:
@@ -249,26 +256,11 @@ class _CestinoWidgetState extends State<CestinoWidget> {
                                       Text(
                                         listViewPiattiRecord.nome,
                                         textAlign: TextAlign.start,
-                                        style: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .override(
-                                              font: GoogleFonts.openSans(
-                                                fontWeight: FontWeight.bold,
-                                                fontStyle:
-                                                    FlutterFlowTheme.of(context)
-                                                        .bodyMedium
-                                                        .fontStyle,
-                                              ),
-                                              color:
-                                                  FFAppState().temaPrimaryText,
-                                              letterSpacing: 0.0,
-                                              fontWeight: FontWeight.bold,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .fontStyle,
-                                            ),
+                                        style: theme.textTheme.titleSmall?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
+                                      const SizedBox(height: 4.0),
                                       Text(
                                         formatNumber(
                                           listViewPiattiRecord.prezzo,
@@ -277,160 +269,105 @@ class _CestinoWidgetState extends State<CestinoWidget> {
                                           currency: '€',
                                         ),
                                         textAlign: TextAlign.start,
-                                        style: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .override(
-                                              font: GoogleFonts.openSans(
-                                                fontWeight:
-                                                    FlutterFlowTheme.of(context)
-                                                        .bodyMedium
-                                                        .fontWeight,
-                                                fontStyle:
-                                                    FlutterFlowTheme.of(context)
-                                                        .bodyMedium
-                                                        .fontStyle,
-                                              ),
-                                              color:
-                                                  FFAppState().temaPrimaryText,
-                                              letterSpacing: 0.0,
-                                              fontWeight:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .fontWeight,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .fontStyle,
-                                            ),
+                                        style: theme.textTheme.bodyMedium?.copyWith(
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
                                     ],
                                   ),
-                                  Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      FlutterFlowIconButton(
-                                        borderRadius: 8.0,
-                                        buttonSize: 40.0,
-                                        icon: Icon(
-                                          Icons.restore,
-                                          color: FFAppState().temaPrimary,
-                                          size: 24.0,
-                                        ),
-                                        onPressed: () async {
-                                          await listViewPiattiRecord.reference
-                                              .update({
-                                            ...createPiattiRecordData(
-                                              isCestinato: false,
-                                            ),
-                                            ...mapToFirestore(
-                                              {
-                                                'dataCestinamento':
-                                                    FieldValue.delete(),
-                                              },
-                                            ),
-                                          });
+                                ),
+                                Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    IconButton(
+                                      icon: Icon(
+                                        Icons.restore,
+                                        color: theme.colorScheme.primary,
+                                        size: 22.0,
+                                      ),
+                                      onPressed: () async {
+                                        await listViewPiattiRecord.reference
+                                            .update({
+                                          ...createPiattiRecordData(
+                                            isCestinato: false,
+                                          ),
+                                          ...mapToFirestore(
+                                            {
+                                              'dataCestinamento':
+                                                  FieldValue.delete(),
+                                            },
+                                          ),
+                                        });
+                                        if (context.mounted) {
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(
-                                            SnackBar(
+                                            const SnackBar(
                                               content: Text(
                                                 'Piatto ripristinato con successo!',
-                                                style: FlutterFlowTheme.of(
-                                                        context)
-                                                    .titleLarge
-                                                    .override(
-                                                      font: GoogleFonts.outfit(
-                                                        fontWeight:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .titleLarge
-                                                                .fontWeight,
-                                                        fontStyle:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .titleLarge
-                                                                .fontStyle,
-                                                      ),
-                                                      color: FlutterFlowTheme
-                                                              .of(context)
-                                                          .primaryBackground,
-                                                      letterSpacing: 0.0,
-                                                      fontWeight:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .titleLarge
-                                                              .fontWeight,
-                                                      fontStyle:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .titleLarge
-                                                              .fontStyle,
-                                                    ),
                                               ),
                                               duration:
-                                                  Duration(milliseconds: 8000),
-                                              backgroundColor:
-                                                  FlutterFlowTheme.of(context)
-                                                      .primary,
+                                                  Duration(milliseconds: 3000),
                                             ),
                                           );
-                                        },
+                                        }
+                                      },
+                                    ),
+                                    IconButton(
+                                      icon: Icon(
+                                        Icons.delete_outline_rounded,
+                                        color: theme.colorScheme.error,
+                                        size: 22.0,
                                       ),
-                                      Padding(
-                                        padding: EdgeInsetsDirectional.fromSTEB(
-                                            10.0, 0.0, 0.0, 0.0),
-                                        child: FlutterFlowIconButton(
-                                          borderRadius: 8.0,
-                                          buttonSize: 40.0,
-                                          icon: Icon(
-                                            Icons.delete,
-                                            color: FFAppState().temaError,
-                                            size: 24.0,
-                                          ),
-                                          onPressed: () async {
-                                            var confirmDialogResponse =
-                                                await showDialog<bool>(
-                                                      context: context,
-                                                      builder:
-                                                          (alertDialogContext) {
-                                                        return AlertDialog(
-                                                          title: Text(
-                                                              'Elimina definitivamente'),
-                                                          content: Text(
-                                                              'Sei sicuro? Il piatto e la sua foto verranno cancellati per sempre e non potrai più recuperarli'),
-                                                          actions: [
-                                                            TextButton(
-                                                              onPressed: () =>
-                                                                  Navigator.pop(
-                                                                      alertDialogContext,
-                                                                      false),
-                                                              child: Text(
-                                                                  'Annulla'),
-                                                            ),
-                                                            TextButton(
-                                                              onPressed: () =>
-                                                                  Navigator.pop(
-                                                                      alertDialogContext,
-                                                                      true),
-                                                              child: Text(
-                                                                  'Elimina'),
-                                                            ),
-                                                          ],
-                                                        );
-                                                      },
-                                                    ) ??
-                                                    false;
-                                            if (confirmDialogResponse) {
-                                              await listViewPiattiRecord
-                                                  .reference
+                                      onPressed: () async {
+                                        var confirmDialogResponse =
+                                            await showDialog<bool>(
+                                                  context: context,
+                                                  builder:
+                                                      (alertDialogContext) {
+                                                    return AlertDialog(
+                                                      title: const Text(
+                                                          'Elimina definitivamente'),
+                                                      content: const Text(
+                                                          'Sei sicuro? Il piatto e la sua foto verranno cancellati per sempre e non potrai più recuperarli'),
+                                                      actions: [
+                                                        TextButton(
+                                                          onPressed: () =>
+                                                              Navigator.pop(
+                                                                  alertDialogContext,
+                                                                  false),
+                                                          child: const Text(
+                                                              'Annulla'),
+                                                        ),
+                                                        TextButton(
+                                                          onPressed: () =>
+                                                              Navigator.pop(
+                                                                  alertDialogContext,
+                                                                  true),
+                                                          child: const Text(
+                                                              'Elimina'),
+                                                        ),
+                                                      ],
+                                                    );
+                                                  },
+                                                ) ??
+                                                false;
+                                        if (confirmDialogResponse) {
+                                          if (listViewPiattiRecord.foto.isNotEmpty) {
+                                            try {
+                                              await FirebaseStorage.instance
+                                                  .refFromURL(listViewPiattiRecord.foto)
                                                   .delete();
-                                            }
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
+                                            } catch (_) {}
+                                          }
+                                          await listViewPiattiRecord
+                                              .reference
+                                              .delete();
+                                        }
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
                         ),

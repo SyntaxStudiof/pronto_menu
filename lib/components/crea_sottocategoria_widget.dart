@@ -1,13 +1,9 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'crea_sottocategoria_model.dart';
 export 'crea_sottocategoria_model.dart';
@@ -55,12 +51,17 @@ class _CreaSottocategoriaWidgetState extends State<CreaSottocategoriaWidget> {
   @override
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
+    final theme = Theme.of(context);
 
     return Container(
       width: double.infinity,
       height: MediaQuery.sizeOf(context).height * 0.6,
       decoration: BoxDecoration(
-        color: FFAppState().temaSecondary,
+        color: theme.cardColor,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(20.0),
+          topRight: Radius.circular(20.0),
+        ),
       ),
       child: SingleChildScrollView(
         controller: _model.columnController,
@@ -68,7 +69,7 @@ class _CreaSottocategoriaWidgetState extends State<CreaSottocategoriaWidget> {
           mainAxisSize: MainAxisSize.max,
           children: [
             Padding(
-              padding: EdgeInsetsDirectional.fromSTEB(0.0, 20.0, 0.0, 0.0),
+              padding: const EdgeInsetsDirectional.fromSTEB(0.0, 20.0, 0.0, 0.0),
               child: Container(
                 width: 280.0,
                 child: TextFormField(
@@ -79,91 +80,44 @@ class _CreaSottocategoriaWidgetState extends State<CreaSottocategoriaWidget> {
                   obscureText: false,
                   decoration: InputDecoration(
                     isDense: true,
-                    labelStyle:
-                        FlutterFlowTheme.of(context).labelMedium.override(
-                              font: GoogleFonts.openSans(
-                                fontWeight: FlutterFlowTheme.of(context)
-                                    .labelMedium
-                                    .fontWeight,
-                                fontStyle: FlutterFlowTheme.of(context)
-                                    .labelMedium
-                                    .fontStyle,
-                              ),
-                              color: FFAppState().temaSecondaryText,
-                              letterSpacing: 0.0,
-                              fontWeight: FlutterFlowTheme.of(context)
-                                  .labelMedium
-                                  .fontWeight,
-                              fontStyle: FlutterFlowTheme.of(context)
-                                  .labelMedium
-                                  .fontStyle,
-                            ),
-                    hintText: 'Scrivi una categoria...',
-                    hintStyle: FlutterFlowTheme.of(context).bodyMedium.override(
-                          font: GoogleFonts.openSans(
-                            fontWeight: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .fontWeight,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .fontStyle,
-                          ),
-                          color: FFAppState().temaSecondaryText,
-                          letterSpacing: 0.0,
-                          fontWeight: FlutterFlowTheme.of(context)
-                              .bodyMedium
-                              .fontWeight,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                        ),
+                    hintText: 'Scrivi una sottocategoria...',
+                    hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.hintColor,
+                    ),
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: FFAppState().temaSecondary,
+                        color: theme.dividerColor.withValues(alpha: 0.2),
                         width: 1.0,
                       ),
                       borderRadius: BorderRadius.circular(12.0),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: FFAppState().temaPrimary,
-                        width: 1.0,
+                        color: theme.colorScheme.primary,
+                        width: 1.5,
                       ),
                       borderRadius: BorderRadius.circular(12.0),
                     ),
                     errorBorder: OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: FFAppState().temaError,
+                        color: theme.colorScheme.error,
                         width: 1.0,
                       ),
                       borderRadius: BorderRadius.circular(12.0),
                     ),
                     focusedErrorBorder: OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: FFAppState().temaError,
-                        width: 1.0,
+                        color: theme.colorScheme.error,
+                        width: 1.5,
                       ),
                       borderRadius: BorderRadius.circular(12.0),
                     ),
                     filled: true,
-                    fillColor: FFAppState().temaSecondaryBackground,
+                    fillColor: theme.scaffoldBackgroundColor,
                   ),
-                  style: FlutterFlowTheme.of(context).bodyMedium.override(
-                        font: GoogleFonts.openSans(
-                          fontWeight: FlutterFlowTheme.of(context)
-                              .bodyMedium
-                              .fontWeight,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                        ),
-                        color: FFAppState().temaPrimaryText,
-                        letterSpacing: 0.0,
-                        fontWeight:
-                            FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                        fontStyle:
-                            FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                      ),
+                  style: theme.textTheme.bodyMedium,
                   textAlign: TextAlign.center,
-                  cursorColor: FFAppState().temaPrimary,
+                  cursorColor: theme.colorScheme.primary,
                   enableInteractiveSelection: true,
                   validator: _model.nomeSottocategoriaTextControllerValidator
                       .asValidator(context),
@@ -177,13 +131,13 @@ class _CreaSottocategoriaWidgetState extends State<CreaSottocategoriaWidget> {
                 await sottocategorieRecordReference
                     .set(createSottocategorieRecordData(
                   nome: _model.nomeSottocategoriaTextController.text,
-                  categoriaPadreRef: widget!.categoriaRicevuta,
+                  categoriaPadreRef: widget.categoriaRicevuta,
                   proprietario: currentUserReference,
                 ));
                 _model.nuovaSottocat = SottocategorieRecord.getDocumentFromData(
                     createSottocategorieRecordData(
                       nome: _model.nomeSottocategoriaTextController.text,
-                      categoriaPadreRef: widget!.categoriaRicevuta,
+                      categoriaPadreRef: widget.categoriaRicevuta,
                       proprietario: currentUserReference,
                     ),
                     sottocategorieRecordReference);
@@ -195,28 +149,13 @@ class _CreaSottocategoriaWidgetState extends State<CreaSottocategoriaWidget> {
               options: FFButtonOptions(
                 width: 280.0,
                 height: 45.0,
-                padding: EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
-                iconPadding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
-                color: FFAppState().temaPrimary,
-                textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                      font: GoogleFonts.outfit(
-                        fontWeight:
-                            FlutterFlowTheme.of(context).titleSmall.fontWeight,
-                        fontStyle:
-                            FlutterFlowTheme.of(context).titleSmall.fontStyle,
-                      ),
-                      color: FFAppState().temaPrimaryBackground,
-                      letterSpacing: 0.0,
-                      fontWeight:
-                          FlutterFlowTheme.of(context).titleSmall.fontWeight,
-                      fontStyle:
-                          FlutterFlowTheme.of(context).titleSmall.fontStyle,
-                    ),
-                elevation: 2.0,
+                padding: const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
+                iconPadding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                elevation: 0.0,
                 borderRadius: BorderRadius.circular(12.0),
               ),
             ),
-          ].divide(SizedBox(height: 10.0)),
+          ].divide(const SizedBox(height: 10.0)),
         ),
       ),
     );

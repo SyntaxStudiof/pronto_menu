@@ -1,11 +1,6 @@
-import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'cestino_vuoto_model.dart';
 export 'cestino_vuoto_model.dart';
@@ -44,55 +39,62 @@ class _CestinoVuotoWidgetState extends State<CestinoVuotoWidget> {
   @override
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
+    final theme = Theme.of(context);
 
     return Container(
-      width: 298.9,
-      height: 300.1,
+      width: double.infinity,
+      constraints: const BoxConstraints(maxWidth: 420.0),
+      margin: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
+      padding: const EdgeInsets.all(32.0),
       decoration: BoxDecoration(
-        color: FFAppState().temaSecondaryBackground,
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(24.0),
+        border: Border.all(
+          color: theme.dividerColor.withValues(alpha: 0.15),
+          width: 1.0,
+        ),
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 16.0,
+            color: Colors.black.withValues(alpha: 0.04),
+            offset: const Offset(0.0, 4.0),
+          ),
+        ],
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          FaIcon(
-            FontAwesomeIcons.solidSmileBeam,
-            color: FFAppState().temaPrimary,
-            size: 80.0,
+          Container(
+            width: 72.0,
+            height: 72.0,
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primary.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            alignment: Alignment.center,
+            child: FaIcon(
+              FontAwesomeIcons.solidSmileBeam,
+              color: theme.colorScheme.primary,
+              size: 36.0,
+            ),
           ),
+          const SizedBox(height: 20.0),
           Text(
             'Il cestino è vuoto',
             textAlign: TextAlign.center,
-            style: FlutterFlowTheme.of(context).titleLarge.override(
-                  font: GoogleFonts.outfit(
-                    fontWeight:
-                        FlutterFlowTheme.of(context).titleLarge.fontWeight,
-                    fontStyle:
-                        FlutterFlowTheme.of(context).titleLarge.fontStyle,
-                  ),
-                  color: FFAppState().temaPrimaryText,
-                  letterSpacing: 0.0,
-                  fontWeight:
-                      FlutterFlowTheme.of(context).titleLarge.fontWeight,
-                  fontStyle: FlutterFlowTheme.of(context).titleLarge.fontStyle,
-                ),
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              letterSpacing: -0.3,
+            ),
           ),
+          const SizedBox(height: 8.0),
           Text(
-            'Non hai nessun piatto eliminato. I piatti cancellati rimarranno qui per 7 giorni prima di essere distrutti.',
+            'Non hai nessun piatto eliminato.\nI piatti cancellati rimarranno qui per 7 giorni prima dell\'eliminazione definitiva.',
             textAlign: TextAlign.center,
-            style: FlutterFlowTheme.of(context).bodyMedium.override(
-                  font: GoogleFonts.openSans(
-                    fontWeight:
-                        FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                    fontStyle:
-                        FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                  ),
-                  color: FFAppState().temaSecondaryText,
-                  letterSpacing: 0.0,
-                  fontWeight:
-                      FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                  fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                ),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.textTheme.bodySmall?.color,
+              height: 1.5,
+            ),
           ),
         ],
       ),

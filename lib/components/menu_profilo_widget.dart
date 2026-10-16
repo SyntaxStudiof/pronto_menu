@@ -1,13 +1,8 @@
 import '/auth/firebase_auth/auth_util.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
-import 'dart:ui';
 import '/index.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'menu_profilo_model.dart';
 export 'menu_profilo_model.dart';
@@ -44,439 +39,411 @@ class _MenuProfiloWidgetState extends State<MenuProfiloWidget> {
   @override
   void dispose() {
     _model.maybeDispose();
-
     super.dispose();
+  }
+
+  Widget _buildMenuItem({
+    required BuildContext context,
+    required String title,
+    required IconData icon,
+    required Color iconColor,
+    required Color iconBgColor,
+    required VoidCallback onTap,
+    bool isDestructive = false,
+  }) {
+    final theme = Theme.of(context);
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12.0),
+        hoverColor: isDestructive
+            ? theme.colorScheme.error.withValues(alpha: 0.1)
+            : theme.dividerColor.withValues(alpha: 0.1),
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
+          child: Row(
+            children: [
+              Container(
+                width: 38.0,
+                height: 38.0,
+                decoration: BoxDecoration(
+                  color: iconBgColor,
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                alignment: Alignment.center,
+                child: Icon(
+                  icon,
+                  color: iconColor,
+                  size: 20.0,
+                ),
+              ),
+              const SizedBox(width: 14.0),
+              Expanded(
+                child: Text(
+                  title,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: isDestructive ? theme.colorScheme.error : null,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: isDestructive
+                    ? theme.colorScheme.error.withValues(alpha: 0.5)
+                    : theme.iconTheme.color?.withValues(alpha: 0.4) ??
+                        theme.dividerColor.withValues(alpha: 0.6),
+                size: 20.0,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
+    final theme = Theme.of(context);
 
     return Container(
-      width: 220.0,
+      width: 320.0,
       decoration: BoxDecoration(
-        color: FFAppState().temaSecondary,
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          InkWell(
-            splashColor: Colors.transparent,
-            focusColor: Colors.transparent,
-            hoverColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            onTap: () async {
-              context.pushNamed(
-                ProfiloUtenteWidget.routeName,
-                queryParameters: {
-                  'ristoranteRef': serializeParam(
-                    widget!.ristoranteRef,
-                    ParamType.DocumentReference,
-                  ),
-                }.withoutNulls,
-                extra: <String, dynamic>{
-                  '__transition_info__': TransitionInfo(
-                    hasTransition: true,
-                    transitionType: PageTransitionType.rightToLeft,
-                  ),
-                },
-              );
-            },
-            child: Material(
-              color: Colors.transparent,
-              child: ListTile(
-                title: Text(
-                  'Il mio profilo',
-                  style: FlutterFlowTheme.of(context).titleLarge.override(
-                        font: GoogleFonts.outfit(
-                          fontWeight: FlutterFlowTheme.of(context)
-                              .titleLarge
-                              .fontWeight,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).titleLarge.fontStyle,
-                        ),
-                        color: FFAppState().temaPrimaryText,
-                        letterSpacing: 0.0,
-                        fontWeight:
-                            FlutterFlowTheme.of(context).titleLarge.fontWeight,
-                        fontStyle:
-                            FlutterFlowTheme.of(context).titleLarge.fontStyle,
-                      ),
-                ),
-                trailing: Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  color: FFAppState().temaSecondaryText,
-                  size: 24.0,
-                ),
-                dense: false,
-                contentPadding:
-                    EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 12.0, 0.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-              ),
-            ),
-          ),
-          Divider(
-            thickness: 1.0,
-            indent: 20.0,
-            endIndent: 20.0,
-            color: FFAppState().temaSecondaryBackground,
-          ),
-          if (valueOrDefault<bool>(currentUserDocument?.isAdmin, false) == true)
-            AuthUserStreamWidget(
-              builder: (context) => InkWell(
-                splashColor: Colors.transparent,
-                focusColor: Colors.transparent,
-                hoverColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-                onTap: () async {
-                  Navigator.pop(context);
-
-                  context.pushNamed(AdminDashboardWidget.routeName);
-                },
-                child: Material(
-                  color: Colors.transparent,
-                  child: ListTile(
-                    title: Text(
-                      'Admin',
-                      style: FlutterFlowTheme.of(context).titleLarge.override(
-                            font: GoogleFonts.outfit(
-                              fontWeight: FlutterFlowTheme.of(context)
-                                  .titleLarge
-                                  .fontWeight,
-                              fontStyle: FlutterFlowTheme.of(context)
-                                  .titleLarge
-                                  .fontStyle,
-                            ),
-                            color: FFAppState().temaPrimaryText,
-                            letterSpacing: 0.0,
-                            fontWeight: FlutterFlowTheme.of(context)
-                                .titleLarge
-                                .fontWeight,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .titleLarge
-                                .fontStyle,
-                          ),
-                    ),
-                    trailing: Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      color: FFAppState().temaSecondaryText,
-                      size: 24.0,
-                    ),
-                    dense: false,
-                    contentPadding:
-                        EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 12.0, 0.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          if (valueOrDefault<bool>(currentUserDocument?.isAdmin, false) == true)
-            AuthUserStreamWidget(
-              builder: (context) => Divider(
-                thickness: 1.0,
-                indent: 20.0,
-                endIndent: 20.0,
-                color: FFAppState().temaSecondaryBackground,
-              ),
-            ),
-          InkWell(
-            splashColor: Colors.transparent,
-            focusColor: Colors.transparent,
-            hoverColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            onTap: () async {
-              context.pushNamed(
-                ImpostazioniQRWidget.routeName,
-                extra: <String, dynamic>{
-                  '__transition_info__': TransitionInfo(
-                    hasTransition: true,
-                    transitionType: PageTransitionType.rightToLeft,
-                  ),
-                },
-              );
-            },
-            child: Material(
-              color: Colors.transparent,
-              child: ListTile(
-                title: Text(
-                  'QR code menu',
-                  style: FlutterFlowTheme.of(context).titleLarge.override(
-                        font: GoogleFonts.outfit(
-                          fontWeight: FlutterFlowTheme.of(context)
-                              .titleLarge
-                              .fontWeight,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).titleLarge.fontStyle,
-                        ),
-                        color: FFAppState().temaPrimaryText,
-                        letterSpacing: 0.0,
-                        fontWeight:
-                            FlutterFlowTheme.of(context).titleLarge.fontWeight,
-                        fontStyle:
-                            FlutterFlowTheme.of(context).titleLarge.fontStyle,
-                      ),
-                ),
-                trailing: Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  color: FFAppState().temaSecondaryText,
-                  size: 24.0,
-                ),
-                dense: false,
-                contentPadding:
-                    EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 12.0, 0.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-              ),
-            ),
-          ),
-          Divider(
-            thickness: 1.0,
-            indent: 20.0,
-            endIndent: 20.0,
-            color: FFAppState().temaSecondaryBackground,
-          ),
-          InkWell(
-            splashColor: Colors.transparent,
-            focusColor: Colors.transparent,
-            hoverColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            onTap: () async {
-              context.pushNamed(
-                CestinoWidget.routeName,
-                extra: <String, dynamic>{
-                  '__transition_info__': TransitionInfo(
-                    hasTransition: true,
-                    transitionType: PageTransitionType.rightToLeft,
-                  ),
-                },
-              );
-            },
-            child: Material(
-              color: Colors.transparent,
-              child: ListTile(
-                title: Text(
-                  'Cestino',
-                  style: FlutterFlowTheme.of(context).titleLarge.override(
-                        font: GoogleFonts.outfit(
-                          fontWeight: FlutterFlowTheme.of(context)
-                              .titleLarge
-                              .fontWeight,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).titleLarge.fontStyle,
-                        ),
-                        color: FFAppState().temaPrimaryText,
-                        letterSpacing: 0.0,
-                        fontWeight:
-                            FlutterFlowTheme.of(context).titleLarge.fontWeight,
-                        fontStyle:
-                            FlutterFlowTheme.of(context).titleLarge.fontStyle,
-                      ),
-                ),
-                trailing: Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  color: FFAppState().temaSecondaryText,
-                  size: 24.0,
-                ),
-                dense: false,
-                contentPadding:
-                    EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 12.0, 0.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-              ),
-            ),
-          ),
-          Divider(
-            thickness: 1.0,
-            indent: 20.0,
-            endIndent: 20.0,
-            color: FFAppState().temaSecondaryBackground,
-          ),
-          InkWell(
-            splashColor: Colors.transparent,
-            focusColor: Colors.transparent,
-            hoverColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            onTap: () async {
-              if (Navigator.of(context).canPop()) {
-                context.pop();
-              }
-              context.pushNamed(
-                ImpostazioniUtenteWidget.routeName,
-                queryParameters: {
-                  'ristoranteRef': serializeParam(
-                    widget!.ristoranteRef,
-                    ParamType.DocumentReference,
-                  ),
-                }.withoutNulls,
-                extra: <String, dynamic>{
-                  '__transition_info__': TransitionInfo(
-                    hasTransition: true,
-                    transitionType: PageTransitionType.rightToLeft,
-                  ),
-                },
-              );
-            },
-            child: Material(
-              color: Colors.transparent,
-              child: ListTile(
-                title: Text(
-                  'Impostazioni',
-                  style: FlutterFlowTheme.of(context).titleLarge.override(
-                        font: GoogleFonts.outfit(
-                          fontWeight: FlutterFlowTheme.of(context)
-                              .titleLarge
-                              .fontWeight,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).titleLarge.fontStyle,
-                        ),
-                        color: FFAppState().temaPrimaryText,
-                        letterSpacing: 0.0,
-                        fontWeight:
-                            FlutterFlowTheme.of(context).titleLarge.fontWeight,
-                        fontStyle:
-                            FlutterFlowTheme.of(context).titleLarge.fontStyle,
-                      ),
-                ),
-                trailing: Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  color: FFAppState().temaSecondaryText,
-                  size: 24.0,
-                ),
-                dense: false,
-                contentPadding:
-                    EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 12.0, 0.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-              ),
-            ),
-          ),
-          Divider(
-            thickness: 1.0,
-            indent: 20.0,
-            endIndent: 20.0,
-            color: FFAppState().temaSecondaryBackground,
-          ),
-          InkWell(
-            splashColor: Colors.transparent,
-            focusColor: Colors.transparent,
-            hoverColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            onTap: () async {
-              context.pushNamed(
-                SupportoRistoratoreWidget.routeName,
-                queryParameters: {
-                  'ristoranteRef': serializeParam(
-                    widget!.ristoranteRef,
-                    ParamType.DocumentReference,
-                  ),
-                }.withoutNulls,
-                extra: <String, dynamic>{
-                  '__transition_info__': TransitionInfo(
-                    hasTransition: true,
-                    transitionType: PageTransitionType.rightToLeft,
-                  ),
-                },
-              );
-            },
-            child: Material(
-              color: Colors.transparent,
-              child: ListTile(
-                title: Text(
-                  'Supporto',
-                  style: FlutterFlowTheme.of(context).titleLarge.override(
-                        font: GoogleFonts.outfit(
-                          fontWeight: FlutterFlowTheme.of(context)
-                              .titleLarge
-                              .fontWeight,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).titleLarge.fontStyle,
-                        ),
-                        color: FFAppState().temaPrimaryText,
-                        letterSpacing: 0.0,
-                        fontWeight:
-                            FlutterFlowTheme.of(context).titleLarge.fontWeight,
-                        fontStyle:
-                            FlutterFlowTheme.of(context).titleLarge.fontStyle,
-                      ),
-                ),
-                trailing: Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  color: FFAppState().temaSecondaryText,
-                  size: 24.0,
-                ),
-                dense: false,
-                contentPadding:
-                    EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 12.0, 0.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-              ),
-            ),
-          ),
-          Divider(
-            thickness: 1.0,
-            indent: 20.0,
-            endIndent: 20.0,
-            color: FFAppState().temaSecondaryBackground,
-          ),
-          InkWell(
-            splashColor: Colors.transparent,
-            focusColor: Colors.transparent,
-            hoverColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            onTap: () async {
-              GoRouter.of(context).prepareAuthEvent();
-              await authManager.signOut();
-              GoRouter.of(context).clearRedirectLocation();
-
-              context.pushNamedAuth(
-                  AuthWelcomeWidget.routeName, context.mounted);
-            },
-            child: Material(
-              color: Colors.transparent,
-              child: ListTile(
-                title: Text(
-                  'Log Out',
-                  style: FlutterFlowTheme.of(context).titleLarge.override(
-                        font: GoogleFonts.outfit(
-                          fontWeight: FlutterFlowTheme.of(context)
-                              .titleLarge
-                              .fontWeight,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).titleLarge.fontStyle,
-                        ),
-                        color: FFAppState().temaPrimaryText,
-                        letterSpacing: 0.0,
-                        fontWeight:
-                            FlutterFlowTheme.of(context).titleLarge.fontWeight,
-                        fontStyle:
-                            FlutterFlowTheme.of(context).titleLarge.fontStyle,
-                      ),
-                ),
-                trailing: Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  color: FFAppState().temaSecondaryText,
-                  size: 24.0,
-                ),
-                dense: false,
-                contentPadding:
-                    EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 12.0, 0.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-              ),
-            ),
+        color: theme.cardColor,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(20.0),
+          bottomLeft: Radius.circular(20.0),
+        ),
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 24.0,
+            color: Colors.black.withValues(alpha: 0.15),
+            offset: const Offset(-4.0, 0.0),
           ),
         ],
+      ),
+      child: SafeArea(
+        child: Column(
+          children: [
+            // Header del Drawer
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20.0, 16.0, 16.0, 16.0),
+              child: Row(
+                children: [
+                  Container(
+                    width: 44.0,
+                    height: 44.0,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: theme.colorScheme.primary,
+                        width: 2.0,
+                      ),
+                    ),
+                    child: ClipOval(
+                      child: Image.network(
+                        valueOrDefault<String>(
+                          currentUserPhoto,
+                          'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+                        ),
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Image.asset(
+                          'assets/images/IMG_8006.png',
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12.0),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          valueOrDefault<String>(
+                            currentUserDisplayName,
+                            'Il mio ristorante',
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: -0.3,
+                          ),
+                        ),
+                        const SizedBox(height: 2.0),
+                        Text(
+                          currentUserEmail,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.close_rounded,
+                      size: 22.0,
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+            ),
+            Divider(
+              height: 1.0,
+              thickness: 1.0,
+              color: theme.dividerColor.withValues(alpha: 0.15),
+            ),
+            // Menu Items List
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  children: [
+                    _buildMenuItem(
+                      context: context,
+                      title: 'Il mio profilo',
+                      icon: Icons.person_rounded,
+                      iconColor: const Color(0xFF2563EB),
+                      iconBgColor: const Color(0xFF2563EB).withValues(alpha: 0.12),
+                      onTap: () async {
+                        Navigator.pop(context);
+                        context.pushNamed(
+                          ProfiloUtenteWidget.routeName,
+                          queryParameters: {
+                            'ristoranteRef': serializeParam(
+                              widget.ristoranteRef,
+                              ParamType.DocumentReference,
+                            ),
+                          }.withoutNulls,
+                          extra: <String, dynamic>{
+                            '__transition_info__': const TransitionInfo(
+                              hasTransition: true,
+                              transitionType: PageTransitionType.rightToLeft,
+                            ),
+                          },
+                        );
+                      },
+                    ),
+                    AuthUserStreamWidget(
+                      builder: (context) =>
+                          valueOrDefault<bool>(currentUserDocument?.isAdmin, false)
+                              ? Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const SizedBox(height: 4.0),
+                                    _buildMenuItem(
+                                      context: context,
+                                      title: 'Admin Dashboard',
+                                      icon: Icons.admin_panel_settings_rounded,
+                                      iconColor: const Color(0xFF7C3AED),
+                                      iconBgColor: const Color(0xFF7C3AED).withValues(alpha: 0.12),
+                                      onTap: () async {
+                                        Navigator.pop(context);
+                                        context.pushNamed(AdminDashboardWidget.routeName);
+                                      },
+                                    ),
+                                  ],
+                                )
+                              : const SizedBox.shrink(),
+                    ),
+                    const SizedBox(height: 4.0),
+                    _buildMenuItem(
+                      context: context,
+                      title: 'QR code menu',
+                      icon: Icons.qr_code_2_rounded,
+                      iconColor: const Color(0xFF0EA5E9),
+                      iconBgColor: const Color(0xFF0EA5E9).withValues(alpha: 0.12),
+                      onTap: () async {
+                        Navigator.pop(context);
+                        context.pushNamed(
+                          ImpostazioniQRWidget.routeName,
+                          extra: <String, dynamic>{
+                            '__transition_info__': const TransitionInfo(
+                              hasTransition: true,
+                              transitionType: PageTransitionType.rightToLeft,
+                            ),
+                          },
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 4.0),
+                    _buildMenuItem(
+                      context: context,
+                      title: 'Vedi menu come cliente',
+                      icon: Icons.visibility_rounded,
+                      iconColor: const Color(0xFF10B981),
+                      iconBgColor:
+                          const Color(0xFF10B981).withValues(alpha: 0.12),
+                      onTap: () async {
+                        Navigator.pop(context);
+                        context.pushNamed(
+                          MenuClienteWidget.routeName,
+                          queryParameters: {
+                            'ristoranteRef': serializeParam(
+                              widget.ristoranteRef,
+                              ParamType.DocumentReference,
+                            ),
+                            'isAnteprima': serializeParam(
+                              true,
+                              ParamType.bool,
+                            ),
+                          }.withoutNulls,
+                          extra: <String, dynamic>{
+                            '__transition_info__': const TransitionInfo(
+                              hasTransition: true,
+                              transitionType: PageTransitionType.rightToLeft,
+                            ),
+                          },
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 4.0),
+                    _buildMenuItem(
+                      context: context,
+                      title: 'Cestino',
+                      icon: Icons.delete_outline_rounded,
+                      iconColor: const Color(0xFFD97706),
+                      iconBgColor: const Color(0xFFD97706).withValues(alpha: 0.12),
+                      onTap: () async {
+                        Navigator.pop(context);
+                        context.pushNamed(
+                          CestinoWidget.routeName,
+                          extra: <String, dynamic>{
+                            '__transition_info__': const TransitionInfo(
+                              hasTransition: true,
+                              transitionType: PageTransitionType.rightToLeft,
+                            ),
+                          },
+                        );
+                      },
+                    ),
+                    if (valueOrDefault<bool>(
+                        currentUserDocument?.dispensaAttiva, false)) ...[
+                      const SizedBox(height: 4.0),
+                      _buildMenuItem(
+                        context: context,
+                        title: 'Dispensa',
+                        icon: Icons.kitchen_rounded,
+                        iconColor: const Color(0xFFF97316),
+                        iconBgColor:
+                            const Color(0xFFF97316).withValues(alpha: 0.12),
+                        onTap: () async {
+                          Navigator.pop(context);
+                          context.pushNamed(
+                            GestioneDispensaWidget.routeName,
+                            queryParameters: {
+                              'ristoranteRef': serializeParam(
+                                widget.ristoranteRef,
+                                ParamType.DocumentReference,
+                              ),
+                            }.withoutNulls,
+                            extra: <String, dynamic>{
+                              '__transition_info__': const TransitionInfo(
+                                hasTransition: true,
+                                transitionType: PageTransitionType.rightToLeft,
+                              ),
+                            },
+                          );
+                        },
+                      ),
+                    ],
+                    const SizedBox(height: 4.0),
+                    _buildMenuItem(
+                      context: context,
+                      title: 'Impostazioni',
+                      icon: Icons.settings_rounded,
+                      iconColor: const Color(0xFF6B7280),
+                      iconBgColor: const Color(0xFF6B7280).withValues(alpha: 0.12),
+                      onTap: () async {
+                        if (Navigator.of(context).canPop()) {
+                          context.pop();
+                        }
+                        context.pushNamed(
+                          ImpostazioniUtenteWidget.routeName,
+                          queryParameters: {
+                            'ristoranteRef': serializeParam(
+                              widget.ristoranteRef,
+                              ParamType.DocumentReference,
+                            ),
+                          }.withoutNulls,
+                          extra: <String, dynamic>{
+                            '__transition_info__': const TransitionInfo(
+                              hasTransition: true,
+                              transitionType: PageTransitionType.rightToLeft,
+                            ),
+                          },
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 4.0),
+                    _buildMenuItem(
+                      context: context,
+                      title: 'Supporto',
+                      icon: Icons.help_outline_rounded,
+                      iconColor: const Color(0xFF059669),
+                      iconBgColor: const Color(0xFF059669).withValues(alpha: 0.12),
+                      onTap: () async {
+                        Navigator.pop(context);
+                        context.pushNamed(
+                          SupportoRistoratoreWidget.routeName,
+                          queryParameters: {
+                            'ristoranteRef': serializeParam(
+                              widget.ristoranteRef,
+                              ParamType.DocumentReference,
+                            ),
+                          }.withoutNulls,
+                          extra: <String, dynamic>{
+                            '__transition_info__': const TransitionInfo(
+                              hasTransition: true,
+                              transitionType: PageTransitionType.rightToLeft,
+                            ),
+                          },
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Divider(
+              height: 1.0,
+              thickness: 1.0,
+              color: theme.dividerColor.withValues(alpha: 0.15),
+            ),
+            // Bottone Log Out
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 16.0),
+              child: _buildMenuItem(
+                context: context,
+                title: 'Log Out',
+                icon: Icons.logout_rounded,
+                iconColor: theme.colorScheme.error,
+                iconBgColor: theme.colorScheme.error.withValues(alpha: 0.12),
+                isDestructive: true,
+                onTap: () async {
+                  Navigator.pop(context);
+                  GoRouter.of(context).prepareAuthEvent();
+                  await authManager.signOut();
+                  GoRouter.of(context).clearRedirectLocation();
+
+                  context.pushNamedAuth(
+                    AuthWelcomeWidget.routeName,
+                    context.mounted,
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import '/app_state.dart';
+export '/theme_global.dart';
 
 const kThemeModeKey = '__theme_mode__';
 
@@ -39,22 +41,22 @@ abstract class FlutterFlowTheme {
   @Deprecated('Use tertiary instead')
   Color get tertiaryColor => tertiary;
 
-  late Color primary;
-  late Color secondary;
-  late Color tertiary;
-  late Color alternate;
-  late Color primaryText;
-  late Color secondaryText;
-  late Color primaryBackground;
-  late Color secondaryBackground;
-  late Color accent1;
-  late Color accent2;
-  late Color accent3;
-  late Color accent4;
-  late Color success;
-  late Color warning;
-  late Color error;
-  late Color info;
+  Color get primary => FFAppState().temaPrimary;
+  Color get secondary => FFAppState().temaSecondary;
+  Color get tertiary => FFAppState().temaTertiary;
+  Color get alternate => FFAppState().temaAlternate;
+  Color get primaryText => FFAppState().temaPrimaryText;
+  Color get secondaryText => FFAppState().temaSecondaryText;
+  Color get primaryBackground => FFAppState().temaPrimaryBackground;
+  Color get secondaryBackground => FFAppState().temaSecondaryBackground;
+  Color get accent1 => FFAppState().temaAccent1;
+  Color get accent2 => FFAppState().temaAccent2;
+  Color get accent3 => FFAppState().temaAccent3;
+  Color get accent4 => FFAppState().temaAccent4;
+  Color get success => FFAppState().temaSuccess;
+  Color get warning => FFAppState().temaWarning;
+  Color get error => FFAppState().temaError;
+  Color get info => FFAppState().temaInfo;
 
   FFDesignTokens get designToken => FFDesignTokens(this);
 
@@ -136,31 +138,7 @@ abstract class FlutterFlowTheme {
   Typography get typography => ThemeTypography(this);
 }
 
-class LightModeTheme extends FlutterFlowTheme {
-  @Deprecated('Use primary instead')
-  Color get primaryColor => primary;
-  @Deprecated('Use secondary instead')
-  Color get secondaryColor => secondary;
-  @Deprecated('Use tertiary instead')
-  Color get tertiaryColor => tertiary;
-
-  late Color primary = const Color(0xFF2C5E4F);
-  late Color secondary = const Color(0xFFD8CAB7);
-  late Color tertiary = const Color(0xFFA6343C);
-  late Color alternate = const Color(0xFF333333);
-  late Color primaryText = const Color(0xFF413F3E);
-  late Color secondaryText = const Color(0xFFA59D96);
-  late Color primaryBackground = const Color(0xFFFFFAF5);
-  late Color secondaryBackground = const Color(0xFFF1E8DC);
-  late Color accent1 = const Color(0x322C5E4F);
-  late Color accent2 = const Color(0x33A6343C);
-  late Color accent3 = const Color(0x34D8CAB7);
-  late Color accent4 = const Color(0xFF4F85E0);
-  late Color success = const Color(0xFF0B9F74);
-  late Color warning = const Color(0xFFFFA926);
-  late Color error = const Color(0xFFF8464C);
-  late Color info = const Color(0xFF4F85E0);
-}
+class LightModeTheme extends FlutterFlowTheme {}
 
 abstract class Typography {
   String get displayLargeFamily;
@@ -323,31 +301,7 @@ class ThemeTypography extends Typography {
       );
 }
 
-class DarkModeTheme extends FlutterFlowTheme {
-  @Deprecated('Use primary instead')
-  Color get primaryColor => primary;
-  @Deprecated('Use secondary instead')
-  Color get secondaryColor => secondary;
-  @Deprecated('Use tertiary instead')
-  Color get tertiaryColor => tertiary;
-
-  late Color primary = const Color(0xFF21493D);
-  late Color secondary = const Color(0xFF782329);
-  late Color tertiary = const Color(0xFF8E7C6C);
-  late Color alternate = const Color(0xFFF2ECE4);
-  late Color primaryText = const Color(0xFFFDF6ED);
-  late Color secondaryText = const Color(0xFFC1B4AB);
-  late Color primaryBackground = const Color(0xFF121212);
-  late Color secondaryBackground = const Color(0xFF1E1E1E);
-  late Color accent1 = const Color(0xFF367160);
-  late Color accent2 = const Color(0xFFC03C46);
-  late Color accent3 = const Color(0xFFB59F8B);
-  late Color accent4 = const Color(0xFF6F9CEF);
-  late Color success = const Color(0xFF11C694);
-  late Color warning = const Color(0xFFFFB84D);
-  late Color error = const Color(0xFFF75A60);
-  late Color info = const Color(0xFF6F9CEF);
-}
+class DarkModeTheme extends FlutterFlowTheme {}
 
 class FFDesignTokens {
   const FFDesignTokens(this.theme);

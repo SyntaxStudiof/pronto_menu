@@ -12,6 +12,8 @@ import 'schema/users_record.dart';
 import 'schema/tickets_record.dart';
 import 'schema/sottocategorie_record.dart';
 import 'schema/cancellation_requests_record.dart';
+import 'schema/jukebox_requests_record.dart';
+import 'schema/dispensa_record.dart';
 
 export 'dart:async' show StreamSubscription;
 export 'package:cloud_firestore/cloud_firestore.dart' hide Order;
@@ -27,6 +29,8 @@ export 'schema/users_record.dart';
 export 'schema/tickets_record.dart';
 export 'schema/sottocategorie_record.dart';
 export 'schema/cancellation_requests_record.dart';
+export 'schema/jukebox_requests_record.dart';
+export 'schema/dispensa_record.dart';
 
 /// Functions to query CategoriesRecords (as a Stream and as a Future).
 Future<int> queryCategoriesRecordCount({
@@ -282,6 +286,80 @@ Future<List<CancellationRequestsRecord>> queryCancellationRequestsRecordOnce({
     queryCollectionOnce(
       CancellationRequestsRecord.collection,
       CancellationRequestsRecord.fromSnapshot,
+      queryBuilder: queryBuilder,
+      limit: limit,
+      singleRecord: singleRecord,
+    );
+
+/// Functions to query JukeboxRequestsRecords (as a Stream and as a Future).
+Future<int> queryJukeboxRequestsRecordCount({
+  Query Function(Query)? queryBuilder,
+  int limit = -1,
+}) =>
+    queryCollectionCount(
+      JukeboxRequestsRecord.collection,
+      queryBuilder: queryBuilder,
+      limit: limit,
+    );
+
+Stream<List<JukeboxRequestsRecord>> queryJukeboxRequestsRecord({
+  Query Function(Query)? queryBuilder,
+  int limit = -1,
+  bool singleRecord = false,
+}) =>
+    queryCollection(
+      JukeboxRequestsRecord.collection,
+      JukeboxRequestsRecord.fromSnapshot,
+      queryBuilder: queryBuilder,
+      limit: limit,
+      singleRecord: singleRecord,
+    );
+
+Future<List<JukeboxRequestsRecord>> queryJukeboxRequestsRecordOnce({
+  Query Function(Query)? queryBuilder,
+  int limit = -1,
+  bool singleRecord = false,
+}) =>
+    queryCollectionOnce(
+      JukeboxRequestsRecord.collection,
+      JukeboxRequestsRecord.fromSnapshot,
+      queryBuilder: queryBuilder,
+      limit: limit,
+      singleRecord: singleRecord,
+    );
+
+/// Functions to query DispensaRecords (as a Stream and as a Future).
+Future<int> queryDispensaRecordCount({
+  Query Function(Query)? queryBuilder,
+  int limit = -1,
+}) =>
+    queryCollectionCount(
+      DispensaRecord.collection,
+      queryBuilder: queryBuilder,
+      limit: limit,
+    );
+
+Stream<List<DispensaRecord>> queryDispensaRecord({
+  Query Function(Query)? queryBuilder,
+  int limit = -1,
+  bool singleRecord = false,
+}) =>
+    queryCollection(
+      DispensaRecord.collection,
+      DispensaRecord.fromSnapshot,
+      queryBuilder: queryBuilder,
+      limit: limit,
+      singleRecord: singleRecord,
+    );
+
+Future<List<DispensaRecord>> queryDispensaRecordOnce({
+  Query Function(Query)? queryBuilder,
+  int limit = -1,
+  bool singleRecord = false,
+}) =>
+    queryCollectionOnce(
+      DispensaRecord.collection,
+      DispensaRecord.fromSnapshot,
       queryBuilder: queryBuilder,
       limit: limit,
       singleRecord: singleRecord,

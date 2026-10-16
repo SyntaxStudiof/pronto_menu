@@ -1,16 +1,10 @@
-import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'dart:ui';
 import '/index.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'admin_dettaglio_ristorante_model.dart';
 export 'admin_dettaglio_ristorante_model.dart';
@@ -55,20 +49,21 @@ class _AdminDettaglioRistoranteWidgetState
   @override
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
+    final theme = Theme.of(context);
 
     return StreamBuilder<UsersRecord>(
-      stream: UsersRecord.getDocument(widget!.utenteRef!),
+      stream: UsersRecord.getDocument(widget.utenteRef!),
       builder: (context, snapshot) {
         // Customize what your widget looks like when it's loading.
         if (!snapshot.hasData) {
           return Scaffold(
-            backgroundColor: FFAppState().temaPrimaryBackground,
+            backgroundColor: theme.scaffoldBackgroundColor,
             body: Center(
               child: SizedBox(
                 width: 50.0,
                 height: 50.0,
                 child: SpinKitPulse(
-                  color: FlutterFlowTheme.of(context).primary,
+                  color: theme.colorScheme.primary,
                   size: 50.0,
                 ),
               ),
@@ -85,9 +80,9 @@ class _AdminDettaglioRistoranteWidgetState
           },
           child: Scaffold(
             key: scaffoldKey,
-            backgroundColor: FFAppState().temaPrimaryBackground,
+            backgroundColor: theme.scaffoldBackgroundColor,
             appBar: AppBar(
-              backgroundColor: FFAppState().temaPrimary,
+              backgroundColor: theme.appBarTheme.backgroundColor ?? theme.cardColor,
               automaticallyImplyLeading: false,
               leading: FlutterFlowIconButton(
                 borderColor: Colors.transparent,
@@ -96,7 +91,7 @@ class _AdminDettaglioRistoranteWidgetState
                 buttonSize: 40.0,
                 icon: Icon(
                   Icons.arrow_back_rounded,
-                  color: FFAppState().temaPrimaryText,
+                  color: theme.appBarTheme.foregroundColor ?? theme.iconTheme.color,
                   size: 24.0,
                 ),
                 onPressed: () async {
@@ -104,34 +99,21 @@ class _AdminDettaglioRistoranteWidgetState
                 },
               ),
               title: Text(
-                'Page Title',
-                style: FlutterFlowTheme.of(context).headlineMedium.override(
-                      font: GoogleFonts.outfit(
-                        fontWeight: FlutterFlowTheme.of(context)
-                            .headlineMedium
-                            .fontWeight,
-                        fontStyle: FlutterFlowTheme.of(context)
-                            .headlineMedium
-                            .fontStyle,
-                      ),
-                      color: FFAppState().temaPrimaryText,
+                'Dettaglio Ristorante',
+                style: theme.appBarTheme.titleTextStyle ??
+                    theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
                       fontSize: 22.0,
-                      letterSpacing: 0.0,
-                      fontWeight: FlutterFlowTheme.of(context)
-                          .headlineMedium
-                          .fontWeight,
-                      fontStyle:
-                          FlutterFlowTheme.of(context).headlineMedium.fontStyle,
                     ),
               ),
-              actions: [],
+              actions: const [],
               centerTitle: true,
-              elevation: 2.0,
+              elevation: theme.appBarTheme.elevation ?? 2.0,
             ),
             body: SafeArea(
               top: true,
               child: Align(
-                alignment: AlignmentDirectional(0.0, 0.0),
+                alignment: const AlignmentDirectional(0.0, 0.0),
                 child: SingleChildScrollView(
                   controller: _model.columnController,
                   child: Column(
@@ -140,57 +122,27 @@ class _AdminDettaglioRistoranteWidgetState
                     children: [
                       Text(
                         adminDettaglioRistoranteUsersRecord.displayName,
-                        style: FlutterFlowTheme.of(context).titleLarge.override(
-                              font: GoogleFonts.outfit(
-                                fontWeight: FlutterFlowTheme.of(context)
-                                    .titleLarge
-                                    .fontWeight,
-                                fontStyle: FlutterFlowTheme.of(context)
-                                    .titleLarge
-                                    .fontStyle,
-                              ),
-                              color: FFAppState().temaPrimaryText,
-                              fontSize: 26.0,
-                              letterSpacing: 0.0,
-                              fontWeight: FlutterFlowTheme.of(context)
-                                  .titleLarge
-                                  .fontWeight,
-                              fontStyle: FlutterFlowTheme.of(context)
-                                  .titleLarge
-                                  .fontStyle,
-                            ),
+                        style: theme.textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 26.0,
+                        ),
                       ),
                       Text(
                         adminDettaglioRistoranteUsersRecord.email,
-                        style: FlutterFlowTheme.of(context).bodyMedium.override(
-                              font: GoogleFonts.openSans(
-                                fontWeight: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .fontWeight,
-                                fontStyle: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .fontStyle,
-                              ),
-                              color: FFAppState().temaPrimaryText,
-                              letterSpacing: 0.0,
-                              fontWeight: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .fontWeight,
-                              fontStyle: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .fontStyle,
-                            ),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.hintColor,
+                        ),
                       ),
                       Padding(
                         padding:
-                            EdgeInsetsDirectional.fromSTEB(0.0, 15.0, 0.0, 0.0),
+                            const EdgeInsetsDirectional.fromSTEB(0.0, 15.0, 0.0, 0.0),
                         child: FFButtonWidget(
                           onPressed: () async {
                             context.pushNamed(
                               HomeRistoratoreWidget.routeName,
                               queryParameters: {
                                 'ristoranteRef': serializeParam(
-                                  widget!.utenteRef,
+                                  widget.utenteRef,
                                   ParamType.DocumentReference,
                                 ),
                               }.withoutNulls,
@@ -199,31 +151,15 @@ class _AdminDettaglioRistoranteWidgetState
                           text: 'Entra e Modifica Menu',
                           options: FFButtonOptions(
                             height: 40.0,
-                            padding: EdgeInsetsDirectional.fromSTEB(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
                                 16.0, 0.0, 16.0, 0.0),
-                            iconPadding: EdgeInsetsDirectional.fromSTEB(
+                            iconPadding: const EdgeInsetsDirectional.fromSTEB(
                                 0.0, 0.0, 0.0, 0.0),
-                            color: FFAppState().temaPrimary,
-                            textStyle: FlutterFlowTheme.of(context)
-                                .titleSmall
-                                .override(
-                                  font: GoogleFonts.outfit(
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .titleSmall
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .titleSmall
-                                        .fontStyle,
-                                  ),
-                                  color: FFAppState().temaPrimaryBackground,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FlutterFlowTheme.of(context)
-                                      .titleSmall
-                                      .fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .titleSmall
-                                      .fontStyle,
-                                ),
+                            color: theme.colorScheme.primary,
+                            textStyle: theme.textTheme.titleSmall?.copyWith(
+                              color: theme.colorScheme.onPrimary,
+                              fontWeight: FontWeight.w600,
+                            ),
                             elevation: 0.0,
                             borderRadius: BorderRadius.circular(8.0),
                           ),
@@ -231,61 +167,35 @@ class _AdminDettaglioRistoranteWidgetState
                       ),
                       Padding(
                         padding:
-                            EdgeInsetsDirectional.fromSTEB(0.0, 10.0, 0.0, 0.0),
+                            const EdgeInsetsDirectional.fromSTEB(0.0, 10.0, 0.0, 0.0),
                         child: FFButtonWidget(
                           onPressed: () async {
-                            final _datePickedDate = await showDatePicker(
+                            final datePickedDate = await showDatePicker(
                               context: context,
                               initialDate: getCurrentTimestamp,
                               firstDate: getCurrentTimestamp,
                               lastDate: DateTime(2050),
                               builder: (context, child) {
-                                return wrapInMaterialDatePickerTheme(
-                                  context,
-                                  child!,
-                                  headerBackgroundColor:
-                                      FlutterFlowTheme.of(context).primary,
-                                  headerForegroundColor:
-                                      FlutterFlowTheme.of(context).info,
-                                  headerTextStyle: FlutterFlowTheme.of(context)
-                                      .headlineLarge
-                                      .override(
-                                        font: GoogleFonts.outfit(
-                                          fontWeight: FontWeight.w600,
-                                          fontStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .headlineLarge
-                                                  .fontStyle,
-                                        ),
-                                        fontSize: 32.0,
-                                        letterSpacing: 0.0,
-                                        fontWeight: FontWeight.w600,
-                                        fontStyle: FlutterFlowTheme.of(context)
-                                            .headlineLarge
-                                            .fontStyle,
-                                      ),
-                                  pickerBackgroundColor:
-                                      FlutterFlowTheme.of(context)
-                                          .secondaryBackground,
-                                  pickerForegroundColor:
-                                      FlutterFlowTheme.of(context).primaryText,
-                                  selectedDateTimeBackgroundColor:
-                                      FlutterFlowTheme.of(context).primary,
-                                  selectedDateTimeForegroundColor:
-                                      FlutterFlowTheme.of(context).info,
-                                  actionButtonForegroundColor:
-                                      FlutterFlowTheme.of(context).primaryText,
-                                  iconSize: 24.0,
+                                return Theme(
+                                  data: theme.copyWith(
+                                    colorScheme: theme.colorScheme.copyWith(
+                                      primary: theme.colorScheme.primary,
+                                      onPrimary: theme.colorScheme.onPrimary,
+                                      surface: theme.cardColor,
+                                      onSurface: theme.textTheme.bodyMedium?.color ?? Colors.black,
+                                    ),
+                                  ),
+                                  child: child!,
                                 );
                               },
                             );
 
-                            if (_datePickedDate != null) {
+                            if (datePickedDate != null) {
                               safeSetState(() {
                                 _model.datePicked = DateTime(
-                                  _datePickedDate.year,
-                                  _datePickedDate.month,
-                                  _datePickedDate.day,
+                                  datePickedDate.year,
+                                  datePickedDate.month,
+                                  datePickedDate.day,
                                 );
                               });
                             } else if (_model.datePicked != null) {
@@ -304,31 +214,15 @@ class _AdminDettaglioRistoranteWidgetState
                           text: 'Scegli data di scadenza',
                           options: FFButtonOptions(
                             height: 40.0,
-                            padding: EdgeInsetsDirectional.fromSTEB(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
                                 16.0, 0.0, 16.0, 0.0),
-                            iconPadding: EdgeInsetsDirectional.fromSTEB(
+                            iconPadding: const EdgeInsetsDirectional.fromSTEB(
                                 0.0, 0.0, 0.0, 0.0),
-                            color: FlutterFlowTheme.of(context).primary,
-                            textStyle: FlutterFlowTheme.of(context)
-                                .titleSmall
-                                .override(
-                                  font: GoogleFonts.outfit(
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .titleSmall
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .titleSmall
-                                        .fontStyle,
-                                  ),
-                                  color: Colors.white,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FlutterFlowTheme.of(context)
-                                      .titleSmall
-                                      .fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .titleSmall
-                                      .fontStyle,
-                                ),
+                            color: theme.colorScheme.primary,
+                            textStyle: theme.textTheme.titleSmall?.copyWith(
+                              color: theme.colorScheme.onPrimary,
+                              fontWeight: FontWeight.w600,
+                            ),
                             elevation: 0.0,
                             borderRadius: BorderRadius.circular(8.0),
                           ),

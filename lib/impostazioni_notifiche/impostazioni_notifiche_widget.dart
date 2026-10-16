@@ -1,14 +1,8 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
-import 'dart:ui';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'impostazioni_notifiche_model.dart';
 export 'impostazioni_notifiche_model.dart';
@@ -53,6 +47,7 @@ class _ImpostazioniNotificheWidgetState
   @override
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
+    final theme = Theme.of(context);
 
     return GestureDetector(
       onTap: () {
@@ -61,9 +56,9 @@ class _ImpostazioniNotificheWidgetState
       },
       child: Scaffold(
         key: scaffoldKey,
-        backgroundColor: FFAppState().temaPrimaryBackground,
+        backgroundColor: theme.scaffoldBackgroundColor,
         appBar: AppBar(
-          backgroundColor: FFAppState().temaSecondaryBackground,
+          backgroundColor: theme.appBarTheme.backgroundColor ?? theme.cardColor,
           automaticallyImplyLeading: false,
           leading: FlutterFlowIconButton(
             borderColor: Colors.transparent,
@@ -72,7 +67,7 @@ class _ImpostazioniNotificheWidgetState
             buttonSize: 40.0,
             icon: Icon(
               Icons.arrow_back_rounded,
-              color: FFAppState().temaPrimaryText,
+              color: theme.appBarTheme.foregroundColor ?? theme.iconTheme.color,
               size: 24.0,
             ),
             onPressed: () async {
@@ -81,29 +76,20 @@ class _ImpostazioniNotificheWidgetState
           ),
           title: Text(
             'Notifiche',
-            style: FlutterFlowTheme.of(context).titleSmall.override(
-                  font: GoogleFonts.outfit(
-                    fontWeight:
-                        FlutterFlowTheme.of(context).titleSmall.fontWeight,
-                    fontStyle:
-                        FlutterFlowTheme.of(context).titleSmall.fontStyle,
-                  ),
-                  color: FFAppState().temaPrimaryText,
+            style: theme.appBarTheme.titleTextStyle ??
+                theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
                   fontSize: 22.0,
-                  letterSpacing: 0.0,
-                  fontWeight:
-                      FlutterFlowTheme.of(context).titleSmall.fontWeight,
-                  fontStyle: FlutterFlowTheme.of(context).titleSmall.fontStyle,
                 ),
           ),
-          actions: [],
+          actions: const [],
           centerTitle: true,
-          elevation: 2.0,
+          elevation: theme.appBarTheme.elevation ?? 2.0,
         ),
         body: SafeArea(
           top: true,
           child: Padding(
-            padding: EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(24.0),
             child: Column(
               mainAxisSize: MainAxisSize.max,
               children: [
@@ -117,40 +103,16 @@ class _ImpostazioniNotificheWidgetState
                       children: [
                         Text(
                           'Nuovi Ordini',
-                          style:
-                              FlutterFlowTheme.of(context).bodyMedium.override(
-                                    font: GoogleFonts.openSans(
-                                      fontWeight: FontWeight.bold,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
-                                    color: FFAppState().temaPrimaryText,
-                                    fontSize: 18.0,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FontWeight.bold,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                  ),
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18.0,
+                          ),
                         ),
                         Text(
                           'Ricevi un avviso quando un cliente ordina',
-                          style:
-                              FlutterFlowTheme.of(context).bodyMedium.override(
-                                    font: GoogleFonts.openSans(
-                                      fontWeight: FontWeight.normal,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
-                                    color: FFAppState().temaSecondaryText,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FontWeight.normal,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                  ),
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.hintColor,
+                          ),
                         ),
                       ],
                     ),
@@ -159,8 +121,8 @@ class _ImpostazioniNotificheWidgetState
                         value: _model.switchOrdiniValue!,
                         onChanged: (newValue) async {
                           safeSetState(
-                              () => _model.switchOrdiniValue = newValue!);
-                          if (newValue!) {
+                              () => _model.switchOrdiniValue = newValue);
+                          if (newValue) {
                             await currentUserReference!
                                 .update(createUsersRecordData(
                               notificheOrdini: true,
@@ -172,17 +134,16 @@ class _ImpostazioniNotificheWidgetState
                             ));
                           }
                         },
-                        activeColor: FFAppState().temaPrimary,
-                        activeTrackColor: FFAppState().temaSecondary,
-                        inactiveTrackColor: FFAppState().temaAlternate,
-                        inactiveThumbColor:
-                            FFAppState().temaSecondaryBackground,
+                        activeThumbColor: theme.colorScheme.primary,
+                        activeTrackColor: theme.colorScheme.primary.withValues(alpha: 0.38),
+                        inactiveTrackColor: theme.dividerColor,
+                        inactiveThumbColor: theme.cardColor,
                       ),
                     ),
                   ],
                 ),
                 Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(0.0, 20.0, 0.0, 0.0),
+                  padding: const EdgeInsetsDirectional.fromSTEB(0.0, 20.0, 0.0, 0.0),
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -193,43 +154,17 @@ class _ImpostazioniNotificheWidgetState
                         children: [
                           Text(
                             'Promozioni e Novità',
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  font: GoogleFonts.openSans(
-                                    fontWeight: FontWeight.bold,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                  ),
-                                  color: FFAppState().temaPrimaryText,
-                                  fontSize: 18.0,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FontWeight.bold,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .fontStyle,
-                                ),
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18.0,
+                            ),
                           ),
                           Text(
                             'Ricevi un avviso quando sono disponibili\npromozioni o novità',
                             maxLines: 2,
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  font: GoogleFonts.openSans(
-                                    fontWeight: FontWeight.normal,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                  ),
-                                  color: FFAppState().temaSecondaryText,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FontWeight.normal,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .fontStyle,
-                                ),
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.hintColor,
+                            ),
                           ),
                         ],
                       ),
@@ -238,8 +173,8 @@ class _ImpostazioniNotificheWidgetState
                           value: _model.switchPromozioniValue!,
                           onChanged: (newValue) async {
                             safeSetState(
-                                () => _model.switchPromozioniValue = newValue!);
-                            if (newValue!) {
+                                () => _model.switchPromozioniValue = newValue);
+                            if (newValue) {
                               await currentUserReference!
                                   .update(createUsersRecordData(
                                 notifichePromo: true,
@@ -251,11 +186,10 @@ class _ImpostazioniNotificheWidgetState
                               ));
                             }
                           },
-                          activeColor: FFAppState().temaPrimary,
-                          activeTrackColor: FFAppState().temaSecondary,
-                          inactiveTrackColor: FFAppState().temaAlternate,
-                          inactiveThumbColor:
-                              FFAppState().temaSecondaryBackground,
+                          activeThumbColor: theme.colorScheme.primary,
+                          activeTrackColor: theme.colorScheme.primary.withValues(alpha: 0.38),
+                          inactiveTrackColor: theme.dividerColor,
+                          inactiveThumbColor: theme.cardColor,
                         ),
                       ),
                     ],

@@ -13,6 +13,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '/components/google_sign_in_button.dart';
 import 'auth_registration_model.dart';
 export 'auth_registration_model.dart';
 
@@ -62,6 +63,7 @@ class _AuthRegistrationWidgetState extends State<AuthRegistrationWidget> {
   @override
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
+    final theme = Theme.of(context);
 
     return GestureDetector(
       onTap: () {
@@ -70,125 +72,93 @@ class _AuthRegistrationWidgetState extends State<AuthRegistrationWidget> {
       },
       child: Scaffold(
         key: scaffoldKey,
-        backgroundColor: FFAppState().temaPrimaryBackground,
+        backgroundColor: theme.scaffoldBackgroundColor,
         body: SafeArea(
           top: true,
-          child: Padding(
-            padding: EdgeInsetsDirectional.fromSTEB(24.0, 0.0, 24.0, 0.0),
+          child: Center(
             child: SingleChildScrollView(
               controller: _model.columnController,
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8.0),
-                    child: Image.asset(
-                      'assets/images/IMG_8006.png',
-                      width: 200.0,
-                      height: 200.0,
-                      fit: BoxFit.contain,
-                    ),
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 32.0),
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 460.0),
+                decoration: BoxDecoration(
+                  color: theme.cardColor,
+                  borderRadius: BorderRadius.circular(24.0),
+                  border: Border.all(
+                    color: theme.dividerColor.withValues(alpha: 0.2),
+                    width: 1.0,
                   ),
-                  RichText(
-                    textScaler: MediaQuery.of(context).textScaler,
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: 'Pronto',
-                          style: FlutterFlowTheme.of(context)
-                              .displayMedium
-                              .override(
-                                font: GoogleFonts.outfit(
-                                  fontWeight: FlutterFlowTheme.of(context)
-                                      .displayMedium
-                                      .fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .displayMedium
-                                      .fontStyle,
-                                ),
-                                color: FFAppState().temaPrimaryText,
-                                letterSpacing: 0.0,
-                                fontWeight: FlutterFlowTheme.of(context)
-                                    .displayMedium
-                                    .fontWeight,
-                                fontStyle: FlutterFlowTheme.of(context)
-                                    .displayMedium
-                                    .fontStyle,
-                              ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 24.0,
+                      offset: const Offset(0.0, 8.0),
+                    ),
+                  ],
+                ),
+                padding: const EdgeInsets.all(32.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Logo + Branding
+                    Center(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(16.0),
+                        child: Image.asset(
+                          'assets/images/IMG_8006.png',
+                          width: 80.0,
+                          height: 80.0,
+                          fit: BoxFit.contain,
                         ),
-                        TextSpan(
-                          text: 'Menu',
-                          style:
-                              FlutterFlowTheme.of(context).bodyMedium.override(
-                                    font: GoogleFonts.outfit(
-                                      fontWeight: FontWeight.bold,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
-                                    color: FFAppState().temaPrimary,
-                                    fontSize: 45.0,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FontWeight.bold,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                  ),
-                        )
-                      ],
-                      style: FlutterFlowTheme.of(context).bodyMedium.override(
-                            font: GoogleFonts.openSans(
-                              fontWeight: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .fontWeight,
-                              fontStyle: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .fontStyle,
-                            ),
-                            color: FFAppState().temaPrimaryText,
-                            fontSize: 45.0,
-                            letterSpacing: 0.0,
-                            fontWeight: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .fontWeight,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .fontStyle,
-                          ),
+                      ),
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                  Padding(
-                    padding:
-                        EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 30.0),
-                    child: Text(
-                      'Crea il tuo account ristoratore',
-                      textAlign: TextAlign.center,
-                      style: FlutterFlowTheme.of(context).bodyMedium.override(
-                            font: GoogleFonts.openSans(
-                              fontWeight: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .fontWeight,
-                              fontStyle: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .fontStyle,
+                    const SizedBox(height: 16.0),
+                    Center(
+                      child: RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: 'Pronto',
+                              style: theme.textTheme.headlineMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: -0.5,
+                              ),
                             ),
-                            color: FFAppState().temaPrimaryText,
-                            letterSpacing: 0.0,
-                            fontWeight: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .fontWeight,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .fontStyle,
-                          ),
+                            TextSpan(
+                              text: 'Menu',
+                              style: theme.textTheme.headlineMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: theme.colorScheme.primary,
+                                letterSpacing: -0.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                  Container(
-                    width: 280.0,
-                    child: TextFormField(
+                    const SizedBox(height: 6.0),
+                    Center(
+                      child: Text(
+                        'Crea il tuo account ristoratore',
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.hintColor,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 28.0),
+
+                    // Campo Nome del ristorante
+                    Text(
+                      'Nome del ristorante',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 8.0),
+                    TextFormField(
                       controller: _model.txtNomeRegistrazioneTextController,
                       focusNode: _model.txtNomeRegistrazioneFocusNode,
                       autofocus: false,
@@ -196,475 +166,300 @@ class _AuthRegistrationWidgetState extends State<AuthRegistrationWidget> {
                       obscureText: false,
                       decoration: InputDecoration(
                         isDense: true,
-                        labelStyle:
-                            FlutterFlowTheme.of(context).labelMedium.override(
-                                  font: GoogleFonts.openSans(
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .labelMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .labelMedium
-                                        .fontStyle,
-                                  ),
-                                  color: FFAppState().temaSecondaryText,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .fontStyle,
-                                ),
-                        hintText: 'Nome del ristorante',
-                        hintStyle:
-                            FlutterFlowTheme.of(context).bodyMedium.override(
-                                  font: GoogleFonts.openSans(
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                  ),
-                                  color: FFAppState().temaSecondaryText,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .fontStyle,
-                                ),
+                        filled: true,
+                        fillColor: theme.scaffoldBackgroundColor,
+                        prefixIcon: Icon(
+                          Icons.storefront_outlined,
+                          color: theme.hintColor,
+                          size: 20.0,
+                        ),
+                        hintText: 'Es. Pizzeria Da Mario',
+                        hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.hintColor.withValues(alpha: 0.6),
+                        ),
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(
-                            color: FFAppState().temaSecondary,
+                            color: theme.dividerColor.withValues(alpha: 0.2),
                             width: 1.0,
                           ),
-                          borderRadius: BorderRadius.circular(12.0),
+                          borderRadius: BorderRadius.circular(14.0),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderSide: BorderSide(
-                            color: FFAppState().temaPrimary,
-                            width: 1.0,
+                            color: theme.colorScheme.primary,
+                            width: 1.5,
                           ),
-                          borderRadius: BorderRadius.circular(12.0),
+                          borderRadius: BorderRadius.circular(14.0),
                         ),
                         errorBorder: OutlineInputBorder(
                           borderSide: BorderSide(
-                            color: FFAppState().temaError,
+                            color: theme.colorScheme.error,
                             width: 1.0,
                           ),
-                          borderRadius: BorderRadius.circular(12.0),
+                          borderRadius: BorderRadius.circular(14.0),
                         ),
                         focusedErrorBorder: OutlineInputBorder(
                           borderSide: BorderSide(
-                            color: FFAppState().temaError,
+                            color: theme.colorScheme.error,
+                            width: 1.5,
+                          ),
+                          borderRadius: BorderRadius.circular(14.0),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+                      ),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
+                      keyboardType: TextInputType.text,
+                      cursorColor: theme.colorScheme.primary,
+                      enableInteractiveSelection: true,
+                      validator: _model.txtNomeRegistrazioneTextControllerValidator.asValidator(context),
+                    ),
+                    const SizedBox(height: 18.0),
+
+                    // Campo Email
+                    Text(
+                      'Email',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 8.0),
+                    TextFormField(
+                      controller: _model.txtEmailRegistrazioneTextController,
+                      focusNode: _model.txtEmailRegistrazioneFocusNode,
+                      autofocus: false,
+                      enabled: true,
+                      obscureText: false,
+                      decoration: InputDecoration(
+                        isDense: true,
+                        filled: true,
+                        fillColor: theme.scaffoldBackgroundColor,
+                        prefixIcon: Icon(
+                          Icons.mail_outline_rounded,
+                          color: theme.hintColor,
+                          size: 20.0,
+                        ),
+                        hintText: 'nome@ristorante.it',
+                        hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.hintColor.withValues(alpha: 0.6),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: theme.dividerColor.withValues(alpha: 0.2),
                             width: 1.0,
                           ),
-                          borderRadius: BorderRadius.circular(12.0),
+                          borderRadius: BorderRadius.circular(14.0),
                         ),
-                        filled: true,
-                        fillColor: FFAppState().temaSecondaryBackground,
-                      ),
-                      style: FlutterFlowTheme.of(context).bodyMedium.override(
-                            font: GoogleFonts.openSans(
-                              fontWeight: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .fontWeight,
-                              fontStyle: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .fontStyle,
-                            ),
-                            color: FFAppState().temaPrimaryText,
-                            letterSpacing: 0.0,
-                            fontWeight: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .fontWeight,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .fontStyle,
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: theme.colorScheme.primary,
+                            width: 1.5,
                           ),
+                          borderRadius: BorderRadius.circular(14.0),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: theme.colorScheme.error,
+                            width: 1.0,
+                          ),
+                          borderRadius: BorderRadius.circular(14.0),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: theme.colorScheme.error,
+                            width: 1.5,
+                          ),
+                          borderRadius: BorderRadius.circular(14.0),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+                      ),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
                       keyboardType: TextInputType.emailAddress,
-                      cursorColor: FFAppState().temaPrimary,
+                      cursorColor: theme.colorScheme.primary,
                       enableInteractiveSelection: true,
-                      validator: _model
-                          .txtNomeRegistrazioneTextControllerValidator
-                          .asValidator(context),
+                      validator: _model.txtEmailRegistrazioneTextControllerValidator.asValidator(context),
                     ),
-                  ),
-                  Padding(
-                    padding:
-                        EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 0.0),
-                    child: Container(
-                      width: 280.0,
-                      child: TextFormField(
-                        controller: _model.txtEmailRegistrazioneTextController,
-                        focusNode: _model.txtEmailRegistrazioneFocusNode,
-                        autofocus: false,
-                        enabled: true,
-                        obscureText: false,
-                        decoration: InputDecoration(
-                          isDense: true,
-                          labelStyle:
-                              FlutterFlowTheme.of(context).labelMedium.override(
-                                    font: GoogleFonts.openSans(
-                                      fontWeight: FlutterFlowTheme.of(context)
-                                          .labelMedium
-                                          .fontWeight,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .labelMedium
-                                          .fontStyle,
-                                    ),
-                                    color: FFAppState().temaSecondaryText,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .labelMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .labelMedium
-                                        .fontStyle,
-                                  ),
-                          hintText: 'Inserisci la tua email',
-                          hintStyle:
-                              FlutterFlowTheme.of(context).bodyMedium.override(
-                                    font: GoogleFonts.openSans(
-                                      fontWeight: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontWeight,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
-                                    color: FFAppState().temaSecondaryText,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                  ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: FFAppState().temaSecondary,
-                              width: 1.0,
-                            ),
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: FFAppState().temaPrimary,
-                              width: 1.0,
-                            ),
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          errorBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: FFAppState().temaError,
-                              width: 1.0,
-                            ),
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          focusedErrorBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: FFAppState().temaError,
-                              width: 1.0,
-                            ),
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          filled: true,
-                          fillColor: FFAppState().temaSecondaryBackground,
-                        ),
-                        style: FlutterFlowTheme.of(context).bodyMedium.override(
-                              font: GoogleFonts.openSans(
-                                fontWeight: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .fontWeight,
-                                fontStyle: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .fontStyle,
-                              ),
-                              color: FFAppState().temaPrimaryText,
-                              letterSpacing: 0.0,
-                              fontWeight: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .fontWeight,
-                              fontStyle: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .fontStyle,
-                            ),
-                        keyboardType: TextInputType.emailAddress,
-                        cursorColor: FFAppState().temaPrimary,
-                        enableInteractiveSelection: true,
-                        validator: _model
-                            .txtEmailRegistrazioneTextControllerValidator
-                            .asValidator(context),
+                    const SizedBox(height: 18.0),
+
+                    // Campo Password
+                    Text(
+                      'Password',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding:
-                        EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 0.0),
-                    child: Container(
-                      width: 280.0,
-                      child: TextFormField(
-                        controller:
-                            _model.txtPasswordRegistrazioneTextController,
-                        focusNode: _model.txtPasswordRegistrazioneFocusNode,
-                        autofocus: false,
-                        enabled: true,
-                        obscureText: !_model.txtPasswordRegistrazioneVisibility,
-                        decoration: InputDecoration(
-                          isDense: true,
-                          labelStyle:
-                              FlutterFlowTheme.of(context).labelMedium.override(
-                                    font: GoogleFonts.openSans(
-                                      fontWeight: FlutterFlowTheme.of(context)
-                                          .labelMedium
-                                          .fontWeight,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .labelMedium
-                                          .fontStyle,
-                                    ),
-                                    color: FFAppState().temaSecondaryText,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .labelMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .labelMedium
-                                        .fontStyle,
-                                  ),
-                          hintText: 'Inserisci la tua password',
-                          hintStyle:
-                              FlutterFlowTheme.of(context).bodyMedium.override(
-                                    font: GoogleFonts.openSans(
-                                      fontWeight: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontWeight,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
-                                    color: FFAppState().temaSecondaryText,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                  ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: FFAppState().temaSecondary,
-                              width: 1.0,
-                            ),
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: FFAppState().temaPrimary,
-                              width: 1.0,
-                            ),
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          errorBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: FFAppState().temaError,
-                              width: 1.0,
-                            ),
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          focusedErrorBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: FFAppState().temaError,
-                              width: 1.0,
-                            ),
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          filled: true,
-                          fillColor: FFAppState().temaSecondaryBackground,
-                          suffixIcon: InkWell(
-                            onTap: () async {
-                              safeSetState(() => _model
-                                      .txtPasswordRegistrazioneVisibility =
-                                  !_model.txtPasswordRegistrazioneVisibility);
-                            },
-                            focusNode: FocusNode(skipTraversal: true),
-                            child: Icon(
-                              _model.txtPasswordRegistrazioneVisibility
-                                  ? Icons.visibility_outlined
-                                  : Icons.visibility_off_outlined,
-                              color: FFAppState().temaPrimary,
-                              size: 22,
-                            ),
+                    const SizedBox(height: 8.0),
+                    TextFormField(
+                      controller: _model.txtPasswordRegistrazioneTextController,
+                      focusNode: _model.txtPasswordRegistrazioneFocusNode,
+                      autofocus: false,
+                      enabled: true,
+                      obscureText: !_model.txtPasswordRegistrazioneVisibility,
+                      decoration: InputDecoration(
+                        isDense: true,
+                        filled: true,
+                        fillColor: theme.scaffoldBackgroundColor,
+                        prefixIcon: Icon(
+                          Icons.lock_outline_rounded,
+                          color: theme.hintColor,
+                          size: 20.0,
+                        ),
+                        suffixIcon: InkWell(
+                          onTap: () async {
+                            safeSetState(() => _model.txtPasswordRegistrazioneVisibility =
+                                !_model.txtPasswordRegistrazioneVisibility);
+                          },
+                          focusNode: FocusNode(skipTraversal: true),
+                          child: Icon(
+                            _model.txtPasswordRegistrazioneVisibility
+                                ? Icons.visibility_outlined
+                                : Icons.visibility_off_outlined,
+                            color: theme.hintColor,
+                            size: 20.0,
                           ),
                         ),
-                        style: FlutterFlowTheme.of(context).bodyMedium.override(
-                              font: GoogleFonts.openSans(
-                                fontWeight: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .fontWeight,
-                                fontStyle: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .fontStyle,
-                              ),
-                              color: FFAppState().temaPrimaryText,
-                              letterSpacing: 0.0,
-                              fontWeight: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .fontWeight,
-                              fontStyle: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .fontStyle,
-                            ),
-                        keyboardType: TextInputType.emailAddress,
-                        cursorColor: FFAppState().temaPrimary,
-                        enableInteractiveSelection: true,
-                        validator: _model
-                            .txtPasswordRegistrazioneTextControllerValidator
-                            .asValidator(context),
+                        hintText: 'Crea una password sicura',
+                        hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.hintColor.withValues(alpha: 0.6),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: theme.dividerColor.withValues(alpha: 0.2),
+                            width: 1.0,
+                          ),
+                          borderRadius: BorderRadius.circular(14.0),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: theme.colorScheme.primary,
+                            width: 1.5,
+                          ),
+                          borderRadius: BorderRadius.circular(14.0),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: theme.colorScheme.error,
+                            width: 1.0,
+                          ),
+                          borderRadius: BorderRadius.circular(14.0),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: theme.colorScheme.error,
+                            width: 1.5,
+                          ),
+                          borderRadius: BorderRadius.circular(14.0),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+                      ),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
+                      cursorColor: theme.colorScheme.primary,
+                      enableInteractiveSelection: true,
+                      validator: _model.txtPasswordRegistrazioneTextControllerValidator.asValidator(context),
+                    ),
+                    const SizedBox(height: 18.0),
+
+                    // Campo Conferma Password
+                    Text(
+                      'Conferma password',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding:
-                        EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 0.0),
-                    child: Container(
-                      width: 280.0,
-                      child: TextFormField(
-                        controller: _model.confirmPasswordTextController,
-                        focusNode: _model.textFieldFocusNode,
-                        autofocus: false,
-                        enabled: true,
-                        obscureText: !_model.passwordVisibility,
-                        decoration: InputDecoration(
-                          isDense: true,
-                          labelStyle:
-                              FlutterFlowTheme.of(context).labelMedium.override(
-                                    font: GoogleFonts.openSans(
-                                      fontWeight: FlutterFlowTheme.of(context)
-                                          .labelMedium
-                                          .fontWeight,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .labelMedium
-                                          .fontStyle,
-                                    ),
-                                    color: FFAppState().temaSecondaryText,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .labelMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .labelMedium
-                                        .fontStyle,
-                                  ),
-                          hintText: 'Conferma la tua password',
-                          hintStyle:
-                              FlutterFlowTheme.of(context).bodyMedium.override(
-                                    font: GoogleFonts.openSans(
-                                      fontWeight: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontWeight,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
-                                    color: FFAppState().temaSecondaryText,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                  ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: FFAppState().temaSecondary,
-                              width: 1.0,
-                            ),
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: FFAppState().temaPrimary,
-                              width: 1.0,
-                            ),
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          errorBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: FFAppState().temaError,
-                              width: 1.0,
-                            ),
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          focusedErrorBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: FFAppState().temaError,
-                              width: 1.0,
-                            ),
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          filled: true,
-                          fillColor: FFAppState().temaSecondaryBackground,
-                          suffixIcon: InkWell(
-                            onTap: () async {
-                              safeSetState(() => _model.passwordVisibility =
-                                  !_model.passwordVisibility);
-                            },
-                            focusNode: FocusNode(skipTraversal: true),
-                            child: Icon(
-                              _model.passwordVisibility
-                                  ? Icons.visibility_outlined
-                                  : Icons.visibility_off_outlined,
-                              color: FFAppState().temaPrimary,
-                              size: 22,
-                            ),
+                    const SizedBox(height: 8.0),
+                    TextFormField(
+                      controller: _model.confirmPasswordTextController,
+                      focusNode: _model.textFieldFocusNode,
+                      autofocus: false,
+                      enabled: true,
+                      obscureText: !_model.passwordVisibility,
+                      decoration: InputDecoration(
+                        isDense: true,
+                        filled: true,
+                        fillColor: theme.scaffoldBackgroundColor,
+                        prefixIcon: Icon(
+                          Icons.lock_outline_rounded,
+                          color: theme.hintColor,
+                          size: 20.0,
+                        ),
+                        suffixIcon: InkWell(
+                          onTap: () async {
+                            safeSetState(() => _model.passwordVisibility =
+                                !_model.passwordVisibility);
+                          },
+                          focusNode: FocusNode(skipTraversal: true),
+                          child: Icon(
+                            _model.passwordVisibility
+                                ? Icons.visibility_outlined
+                                : Icons.visibility_off_outlined,
+                            color: theme.hintColor,
+                            size: 20.0,
                           ),
                         ),
-                        style: FlutterFlowTheme.of(context).bodyMedium.override(
-                              font: GoogleFonts.openSans(
-                                fontWeight: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .fontWeight,
-                                fontStyle: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .fontStyle,
-                              ),
-                              color: FFAppState().temaPrimaryText,
-                              letterSpacing: 0.0,
-                              fontWeight: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .fontWeight,
-                              fontStyle: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .fontStyle,
-                            ),
-                        keyboardType: TextInputType.emailAddress,
-                        cursorColor: FFAppState().temaPrimary,
-                        enableInteractiveSelection: true,
-                        validator: _model.confirmPasswordTextControllerValidator
-                            .asValidator(context),
+                        hintText: 'Ripeti la password',
+                        hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.hintColor.withValues(alpha: 0.6),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: theme.dividerColor.withValues(alpha: 0.2),
+                            width: 1.0,
+                          ),
+                          borderRadius: BorderRadius.circular(14.0),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: theme.colorScheme.primary,
+                            width: 1.5,
+                          ),
+                          borderRadius: BorderRadius.circular(14.0),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: theme.colorScheme.error,
+                            width: 1.0,
+                          ),
+                          borderRadius: BorderRadius.circular(14.0),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: theme.colorScheme.error,
+                            width: 1.5,
+                          ),
+                          borderRadius: BorderRadius.circular(14.0),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
                       ),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
+                      cursorColor: theme.colorScheme.primary,
+                      enableInteractiveSelection: true,
+                      validator: _model.confirmPasswordTextControllerValidator.asValidator(context),
                     ),
-                  ),
-                  Padding(
-                    padding:
-                        EdgeInsetsDirectional.fromSTEB(0.0, 32.0, 0.0, 16.0),
-                    child: FFButtonWidget(
+                    const SizedBox(height: 24.0),
+
+                    // Bottone Registrati
+                    FFButtonWidget(
                       onPressed: () async {
                         GoRouter.of(context).prepareAuthEvent();
-                        if (_model
-                                .txtPasswordRegistrazioneTextController.text !=
+                        if (_model.txtPasswordRegistrazioneTextController.text !=
                             _model.confirmPasswordTextController.text) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
                                 'Le password non coincidono!',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: theme.colorScheme.onError,
+                                ),
                               ),
+                              backgroundColor: theme.colorScheme.error,
                             ),
                           );
                           return;
@@ -680,7 +475,12 @@ class _AuthRegistrationWidgetState extends State<AuthRegistrationWidget> {
                             SnackBar(
                               content: Text(
                                 'Registrazione fallita: email già registrata o dati non validi.',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: theme.colorScheme.onError,
+                                ),
                               ),
+                              backgroundColor: theme.colorScheme.error,
                             ),
                           );
                           return;
@@ -689,10 +489,8 @@ class _AuthRegistrationWidgetState extends State<AuthRegistrationWidget> {
                         await UsersRecord.collection
                             .doc(user.uid)
                             .set(createUsersRecordData(
-                              displayName: _model
-                                  .txtNomeRegistrazioneTextController.text,
-                              email: _model
-                                  .txtEmailRegistrazioneTextController.text,
+                              displayName: _model.txtNomeRegistrazioneTextController.text,
+                              email: _model.txtEmailRegistrazioneTextController.text,
                               isAdmin: false,
                               isPremium: false,
                               temaScelto: 'c',
@@ -707,8 +505,7 @@ class _AuthRegistrationWidgetState extends State<AuthRegistrationWidget> {
 
                         try {
                           await InviaRubricaCall.call(
-                            emailUtente:
-                                _model.txtEmailRegistrazioneTextController.text,
+                            emailUtente: _model.txtEmailRegistrazioneTextController.text,
                           );
                         } catch (_) {}
 
@@ -716,31 +513,13 @@ class _AuthRegistrationWidgetState extends State<AuthRegistrationWidget> {
                           SnackBar(
                             content: Text(
                               'Account creato! Ora accedi con le tue credenziali.',
-                              style: FlutterFlowTheme.of(context)
-                                  .titleMedium
-                                  .override(
-                                    font: GoogleFonts.outfit(
-                                      fontWeight: FlutterFlowTheme.of(context)
-                                          .titleMedium
-                                          .fontWeight,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .titleMedium
-                                          .fontStyle,
-                                    ),
-                                    color: FlutterFlowTheme.of(context)
-                                        .primaryBackground,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .titleMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .titleMedium
-                                        .fontStyle,
-                                  ),
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: theme.colorScheme.onPrimary,
+                              ),
                             ),
-                            duration: Duration(milliseconds: 8000),
-                            backgroundColor:
-                                FlutterFlowTheme.of(context).primary,
+                            duration: const Duration(milliseconds: 8000),
+                            backgroundColor: theme.colorScheme.primary,
                           ),
                         );
                         GoRouter.of(context).prepareAuthEvent();
@@ -752,52 +531,52 @@ class _AuthRegistrationWidgetState extends State<AuthRegistrationWidget> {
                       },
                       text: 'Registrati',
                       options: FFButtonOptions(
-                        width: 280.0,
-                        height: 45.0,
-                        padding: EdgeInsetsDirectional.fromSTEB(
-                            16.0, 0.0, 16.0, 0.0),
-                        iconPadding:
-                            EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
-                        color: FFAppState().temaPrimary,
-                        textStyle:
-                            FlutterFlowTheme.of(context).labelLarge.override(
-                                  font: GoogleFonts.openSans(
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .labelLarge
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .labelLarge
-                                        .fontStyle,
-                                  ),
-                                  color: FFAppState().temaPrimaryBackground,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FlutterFlowTheme.of(context)
-                                      .labelLarge
-                                      .fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .labelLarge
-                                      .fontStyle,
-                                ),
-                        elevation: 2.0,
-                        borderRadius: BorderRadius.circular(12.0),
+                        width: double.infinity,
+                        height: 48.0,
+                        color: theme.colorScheme.primary,
+                        textStyle: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.onPrimary,
+                        ),
+                        elevation: 0.0,
+                        borderRadius: BorderRadius.circular(14.0),
                       ),
                     ),
-                  ),
-                  Align(
-                    alignment: AlignmentDirectional(0.0, 0.0),
-                    child: FlutterFlowIconButton(
-                      borderRadius: 12.0,
-                      buttonSize: 50.0,
-                      fillColor: FFAppState().temaPrimary,
-                      icon: FaIcon(
-                        FontAwesomeIcons.google,
-                        color: FFAppState().temaPrimaryBackground,
-                        size: 24.0,
-                      ),
-                      onPressed: () async {
+                    const SizedBox(height: 22.0),
+
+                    // Divisore "oppure"
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Divider(
+                            color: theme.dividerColor.withValues(alpha: 0.2),
+                            height: 1.0,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                          child: Text(
+                            'oppure',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.hintColor,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Divider(
+                            color: theme.dividerColor.withValues(alpha: 0.2),
+                            height: 1.0,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 22.0),
+
+                    // Bottone Continua con Google
+                    GoogleSignInButton(
+                      onTap: () async {
                         GoRouter.of(context).prepareAuthEvent();
-                        final user =
-                            await authManager.signInWithGoogle(context);
+                        final user = await authManager.signInWithGoogle(context);
                         if (user == null) {
                           return;
                         }
@@ -834,69 +613,34 @@ class _AuthRegistrationWidgetState extends State<AuthRegistrationWidget> {
                         }
                       },
                     ),
-                  ),
-                  Padding(
-                    padding:
-                        EdgeInsetsDirectional.fromSTEB(0.0, 24.0, 0.0, 0.0),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
+                    const SizedBox(height: 26.0),
+
+                    // Link Accedi
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                           'Hai già un account? ',
-                          style:
-                              FlutterFlowTheme.of(context).bodyMedium.override(
-                                    font: GoogleFonts.openSans(
-                                      fontWeight: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontWeight,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
-                                    color: FFAppState().temaSecondaryText,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                  ),
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.hintColor,
+                          ),
                         ),
                         InkWell(
-                          splashColor: Colors.transparent,
-                          focusColor: Colors.transparent,
-                          hoverColor: Colors.transparent,
-                          highlightColor: Colors.transparent,
                           onTap: () async {
                             context.pushNamed(AuthWelcomeWidget.routeName);
                           },
                           child: Text(
                             'Accedi',
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  font: GoogleFonts.openSans(
-                                    fontWeight: FontWeight.bold,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                  ),
-                                  color: FFAppState().temaAccent4,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FontWeight.bold,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .fontStyle,
-                                  decoration: TextDecoration.underline,
-                                ),
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: theme.colorScheme.primary,
+                            ),
                           ),
                         ),
                       ],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

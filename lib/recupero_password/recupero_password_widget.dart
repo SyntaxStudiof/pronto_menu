@@ -1,13 +1,8 @@
 import '/auth/firebase_auth/auth_util.dart';
-import '/flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'dart:ui';
 import '/index.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'recupero_password_model.dart';
 export 'recupero_password_model.dart';
@@ -49,6 +44,7 @@ class _RecuperoPasswordWidgetState extends State<RecuperoPasswordWidget> {
   @override
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
+    final theme = Theme.of(context);
 
     return GestureDetector(
       onTap: () {
@@ -57,84 +53,114 @@ class _RecuperoPasswordWidgetState extends State<RecuperoPasswordWidget> {
       },
       child: Scaffold(
         key: scaffoldKey,
-        backgroundColor: FFAppState().temaPrimaryBackground,
-        appBar: AppBar(
-          backgroundColor: FFAppState().temaSecondaryBackground,
-          automaticallyImplyLeading: false,
-          leading: FlutterFlowIconButton(
-            borderColor: Colors.transparent,
-            borderRadius: 30.0,
-            borderWidth: 1.0,
-            buttonSize: 40.0,
-            icon: Icon(
-              Icons.arrow_back_rounded,
-              color: FFAppState().temaPrimaryText,
-              size: 24.0,
-            ),
-            onPressed: () async {
-              context.pushNamed(AuthWelcomeWidget.routeName);
-            },
-          ),
-          title: Text(
-            'Recupera Password',
-            style: FlutterFlowTheme.of(context).headlineMedium.override(
-                  font: GoogleFonts.outfit(
-                    fontWeight:
-                        FlutterFlowTheme.of(context).headlineMedium.fontWeight,
-                    fontStyle:
-                        FlutterFlowTheme.of(context).headlineMedium.fontStyle,
-                  ),
-                  color: FFAppState().temaPrimaryText,
-                  fontSize: 22.0,
-                  letterSpacing: 0.0,
-                  fontWeight:
-                      FlutterFlowTheme.of(context).headlineMedium.fontWeight,
-                  fontStyle:
-                      FlutterFlowTheme.of(context).headlineMedium.fontStyle,
-                ),
-          ),
-          actions: [],
-          centerTitle: true,
-          elevation: 2.0,
-        ),
+        backgroundColor: theme.scaffoldBackgroundColor,
         body: SafeArea(
           top: true,
-          child: Padding(
-            padding: EdgeInsetsDirectional.fromSTEB(24.0, 24.0, 24.0, 0.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 24.0),
-                  child: Text(
-                    'Non preoccuparti!\nInserisci la tua email e ti invieremo un link per creare una nuova password',
-                    textAlign: TextAlign.center,
-                    style: FlutterFlowTheme.of(context).titleMedium.override(
-                          font: GoogleFonts.outfit(
-                            fontWeight: FlutterFlowTheme.of(context)
-                                .titleMedium
-                                .fontWeight,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .titleMedium
-                                .fontStyle,
-                          ),
-                          color: FFAppState().temaSecondaryText,
-                          letterSpacing: 0.0,
-                          fontWeight: FlutterFlowTheme.of(context)
-                              .titleMedium
-                              .fontWeight,
-                          fontStyle: FlutterFlowTheme.of(context)
-                              .titleMedium
-                              .fontStyle,
-                        ),
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 32.0),
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 440.0),
+                decoration: BoxDecoration(
+                  color: theme.cardColor,
+                  borderRadius: BorderRadius.circular(24.0),
+                  border: Border.all(
+                    color: theme.dividerColor.withValues(alpha: 0.5),
+                    width: 1.0,
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 24.0,
+                      offset: const Offset(0.0, 8.0),
+                    ),
+                  ],
                 ),
-                Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 26.0),
-                  child: Container(
-                    width: 280.0,
-                    child: TextFormField(
+                padding: const EdgeInsets.all(32.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Tasto Indietro
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(12.0),
+                        onTap: () async {
+                          context.pushNamed(AuthWelcomeWidget.routeName);
+                        },
+                        child: Container(
+                          width: 40.0,
+                          height: 40.0,
+                          decoration: BoxDecoration(
+                            color: theme.scaffoldBackgroundColor,
+                            borderRadius: BorderRadius.circular(12.0),
+                            border: Border.all(
+                              color: theme.dividerColor.withValues(alpha: 0.5),
+                              width: 1.0,
+                            ),
+                          ),
+                          child: Icon(
+                            Icons.arrow_back_rounded,
+                            color: theme.iconTheme.color,
+                            size: 20.0,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16.0),
+
+                    // Icona / Badge recupero
+                    Center(
+                      child: Container(
+                        width: 76.0,
+                        height: 76.0,
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.lock_reset_rounded,
+                          color: theme.colorScheme.primary,
+                          size: 38.0,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20.0),
+
+                    // Titolo
+                    Text(
+                      'Recupera Password',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                    const SizedBox(height: 8.0),
+
+                    // Descrizione
+                    Text(
+                      'Non preoccuparti! Inserisci l\'email associata al tuo account e ti invieremo un link per crearne una nuova.',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.hintColor,
+                        height: 1.45,
+                      ),
+                    ),
+                    const SizedBox(height: 28.0),
+
+                    // Label Email
+                    Text(
+                      'Email',
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 8.0),
+
+                    // Campo Email
+                    TextFormField(
                       controller: _model.txtEmailRecuperoTextController,
                       focusNode: _model.txtEmailRecuperoFocusNode,
                       autofocus: false,
@@ -142,164 +168,143 @@ class _RecuperoPasswordWidgetState extends State<RecuperoPasswordWidget> {
                       obscureText: false,
                       decoration: InputDecoration(
                         isDense: true,
-                        labelStyle:
-                            FlutterFlowTheme.of(context).labelMedium.override(
-                                  font: GoogleFonts.openSans(
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .labelMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .labelMedium
-                                        .fontStyle,
-                                  ),
-                                  color: FFAppState().temaSecondaryText,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .fontStyle,
-                                ),
-                        hintText: 'La tua email',
-                        hintStyle:
-                            FlutterFlowTheme.of(context).bodyMedium.override(
-                                  font: GoogleFonts.openSans(
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                  ),
-                                  color: FFAppState().temaSecondaryText,
-                                  letterSpacing: 0.0,
-                                  fontWeight: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .fontStyle,
-                                ),
+                        filled: true,
+                        fillColor: theme.scaffoldBackgroundColor,
+                        prefixIcon: Icon(
+                          Icons.mail_outline_rounded,
+                          color: theme.hintColor,
+                          size: 20.0,
+                        ),
+                        hintText: 'nome@ristorante.it',
+                        hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.hintColor,
+                        ),
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(
-                            color: FFAppState().temaSecondary,
+                            color: theme.dividerColor,
                             width: 1.0,
                           ),
-                          borderRadius: BorderRadius.circular(12.0),
+                          borderRadius: BorderRadius.circular(14.0),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderSide: BorderSide(
-                            color: FFAppState().temaPrimary,
-                            width: 1.0,
+                            color: theme.colorScheme.primary,
+                            width: 1.5,
                           ),
-                          borderRadius: BorderRadius.circular(12.0),
+                          borderRadius: BorderRadius.circular(14.0),
                         ),
                         errorBorder: OutlineInputBorder(
                           borderSide: BorderSide(
-                            color: FFAppState().temaError,
+                            color: theme.colorScheme.error,
                             width: 1.0,
                           ),
-                          borderRadius: BorderRadius.circular(12.0),
+                          borderRadius: BorderRadius.circular(14.0),
                         ),
                         focusedErrorBorder: OutlineInputBorder(
                           borderSide: BorderSide(
-                            color: FFAppState().temaError,
-                            width: 1.0,
+                            color: theme.colorScheme.error,
+                            width: 1.5,
                           ),
-                          borderRadius: BorderRadius.circular(12.0),
+                          borderRadius: BorderRadius.circular(14.0),
                         ),
-                        filled: true,
-                        fillColor: FFAppState().temaSecondaryBackground,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
                       ),
-                      style: FlutterFlowTheme.of(context).bodyMedium.override(
-                            font: GoogleFonts.openSans(
-                              fontWeight: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .fontWeight,
-                              fontStyle: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .fontStyle,
-                            ),
-                            color: FFAppState().temaPrimaryText,
-                            letterSpacing: 0.0,
-                            fontWeight: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .fontWeight,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .fontStyle,
-                          ),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
                       keyboardType: TextInputType.emailAddress,
-                      cursorColor: FFAppState().temaPrimary,
+                      cursorColor: theme.colorScheme.primary,
                       enableInteractiveSelection: true,
                       validator: _model.txtEmailRecuperoTextControllerValidator
                           .asValidator(context),
                     ),
-                  ),
-                ),
-                FFButtonWidget(
-                  onPressed: () async {
-                    if (_model.txtEmailRecuperoTextController.text.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'Inserisci la tua email per reimpostare la password.',
-                          ),
-                        ),
-                      );
-                      return;
-                    }
-                    await authManager.resetPassword(
-                      email: _model.txtEmailRecuperoTextController.text,
-                      context: context,
-                    );
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Email inviata! Controlla la tua casella di posta',
-                          style: TextStyle(
-                            color: FFAppState().temaPrimaryBackground,
-                          ),
-                        ),
-                        duration: Duration(milliseconds: 4000),
-                        backgroundColor: FFAppState().temaPrimary,
-                      ),
-                    );
+                    const SizedBox(height: 24.0),
 
-                    context.pushNamed(AuthWelcomeWidget.routeName);
-                  },
-                  text: 'Invia link di recupero',
-                  options: FFButtonOptions(
-                    width: 280.0,
-                    height: 45.0,
-                    padding:
-                        EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
-                    iconPadding:
-                        EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
-                    color: FFAppState().temaPrimary,
-                    textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                          font: GoogleFonts.outfit(
-                            fontWeight: FlutterFlowTheme.of(context)
-                                .titleSmall
-                                .fontWeight,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .titleSmall
-                                .fontStyle,
-                          ),
-                          color: FFAppState().temaPrimaryBackground,
-                          letterSpacing: 0.0,
-                          fontWeight: FlutterFlowTheme.of(context)
-                              .titleSmall
-                              .fontWeight,
-                          fontStyle:
-                              FlutterFlowTheme.of(context).titleSmall.fontStyle,
+                    // Bottone Invia Link
+                    FFButtonWidget(
+                      onPressed: () async {
+                        final email = _model.txtEmailRecuperoTextController.text.trim();
+                        if (email.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Inserisci la tua email per reimpostare la password.',
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: theme.colorScheme.onError,
+                                ),
+                              ),
+                              backgroundColor: theme.colorScheme.error,
+                            ),
+                          );
+                          return;
+                        }
+
+                        await authManager.resetPassword(
+                          email: email,
+                          context: context,
+                        );
+
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Email inviata! Controlla la tua casella di posta.',
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: theme.colorScheme.onPrimary,
+                                ),
+                              ),
+                              duration: const Duration(milliseconds: 5000),
+                              backgroundColor: theme.colorScheme.primary,
+                            ),
+                          );
+                          context.pushNamed(AuthWelcomeWidget.routeName);
+                        }
+                      },
+                      text: 'Invia link di recupero',
+                      options: FFButtonOptions(
+                        width: double.infinity,
+                        height: 48.0,
+                        color: theme.colorScheme.primary,
+                        textStyle: theme.textTheme.titleSmall?.copyWith(
+                          fontSize: 15.0,
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.onPrimary,
                         ),
-                    elevation: 2.0,
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
+                        elevation: 0.0,
+                        borderRadius: BorderRadius.circular(14.0),
+                      ),
+                    ),
+                    const SizedBox(height: 24.0),
+
+                    // Link Torna al Login
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Ricordi la password? ',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.hintColor,
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () async {
+                            context.pushNamed(AuthWelcomeWidget.routeName);
+                          },
+                          child: Text(
+                            'Accedi',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: theme.colorScheme.primary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),

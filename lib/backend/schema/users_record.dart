@@ -3,16 +3,15 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 
 import '/backend/schema/util/firestore_util.dart';
-import '/backend/schema/util/schema_util.dart';
 
 import 'index.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 
 class UsersRecord extends FirestoreRecord {
   UsersRecord._(
-    DocumentReference reference,
-    Map<String, dynamic> data,
-  ) : super(reference, data) {
+    super.reference,
+    super.data,
+  ) {
     _initializeFields();
   }
 
@@ -106,6 +105,77 @@ class UsersRecord extends FirestoreRecord {
   bool get haUsatoProva => _haUsatoProva ?? false;
   bool hasHaUsatoProva() => _haUsatoProva != null;
 
+  // Jukebox fields
+  bool? _jukeboxAttivo;
+  bool get jukeboxAttivo => _jukeboxAttivo ?? false;
+  bool hasJukeboxAttivo() => _jukeboxAttivo != null;
+
+  String? _spotifyPlaylistId;
+  String get spotifyPlaylistId => _spotifyPlaylistId ?? '';
+  bool hasSpotifyPlaylistId() => _spotifyPlaylistId != null;
+
+  int? _jukeboxCooldownMinuti;
+  int get jukeboxCooldownMinuti => _jukeboxCooldownMinuti ?? 30;
+  bool hasJukeboxCooldownMinuti() => _jukeboxCooldownMinuti != null;
+
+  String? _spotifyClientId;
+  String get spotifyClientId => _spotifyClientId ?? '';
+  bool hasSpotifyClientId() => _spotifyClientId != null;
+
+  String? _spotifyClientSecret;
+  String get spotifyClientSecret => _spotifyClientSecret ?? '';
+  bool hasSpotifyClientSecret() => _spotifyClientSecret != null;
+
+  String? _spotifyAccessToken;
+  String get spotifyAccessToken => _spotifyAccessToken ?? '';
+  bool hasSpotifyAccessToken() => _spotifyAccessToken != null;
+
+  String? _spotifyRefreshToken;
+  String get spotifyRefreshToken => _spotifyRefreshToken ?? '';
+  bool hasSpotifyRefreshToken() => _spotifyRefreshToken != null;
+
+  DateTime? _spotifyTokenExpiresAt;
+  DateTime? get spotifyTokenExpiresAt => _spotifyTokenExpiresAt;
+  bool hasSpotifyTokenExpiresAt() => _spotifyTokenExpiresAt != null;
+
+  String? _spotifyCodeVerifier;
+  String get spotifyCodeVerifier => _spotifyCodeVerifier ?? '';
+  bool hasSpotifyCodeVerifier() => _spotifyCodeVerifier != null;
+
+  String? _jukeboxProvider;
+  String get jukeboxProvider => _jukeboxProvider ?? 'spotify';
+  bool hasJukeboxProvider() => _jukeboxProvider != null;
+
+  String? _appleMusicPlaylistUrl;
+  String get appleMusicPlaylistUrl => _appleMusicPlaylistUrl ?? '';
+  bool hasAppleMusicPlaylistUrl() => _appleMusicPlaylistUrl != null;
+
+  // Dispensa & Customization fields
+  bool? _dispensaAttiva;
+  bool get dispensaAttiva => _dispensaAttiva ?? false;
+  bool hasDispensaAttiva() => _dispensaAttiva != null;
+
+  bool? _modifichePiattiAttive;
+  bool get modifichePiattiAttive => _modifichePiattiAttive ?? true;
+  bool hasModifichePiattiAttive() => _modifichePiattiAttive != null;
+
+  bool? _ingredientiManualiAttivi;
+  bool get ingredientiManualiAttivi => _ingredientiManualiAttivi ?? false;
+  bool hasIngredientiManualiAttivi() => _ingredientiManualiAttivi != null;
+
+  double? _prezzoAggiuntaManuale;
+  double get prezzoAggiuntaManuale => _prezzoAggiuntaManuale ?? 0.0;
+  bool hasPrezzoAggiuntaManuale() => _prezzoAggiuntaManuale != null;
+
+  // Menù Mutaforma fields
+  bool? _menuMutaformaAttivo;
+  bool get menuMutaformaAttivo => _menuMutaformaAttivo ?? false;
+  bool hasMenuMutaformaAttivo() => _menuMutaformaAttivo != null;
+
+  String? _fasceMutaforma;
+  String get fasceMutaforma => _fasceMutaforma ?? '';
+  bool hasFasceMutaforma() => _fasceMutaforma != null;
+
   void _initializeFields() {
     _email = snapshotData['email'] as String?;
     _displayName = snapshotData['display_name'] as String?;
@@ -125,6 +195,24 @@ class UsersRecord extends FirestoreRecord {
     _stripeId = snapshotData['stripeId'] as String?;
     _premiumExpiryDate = snapshotData['premium_expiry_date'] as DateTime?;
     _haUsatoProva = snapshotData['ha_usato_prova'] as bool?;
+    _jukeboxAttivo = snapshotData['jukebox_attivo'] as bool?;
+    _spotifyPlaylistId = snapshotData['spotify_playlist_id'] as String?;
+    _jukeboxCooldownMinuti =
+        castToType<int>(snapshotData['jukebox_cooldown_minuti']);
+    _spotifyClientId = snapshotData['spotify_client_id'] as String?;
+    _spotifyClientSecret = snapshotData['spotify_client_secret'] as String?;
+    _spotifyAccessToken = snapshotData['spotify_access_token'] as String?;
+    _spotifyRefreshToken = snapshotData['spotify_refresh_token'] as String?;
+    _spotifyTokenExpiresAt = snapshotData['spotify_token_expires_at'] as DateTime?;
+    _spotifyCodeVerifier = snapshotData['spotify_code_verifier'] as String?;
+    _jukeboxProvider = snapshotData['jukebox_provider'] as String?;
+    _appleMusicPlaylistUrl = snapshotData['apple_music_playlist_url'] as String?;
+    _dispensaAttiva = snapshotData['dispensa_attiva'] as bool?;
+    _modifichePiattiAttive = snapshotData['modifiche_piatti_attive'] as bool?;
+    _ingredientiManualiAttivi = snapshotData['ingredienti_manuali_attivi'] as bool?;
+    _prezzoAggiuntaManuale = castToType<double>(snapshotData['prezzo_aggiunta_manuale']);
+    _menuMutaformaAttivo = snapshotData['menu_mutaforma_attivo'] as bool?;
+    _fasceMutaforma = snapshotData['fasce_mutaforma'] as String?;
   }
 
   static CollectionReference get collection =>
@@ -179,6 +267,23 @@ Map<String, dynamic> createUsersRecordData({
   String? stripeId,
   DateTime? premiumExpiryDate,
   bool? haUsatoProva,
+  bool? jukeboxAttivo,
+  String? spotifyPlaylistId,
+  int? jukeboxCooldownMinuti,
+  String? spotifyClientId,
+  String? spotifyClientSecret,
+  String? spotifyAccessToken,
+  String? spotifyRefreshToken,
+  DateTime? spotifyTokenExpiresAt,
+  String? spotifyCodeVerifier,
+  String? jukeboxProvider,
+  String? appleMusicPlaylistUrl,
+  bool? dispensaAttiva,
+  bool? modifichePiattiAttive,
+  bool? ingredientiManualiAttivi,
+  double? prezzoAggiuntaManuale,
+  bool? menuMutaformaAttivo,
+  String? fasceMutaforma,
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
@@ -200,6 +305,23 @@ Map<String, dynamic> createUsersRecordData({
       'stripeId': stripeId,
       'premium_expiry_date': premiumExpiryDate,
       'ha_usato_prova': haUsatoProva,
+      'jukebox_attivo': jukeboxAttivo,
+      'spotify_playlist_id': spotifyPlaylistId,
+      'jukebox_cooldown_minuti': jukeboxCooldownMinuti,
+      'spotify_client_id': spotifyClientId,
+      'spotify_client_secret': spotifyClientSecret,
+      'spotify_access_token': spotifyAccessToken,
+      'spotify_refresh_token': spotifyRefreshToken,
+      'spotify_token_expires_at': spotifyTokenExpiresAt,
+      'spotify_code_verifier': spotifyCodeVerifier,
+      'jukebox_provider': jukeboxProvider,
+      'apple_music_playlist_url': appleMusicPlaylistUrl,
+      'dispensa_attiva': dispensaAttiva,
+      'modifiche_piatti_attive': modifichePiattiAttive,
+      'ingredienti_manuali_attivi': ingredientiManualiAttivi,
+      'prezzo_aggiunta_manuale': prezzoAggiuntaManuale,
+      'menu_mutaforma_attivo': menuMutaformaAttivo,
+      'fasce_mutaforma': fasceMutaforma,
     }.withoutNulls,
   );
 
