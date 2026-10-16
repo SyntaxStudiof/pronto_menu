@@ -901,8 +901,7 @@ class _TrisGameWidgetState extends State<TrisGameWidget>
                 stream: queryTrisMatchesRecord(
                   queryBuilder: (q) => q
                       .where('ristorante_ref', isEqualTo: widget.ristoranteRef)
-                      .where('stato', isEqualTo: 'in_attesa')
-                      .orderBy('created_at', descending: true),
+                      .where('stato', isEqualTo: 'in_attesa'),
                 ),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
@@ -917,13 +916,22 @@ class _TrisGameWidgetState extends State<TrisGameWidget>
                     );
                   }
 
-                  final matches = snapshot.data!;
-                  // Filtra escludendo sfide create da me stesso
+                  // Ordina per data decrescente in memoria
+                  final matches = List<TrisMatchesRecord>.from(snapshot.data!)
+                    ..sort((a, b) => (b.createdAt ?? DateTime(0)).compareTo(a.createdAt ?? DateTime(0)));
                   final mioTavolo = _model.myTableNumber ?? '';
-                  final sfideAltri = matches
+                  final now = DateTime.now();
+
+                  // Mostra solo le sfide attive recenti (ultime 2 ore)
+                  final sfideRecenti = matches.where((m) {
+                    if (m.createdAt == null) return true;
+                    return now.difference(m.createdAt!).inHours < 2;
+                  }).toList();
+
+                  final sfideAltri = sfideRecenti
                       .where((m) => m.tavoloSfidante != mioTavolo)
                       .toList();
-                  final mieSfideInAttesa = matches
+                  final mieSfideInAttesa = sfideRecenti
                       .where((m) => m.tavoloSfidante == mioTavolo)
                       .toList();
 

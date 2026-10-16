@@ -1070,8 +1070,7 @@ class _QuizGameWidgetState extends State<QuizGameWidget> {
             stream: queryQuizMatchesRecord(
               queryBuilder: (q) => q
                   .where('ristorante_ref', isEqualTo: widget.ristoranteRef)
-                  .where('stato', isEqualTo: 'in_attesa')
-                  .orderBy('created_at', descending: true),
+                  .where('stato', isEqualTo: 'in_attesa'),
             ),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
@@ -1083,9 +1082,20 @@ class _QuizGameWidgetState extends State<QuizGameWidget> {
                 );
               }
 
-              final matches = snapshot.data!;
-              final sfideAltri = matches.where((m) => m.tavoloSfidante != mioTavolo).toList();
-              final mieSfideInAttesa = matches.where((m) => m.tavoloSfidante == mioTavolo).toList();
+              // Ordina per data decrescente in memoria
+              final matches = List<QuizMatchesRecord>.from(snapshot.data!)
+                ..sort((a, b) => (b.createdAt ?? DateTime(0)).compareTo(a.createdAt ?? DateTime(0)));
+              final mioTavolo = _model.myTableNumber ?? '';
+              final now = DateTime.now();
+
+              // Mostra solo le sfide attive recenti (ultime 2 ore)
+              final sfideRecenti = matches.where((m) {
+                if (m.createdAt == null) return true;
+                return now.difference(m.createdAt!).inHours < 2;
+              }).toList();
+
+              final sfideAltri = sfideRecenti.where((m) => m.tavoloSfidante != mioTavolo).toList();
+              final mieSfideInAttesa = sfideRecenti.where((m) => m.tavoloSfidante == mioTavolo).toList();
 
               return Column(
                 children: [
