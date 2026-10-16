@@ -299,15 +299,11 @@ class _MenuProfiloWidgetState extends State<MenuProfiloWidget> {
                       onTap: () async {
                         Navigator.pop(context);
                         context.pushNamed(
-                          MenuClienteWidget.routeName,
+                          HubClienteWidget.routeName,
                           queryParameters: {
                             'ristoranteRef': serializeParam(
                               widget.ristoranteRef,
                               ParamType.DocumentReference,
-                            ),
-                            'isAnteprima': serializeParam(
-                              true,
-                              ParamType.bool,
                             ),
                           }.withoutNulls,
                           extra: <String, dynamic>{

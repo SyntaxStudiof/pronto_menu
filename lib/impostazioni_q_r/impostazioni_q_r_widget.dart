@@ -247,15 +247,11 @@ class _ImpostazioniQRWidgetState extends State<ImpostazioniQRWidget> {
                             child: OutlinedButton.icon(
                               onPressed: () async {
                                 context.pushNamed(
-                                  MenuClienteWidget.routeName,
+                                  HubClienteWidget.routeName,
                                   queryParameters: {
                                     'ristoranteRef': serializeParam(
                                       currentUserReference,
                                       ParamType.DocumentReference,
-                                    ),
-                                    'isAnteprima': serializeParam(
-                                      true,
-                                      ParamType.bool,
                                     ),
                                   }.withoutNulls,
                                 );

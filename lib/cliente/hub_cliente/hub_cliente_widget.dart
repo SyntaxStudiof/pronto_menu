@@ -185,15 +185,30 @@ class _HubClienteWidgetState extends State<HubClienteWidget> {
             automaticallyImplyLeading: false,
             elevation: 1.0,
             centerTitle: true,
-            leadingWidth: 92.0,
+            leadingWidth: context.canPop() ? 134.0 : 92.0,
             leading: Align(
               alignment: Alignment.centerLeft,
               child: Padding(
-                padding: const EdgeInsetsDirectional.only(start: 12.0),
-                child: InkWell(
-                  onTap: () => _mostraSelettoreLingua(theme),
-                  borderRadius: BorderRadius.circular(16.0),
-                  child: Container(
+                padding: const EdgeInsetsDirectional.only(start: 8.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (context.canPop())
+                      IconButton(
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(
+                            minWidth: 32.0, minHeight: 32.0),
+                        icon: Icon(
+                          Icons.arrow_back_rounded,
+                          size: 22.0,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                        onPressed: () => context.safePop(),
+                      ),
+                    InkWell(
+                      onTap: () => _mostraSelettoreLingua(theme),
+                      borderRadius: BorderRadius.circular(16.0),
+                      child: Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 8.0, vertical: 5.0),
                     decoration: BoxDecoration(
@@ -236,8 +251,10 @@ class _HubClienteWidgetState extends State<HubClienteWidget> {
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
+          ),
+        ),
             title: Row(
               mainAxisSize: MainAxisSize.min,
               children: [

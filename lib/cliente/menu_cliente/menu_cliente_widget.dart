@@ -1151,7 +1151,7 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
               automaticallyImplyLeading: false,
               elevation: 2.0,
               centerTitle: true,
-              leadingWidth: context.canPop() ? 134.0 : 92.0,
+              leadingWidth: context.canPop() ? 104.0 : 72.0,
               leading: Align(
                 alignment: Alignment.centerLeft,
                 child: Padding(
@@ -1274,80 +1274,6 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                 ],
               ),
               actions: [
-                if (menuClienteUsersRecord.jukeboxAttivo)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 6.0),
-                    child: IconButton(
-                      tooltip: 'Jukebox',
-                      icon: Container(
-                        width: 36.0,
-                        height: 36.0,
-                        decoration: BoxDecoration(
-                          color:
-                              const Color(0xFF1DB954).withValues(alpha: 0.15),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: const Color(0xFF1DB954)
-                                .withValues(alpha: 0.35),
-                            width: 1.2,
-                          ),
-                        ),
-                        alignment: Alignment.center,
-                        child: const Icon(
-                          Icons.music_note_rounded,
-                          color: Color(0xFF1DB954),
-                          size: 20.0,
-                        ),
-                      ),
-                      onPressed: () {
-                        JukeboxModalWidget.show(
-                          context,
-                          ristoranteRef: widget.ristoranteRef!,
-                          ristorante: menuClienteUsersRecord,
-                          currentLang: _currentLang,
-                        );
-                      },
-                    ),
-                  ),
-                Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 8.0, 0.0),
-                  child: IconButton(
-                    tooltip: 'Tris al Tavolo',
-                    icon: Container(
-                      width: 36.0,
-                      height: 36.0,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: const Color(0xFF8B5CF6).withValues(alpha: 0.35),
-                          width: 1.2,
-                        ),
-                      ),
-                      alignment: Alignment.center,
-                      child: const Icon(
-                        Icons.sports_esports_rounded,
-                        color: Color(0xFF8B5CF6),
-                        size: 20.0,
-                      ),
-                    ),
-                    onPressed: () {
-                      context.pushNamed(
-                        TrisGameWidget.routeName,
-                        queryParameters: {
-                          'ristoranteRef': serializeParam(
-                            widget.ristoranteRef,
-                            ParamType.DocumentReference,
-                          ),
-                          'tavoloPreimpostato': serializeParam(
-                            FFAppState().numeroTavolo,
-                            ParamType.String,
-                          ),
-                        }.withoutNulls,
-                      );
-                    },
-                  ),
-                ),
                 if (!widget.solaConsultazione)
                   InkWell(
                     splashColor: Colors.transparent,
@@ -1359,7 +1285,7 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                         RiepilogoFinaleWidget.routeName,
                         queryParameters: {
                           'ristoranteRef': serializeParam(
-                            widget!.ristoranteRef,
+                            widget.ristoranteRef,
                             ParamType.DocumentReference,
                           ),
                         }.withoutNulls,
