@@ -305,6 +305,10 @@ class _MenuProfiloWidgetState extends State<MenuProfiloWidget> {
                               widget.ristoranteRef,
                               ParamType.DocumentReference,
                             ),
+                            'isAnteprima': serializeParam(
+                              true,
+                              ParamType.bool,
+                            ),
                           }.withoutNulls,
                           extra: <String, dynamic>{
                             '__transition_info__': const TransitionInfo(

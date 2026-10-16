@@ -253,6 +253,10 @@ class _ImpostazioniQRWidgetState extends State<ImpostazioniQRWidget> {
                                       currentUserReference,
                                       ParamType.DocumentReference,
                                     ),
+                                    'isAnteprima': serializeParam(
+                                      true,
+                                      ParamType.bool,
+                                    ),
                                   }.withoutNulls,
                                 );
                               },

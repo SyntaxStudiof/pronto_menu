@@ -18,9 +18,11 @@ class HubClienteWidget extends StatefulWidget {
   const HubClienteWidget({
     super.key,
     required this.ristoranteRef,
+    this.isAnteprima = false,
   });
 
   final DocumentReference? ristoranteRef;
+  final bool isAnteprima;
 
   static String routeName = 'HubCliente';
   static String routePath = '/hubCliente';
@@ -411,6 +413,10 @@ class _HubClienteWidgetState extends State<HubClienteWidget> {
                             widget.ristoranteRef,
                             ParamType.DocumentReference,
                           ),
+                          'isAnteprima': serializeParam(
+                            true,
+                            ParamType.bool,
+                          ),
                         }.withoutNulls,
                       );
                     },
@@ -435,6 +441,10 @@ class _HubClienteWidgetState extends State<HubClienteWidget> {
                             'ristoranteRef': serializeParam(
                               widget.ristoranteRef,
                               ParamType.DocumentReference,
+                            ),
+                            'isAnteprima': serializeParam(
+                              true,
+                              ParamType.bool,
                             ),
                           }.withoutNulls,
                         );

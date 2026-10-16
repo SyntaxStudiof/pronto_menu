@@ -233,7 +233,7 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
 
     // Gestione reindirizzamento immediato per ristoratore
     SchedulerBinding.instance.addPostFrameCallback((_) {
-      if (!widget.isAnteprima && currentUserUid.isNotEmpty) {
+      if (!widget.isAnteprima && currentUserUid.isNotEmpty && widget.ristoranteRef == null) {
         context.pushNamed(
           HomeRistoratoreWidget.routeName,
           queryParameters: {

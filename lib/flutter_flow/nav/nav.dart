@@ -465,6 +465,10 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
               isList: false,
               collectionNamePath: ['users'],
             ),
+            isAnteprima: params.getParam(
+              'isAnteprima',
+              ParamType.bool,
+            ) ?? false,
           ),
         ),
         FFRoute(

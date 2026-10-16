@@ -43,17 +43,7 @@ class _LoaderMenuWidgetState extends State<LoaderMenuWidget> {
     // On page load action - immediato senza attese di rete bloccanti.
     SchedulerBinding.instance.addPostFrameCallback((_) {
       FFAppState().ristoranteSalvato = widget.ristoranteRef;
-      if (currentUserUid.isNotEmpty) {
-        context.goNamed(
-          HomeRistoratoreWidget.routeName,
-          queryParameters: {
-            'ristoranteRef': serializeParam(
-              widget.ristoranteRef,
-              ParamType.DocumentReference,
-            ),
-          }.withoutNulls,
-        );
-      } else {
+      if (widget.ristoranteRef != null) {
         context.goNamed(
           HubClienteWidget.routeName,
           queryParameters: {
@@ -61,7 +51,19 @@ class _LoaderMenuWidgetState extends State<LoaderMenuWidget> {
               widget.ristoranteRef,
               ParamType.DocumentReference,
             ),
+            'isAnteprima': serializeParam(
+              currentUserUid.isNotEmpty,
+              ParamType.bool,
+            ),
           }.withoutNulls,
+        );
+      } else if (currentUserUid.isNotEmpty) {
+        context.goNamed(
+          HomeRistoratoreWidget.routeName,
+        );
+      } else {
+        context.goNamed(
+          AuthWelcomeWidget.routeName,
         );
       }
     });
