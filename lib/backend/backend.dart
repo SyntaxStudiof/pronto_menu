@@ -14,6 +14,7 @@ import 'schema/sottocategorie_record.dart';
 import 'schema/cancellation_requests_record.dart';
 import 'schema/jukebox_requests_record.dart';
 import 'schema/dispensa_record.dart';
+import 'schema/action_logs_record.dart';
 
 export 'dart:async' show StreamSubscription;
 export 'package:cloud_firestore/cloud_firestore.dart' hide Order;
@@ -31,6 +32,7 @@ export 'schema/sottocategorie_record.dart';
 export 'schema/cancellation_requests_record.dart';
 export 'schema/jukebox_requests_record.dart';
 export 'schema/dispensa_record.dart';
+export 'schema/action_logs_record.dart';
 
 /// Functions to query CategoriesRecords (as a Stream and as a Future).
 Future<int> queryCategoriesRecordCount({
@@ -360,6 +362,43 @@ Future<List<DispensaRecord>> queryDispensaRecordOnce({
     queryCollectionOnce(
       DispensaRecord.collection,
       DispensaRecord.fromSnapshot,
+      queryBuilder: queryBuilder,
+      limit: limit,
+      singleRecord: singleRecord,
+    );
+
+/// Functions to query ActionLogsRecords (as a Stream and as a Future).
+Future<int> queryActionLogsRecordCount({
+  Query Function(Query)? queryBuilder,
+  int limit = -1,
+}) =>
+    queryCollectionCount(
+      ActionLogsRecord.collection,
+      queryBuilder: queryBuilder,
+      limit: limit,
+    );
+
+Stream<List<ActionLogsRecord>> queryActionLogsRecord({
+  Query Function(Query)? queryBuilder,
+  int limit = -1,
+  bool singleRecord = false,
+}) =>
+    queryCollection(
+      ActionLogsRecord.collection,
+      ActionLogsRecord.fromSnapshot,
+      queryBuilder: queryBuilder,
+      limit: limit,
+      singleRecord: singleRecord,
+    );
+
+Future<List<ActionLogsRecord>> queryActionLogsRecordOnce({
+  Query Function(Query)? queryBuilder,
+  int limit = -1,
+  bool singleRecord = false,
+}) =>
+    queryCollectionOnce(
+      ActionLogsRecord.collection,
+      ActionLogsRecord.fromSnapshot,
       queryBuilder: queryBuilder,
       limit: limit,
       singleRecord: singleRecord,

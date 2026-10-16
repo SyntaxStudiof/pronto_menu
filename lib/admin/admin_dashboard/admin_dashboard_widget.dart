@@ -141,12 +141,36 @@ class _AdminDashboardWidgetState extends State<AdminDashboardWidget> {
                 ],
               ),
               actions: [
-                IconButton(
-                  icon: const Icon(
-                    Icons.menu_rounded,
-                    size: 24.0,
-                  ),
-                  onPressed: () => scaffoldKey.currentState?.openEndDrawer(),
+                StreamBuilder<List<TicketsRecord>>(
+                  stream: queryTicketsRecord(),
+                  builder: (context, snapshot) {
+                    final apertiCount = snapshot.hasData
+                        ? snapshot.data!.where((t) {
+                            final s = t.stato.trim().toLowerCase();
+                            return s == 'aperto' || s.isEmpty;
+                          }).length
+                        : 0;
+
+                    return IconButton(
+                      icon: Badge(
+                        isLabelVisible: apertiCount > 0,
+                        backgroundColor: const Color(0xFFEF4444),
+                        label: Text(
+                          apertiCount > 99 ? '99+' : apertiCount.toString(),
+                          style: const TextStyle(
+                            fontSize: 10.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.menu_rounded,
+                          size: 24.0,
+                        ),
+                      ),
+                      onPressed: () => scaffoldKey.currentState?.openEndDrawer(),
+                    );
+                  },
                 ),
               ],
               centerTitle: true,
@@ -251,6 +275,200 @@ class _AdminDashboardWidgetState extends State<AdminDashboardWidget> {
                                   ),
                                 ),
                               ],
+                            ),
+                          ),
+                          const SizedBox(height: 16.0),
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  const Color(0xFFF59E0B).withValues(alpha: 0.12),
+                                  const Color(0xFF8B5CF6).withValues(alpha: 0.08),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(18.0),
+                              border: Border.all(
+                                color: const Color(0xFFF59E0B).withValues(alpha: 0.28),
+                                width: 1.0,
+                              ),
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(18.0),
+                                onTap: () => context.pushNamed(AdminMetricheWidget.routeName),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 14.0),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: 44.0,
+                                        height: 44.0,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFF59E0B).withValues(alpha: 0.20),
+                                          borderRadius: BorderRadius.circular(12.0),
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: const Icon(
+                                          Icons.insights_rounded,
+                                          color: Color(0xFFD97706),
+                                          size: 24.0,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 14.0),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Metriche del Business & Costi Server',
+                                              style: theme.textTheme.titleSmall?.copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 15.0,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 2.0),
+                                            Text(
+                                              'Ristoranti attivi oggi, utenti registrati e spazio GB foto Firebase',
+                                              style: theme.textTheme.bodySmall?.copyWith(
+                                                color: theme.textTheme.bodySmall?.color ??
+                                                    theme.colorScheme.onSurface.withValues(alpha: 0.65),
+                                                fontSize: 12.0,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8.0),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFD97706),
+                                          borderRadius: BorderRadius.circular(10.0),
+                                        ),
+                                        child: const Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              'Vedi',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12.0,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            SizedBox(width: 4.0),
+                                            Icon(
+                                              Icons.arrow_forward_rounded,
+                                              color: Colors.white,
+                                              size: 14.0,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12.0),
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  const Color(0xFF3B82F6).withValues(alpha: 0.12),
+                                  const Color(0xFF06B6D4).withValues(alpha: 0.08),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(18.0),
+                              border: Border.all(
+                                color: const Color(0xFF3B82F6).withValues(alpha: 0.28),
+                                width: 1.0,
+                              ),
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(18.0),
+                                onTap: () => context.pushNamed(AdminCronologiaAzioniWidget.routeName),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 14.0),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: 44.0,
+                                        height: 44.0,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF3B82F6).withValues(alpha: 0.20),
+                                          borderRadius: BorderRadius.circular(12.0),
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: const Icon(
+                                          Icons.manage_history_rounded,
+                                          color: Color(0xFF2563EB),
+                                          size: 24.0,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 14.0),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Cronologia Azioni (Audit Log)',
+                                              style: theme.textTheme.titleSmall?.copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 15.0,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 2.0),
+                                            Text(
+                                              'Tracciamento eliminazioni e modifiche piatti/categorie',
+                                              style: theme.textTheme.bodySmall?.copyWith(
+                                                color: theme.textTheme.bodySmall?.color ??
+                                                    theme.colorScheme.onSurface.withValues(alpha: 0.65),
+                                                fontSize: 12.0,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8.0),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF2563EB),
+                                          borderRadius: BorderRadius.circular(10.0),
+                                        ),
+                                        child: const Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              'Vedi',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12.0,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            SizedBox(width: 4.0),
+                                            Icon(
+                                              Icons.arrow_forward_rounded,
+                                              color: Colors.white,
+                                              size: 14.0,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                           const SizedBox(height: 20.0),

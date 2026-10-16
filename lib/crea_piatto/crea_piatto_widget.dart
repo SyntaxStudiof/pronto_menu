@@ -18,6 +18,7 @@ import 'package:percent_indicator/percent_indicator.dart';
 import 'package:provider/provider.dart';
 import '/backend/schema/util/allergeni_data.dart';
 import '/services/translation_service.dart';
+import '/services/audit_log_service.dart';
 import '/components/ingredienti_dispensa_field.dart';
 import 'crea_piatto_model.dart';
 export 'crea_piatto_model.dart';
@@ -937,6 +938,14 @@ class _CreaPiattoWidgetState extends State<CreaPiattoWidget> {
                                 debugPrint('Errore aggiornamento traduzioni: $e');
                               });
                             }
+
+                            await AuditLogService.logAction(
+                              ristoranteRef: widget.ristoranteRef,
+                              azione: "Ha modificato il piatto '${_model.nomePiattoTextController.text}'",
+                              dettagli: "Modificato piatto '${_model.nomePiattoTextController.text}' (Prezzo: ${_model.prezzoTextController.text}€)",
+                              tipoAzione: 'modifica',
+                              tipoEntita: 'piatto',
+                            );
                           } else {
                             final newDoc = PiattiRecord.collection.doc();
                             await newDoc.set(createPiattiRecordData(
@@ -975,6 +984,14 @@ class _CreaPiattoWidgetState extends State<CreaPiattoWidget> {
                                 debugPrint('Errore generazione traduzioni: $e');
                               });
                             }
+
+                            await AuditLogService.logAction(
+                              ristoranteRef: widget.ristoranteRef,
+                              azione: "Ha creato il piatto '${_model.nomePiattoTextController.text}'",
+                              dettagli: "Creato nuovo piatto '${_model.nomePiattoTextController.text}' (Prezzo: ${_model.prezzoTextController.text}€)",
+                              tipoAzione: 'creazione',
+                              tipoEntita: 'piatto',
+                            );
 
                             safeSetState(() {});
                           }

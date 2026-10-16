@@ -59,4 +59,10 @@ export '/impostazioni_mutaforma/impostazioni_mutaforma_widget.dart'
 export '/cliente/hub_cliente/hub_cliente_widget.dart' show HubClienteWidget;
 export '/cliente/menu_disattivati/menu_disattivati_widget.dart'
     show MenuDisattivatiWidget;
+export '/admin/admin_metriche/admin_metriche_widget.dart'
+    show AdminMetricheWidget;
+export '/admin/admin_cronologia_azioni/admin_cronologia_azioni_widget.dart'
+    show AdminCronologiaAzioniWidget;
+
+
 

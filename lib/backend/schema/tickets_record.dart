@@ -46,6 +46,11 @@ class TicketsRecord extends FirestoreRecord {
   String get rispostaAdmin => _rispostaAdmin ?? '';
   bool hasRispostaAdmin() => _rispostaAdmin != null;
 
+  // "risposta_letta" field.
+  bool? _rispostaLetta;
+  bool get rispostaLetta => _rispostaLetta ?? false;
+  bool hasRispostaLetta() => _rispostaLetta != null;
+
   void _initializeFields() {
     _titolo = snapshotData['titolo'] as String?;
     _descrizione = snapshotData['descrizione'] as String?;
@@ -53,6 +58,7 @@ class TicketsRecord extends FirestoreRecord {
     _dataCreazione = snapshotData['data_creazione'] as DateTime?;
     _stato = snapshotData['stato'] as String?;
     _rispostaAdmin = snapshotData['risposta_admin'] as String?;
+    _rispostaLetta = snapshotData['risposta_letta'] as bool?;
   }
 
   static CollectionReference get collection =>
@@ -96,6 +102,7 @@ Map<String, dynamic> createTicketsRecordData({
   DateTime? dataCreazione,
   String? stato,
   String? rispostaAdmin,
+  bool? rispostaLetta,
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
@@ -105,6 +112,7 @@ Map<String, dynamic> createTicketsRecordData({
       'data_creazione': dataCreazione,
       'stato': stato,
       'risposta_admin': rispostaAdmin,
+      'risposta_letta': rispostaLetta,
     }.withoutNulls,
   );
 
@@ -121,7 +129,8 @@ class TicketsRecordDocumentEquality implements Equality<TicketsRecord> {
         e1?.ristoratoreRef == e2?.ristoratoreRef &&
         e1?.dataCreazione == e2?.dataCreazione &&
         e1?.stato == e2?.stato &&
-        e1?.rispostaAdmin == e2?.rispostaAdmin;
+        e1?.rispostaAdmin == e2?.rispostaAdmin &&
+        e1?.rispostaLetta == e2?.rispostaLetta;
   }
 
   @override
@@ -131,7 +140,8 @@ class TicketsRecordDocumentEquality implements Equality<TicketsRecord> {
         e?.ristoratoreRef,
         e?.dataCreazione,
         e?.stato,
-        e?.rispostaAdmin
+        e?.rispostaAdmin,
+        e?.rispostaLetta
       ]);
 
   @override

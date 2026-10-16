@@ -14,6 +14,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 import '/backend/schema/util/allergeni_data.dart';
 import '/components/pannello_modifica_piatto_widget.dart';
+import '/services/audit_log_service.dart';
 import 'lista_piatti_model.dart';
 export 'lista_piatti_model.dart';
 
@@ -332,6 +333,13 @@ class _ListaPiattiWidgetState extends State<ListaPiattiWidget> {
                             dataCestinamento: functions.aggiungiSetteGiorni(
                                 getCurrentTimestamp),
                           ),
+                        );
+                        await AuditLogService.logAction(
+                          ristoranteRef: widget.ristoranteRef,
+                          azione: "Ha spostato nel cestino il piatto '${piatto.nome}'",
+                          dettagli: "Piatto '${piatto.nome}' (Categoria: ${widget.nomeCategoria ?? 'N/D'}) spostato nel cestino",
+                          tipoAzione: 'eliminazione',
+                          tipoEntita: 'piatto',
                         );
                       }
                     },

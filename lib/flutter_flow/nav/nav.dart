@@ -399,6 +399,18 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           builder: (context, params) => AdminDashboardWidget(),
         ),
         FFRoute(
+          name: AdminMetricheWidget.routeName,
+          path: AdminMetricheWidget.routePath,
+          requireAuth: true,
+          builder: (context, params) => const AdminMetricheWidget(),
+        ),
+        FFRoute(
+          name: AdminCronologiaAzioniWidget.routeName,
+          path: AdminCronologiaAzioniWidget.routePath,
+          requireAuth: true,
+          builder: (context, params) => const AdminCronologiaAzioniWidget(),
+        ),
+        FFRoute(
           name: SmistamentoLoginWidget.routeName,
           path: SmistamentoLoginWidget.routePath,
           builder: (context, params) => SmistamentoLoginWidget(),

@@ -1,6 +1,7 @@
 import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
+import '/services/audit_log_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -142,14 +143,22 @@ class _CompAddCategoryWidgetState extends State<CompAddCategoryWidget> {
                 padding: EdgeInsetsDirectional.fromSTEB(0.0, 20.0, 0.0, 0.0),
                 child: FFButtonWidget(
                   onPressed: () async {
+                    final catName = _model.textFieldTextController.text.trim();
                     await CategoriesRecord.collection
                         .doc()
                         .set(createCategoriesRecordData(
-                          name: _model.textFieldTextController.text,
+                          name: catName,
                           createdAt: getCurrentTimestamp,
                           proprietario: widget.ristoranteRef,
                           ordineCategoria: 99,
                         ));
+                    await AuditLogService.logAction(
+                      ristoranteRef: widget.ristoranteRef,
+                      azione: "Ha creato la categoria '$catName'",
+                      dettagli: "Creata la nuova categoria '$catName'",
+                      tipoAzione: 'creazione',
+                      tipoEntita: 'categoria',
+                    );
                     Navigator.pop(context);
                   },
                   text: 'Crea Categoria',

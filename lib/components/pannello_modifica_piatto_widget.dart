@@ -11,6 +11,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '/services/translation_service.dart';
+import '/services/audit_log_service.dart';
 import '/components/ingredienti_dispensa_field.dart';
 
 class PannelloModificaPiattoWidget extends StatefulWidget {
@@ -164,6 +165,15 @@ class _PannelloModificaPiattoWidgetState
         allergeni: _allergeniSelezionati,
         intolleranze: _intolleranzeSelezionate,
       ));
+
+      final piattoNomeSalvato = _nomePiattoController.text.trim();
+      await AuditLogService.logAction(
+        ristoranteRef: widget.ristoranteRef,
+        azione: "Ha modificato il piatto '$piattoNomeSalvato'",
+        dettagli: "Modificato piatto '$piattoNomeSalvato' (Prezzo: ${_prezzoController.text.trim()}€)",
+        tipoAzione: 'modifica',
+        tipoEntita: 'piatto',
+      );
 
       // Aggiorna le traduzioni in background (descrizione e ingredienti, NO nome)
       if (descText.isNotEmpty || ingrText.isNotEmpty) {

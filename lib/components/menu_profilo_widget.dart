@@ -1,7 +1,7 @@
 import '/auth/firebase_auth/auth_util.dart';
+import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'menu_profilo_model.dart';
@@ -49,6 +49,7 @@ class _MenuProfiloWidgetState extends State<MenuProfiloWidget> {
     required Color iconColor,
     required Color iconBgColor,
     required VoidCallback onTap,
+    Widget? trailingBadge,
     bool isDestructive = false,
   }) {
     final theme = Theme.of(context);
@@ -83,12 +84,24 @@ class _MenuProfiloWidgetState extends State<MenuProfiloWidget> {
               ),
               const SizedBox(width: 14.0),
               Expanded(
-                child: Text(
-                  title,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: isDestructive ? theme.colorScheme.error : null,
-                  ),
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: isDestructive ? theme.colorScheme.error : null,
+                        ),
+                      ),
+                    ),
+                    if (trailingBadge != null) ...[
+                      const SizedBox(width: 8.0),
+                      trailingBadge,
+                    ],
+                  ],
                 ),
               ),
               Icon(
@@ -385,27 +398,71 @@ class _MenuProfiloWidgetState extends State<MenuProfiloWidget> {
                       },
                     ),
                     const SizedBox(height: 4.0),
-                    _buildMenuItem(
-                      context: context,
-                      title: 'Supporto',
-                      icon: Icons.help_outline_rounded,
-                      iconColor: const Color(0xFF059669),
-                      iconBgColor: const Color(0xFF059669).withValues(alpha: 0.12),
-                      onTap: () async {
-                        Navigator.pop(context);
-                        context.pushNamed(
-                          SupportoRistoratoreWidget.routeName,
-                          queryParameters: {
-                            'ristoranteRef': serializeParam(
-                              widget.ristoranteRef,
-                              ParamType.DocumentReference,
-                            ),
-                          }.withoutNulls,
-                          extra: <String, dynamic>{
-                            '__transition_info__': const TransitionInfo(
-                              hasTransition: true,
-                              transitionType: PageTransitionType.rightToLeft,
-                            ),
+                    StreamBuilder<List<TicketsRecord>>(
+                      stream: queryTicketsRecord(
+                        queryBuilder: (q) => q.where(
+                          'ristoratore_ref',
+                          isEqualTo: currentUserReference,
+                        ),
+                      ),
+                      builder: (context, snapshot) {
+                        final tickets = snapshot.data ?? [];
+                        final hasUnreadReply = tickets.any((t) =>
+                            t.rispostaAdmin.trim().isNotEmpty &&
+                            !t.rispostaLetta);
+
+                        return _buildMenuItem(
+                          context: context,
+                          title: 'Supporto',
+                          icon: Icons.help_outline_rounded,
+                          iconColor: const Color(0xFF059669),
+                          iconBgColor:
+                              const Color(0xFF059669).withValues(alpha: 0.12),
+                          trailingBadge: hasUnreadReply
+                              ? Container(
+                                  width: 20.0,
+                                  height: 20.0,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFEF4444),
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: const Color(0xFFEF4444)
+                                            .withValues(alpha: 0.4),
+                                        blurRadius: 4.0,
+                                        offset: const Offset(0, 1),
+                                      ),
+                                    ],
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: const Text(
+                                    '!',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 13.0,
+                                      height: 1.1,
+                                    ),
+                                  ),
+                                )
+                              : null,
+                          onTap: () async {
+                            Navigator.pop(context);
+                            context.pushNamed(
+                              SupportoRistoratoreWidget.routeName,
+                              queryParameters: {
+                                'ristoranteRef': serializeParam(
+                                  widget.ristoranteRef,
+                                  ParamType.DocumentReference,
+                                ),
+                              }.withoutNulls,
+                              extra: <String, dynamic>{
+                                '__transition_info__': const TransitionInfo(
+                                  hasTransition: true,
+                                  transitionType: PageTransitionType.rightToLeft,
+                                ),
+                              },
+                            );
                           },
                         );
                       },
@@ -433,6 +490,7 @@ class _MenuProfiloWidgetState extends State<MenuProfiloWidget> {
                   Navigator.pop(context);
                   GoRouter.of(context).prepareAuthEvent();
                   await authManager.signOut();
+                  if (!context.mounted) return;
                   GoRouter.of(context).clearRedirectLocation();
 
                   context.pushNamedAuth(

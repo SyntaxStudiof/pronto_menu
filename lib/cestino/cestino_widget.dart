@@ -4,6 +4,7 @@ import '/components/cestino_vuoto_widget.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/custom_code/actions/index.dart' as actions;
+import '/services/audit_log_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -82,6 +83,12 @@ class _CestinoWidgetState extends State<CestinoWidget> {
             if (confirmDialogResponse) {
               await actions.svuotaCestinoMassivo(
                 currentUserReference,
+              );
+              await AuditLogService.logAction(
+                azione: "Ha svuotato l'intero cestino",
+                dettagli: "Eliminazione definitiva massiva di tutti i piatti presenti nel cestino",
+                tipoAzione: 'eliminazione',
+                tipoEntita: 'piatto',
               );
             }
           },
@@ -298,6 +305,13 @@ class _CestinoWidgetState extends State<CestinoWidget> {
                                             },
                                           ),
                                         });
+                                        final dishName = listViewPiattiRecord.nome;
+                                        await AuditLogService.logAction(
+                                          azione: "Ha ripristinato dal cestino il piatto '$dishName'",
+                                          dettagli: "Piatto '$dishName' ripristinato nel menu attivo",
+                                          tipoAzione: 'ripristino',
+                                          tipoEntita: 'piatto',
+                                        );
                                         if (context.mounted) {
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(
@@ -359,9 +373,16 @@ class _CestinoWidgetState extends State<CestinoWidget> {
                                                   .delete();
                                             } catch (_) {}
                                           }
+                                          final dishName = listViewPiattiRecord.nome;
                                           await listViewPiattiRecord
                                               .reference
                                               .delete();
+                                          await AuditLogService.logAction(
+                                            azione: "Ha eliminato definitivamente il piatto '$dishName'",
+                                            dettagli: "Eliminazione definitiva dal cestino del piatto '$dishName' e foto da storage",
+                                            tipoAzione: 'eliminazione',
+                                            tipoEntita: 'piatto',
+                                          );
                                         }
                                       },
                                     ),

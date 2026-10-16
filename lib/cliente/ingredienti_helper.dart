@@ -55,11 +55,15 @@ class IngredientiHelper {
     TextStyle? strikethroughStyle,
     int? maxLines,
     TextAlign textAlign = TextAlign.start,
-    TextOverflow overflow = TextOverflow.ellipsis,
+    TextOverflow? overflow,
+    bool softWrap = true,
   }) {
     if (ingredientiText.trim().isEmpty) {
       return const SizedBox.shrink();
     }
+
+    final effectiveOverflow =
+        overflow ?? (maxLines != null ? TextOverflow.ellipsis : TextOverflow.clip);
 
     if (ingredientiEsauriti.isEmpty) {
       return Text(
@@ -67,7 +71,8 @@ class IngredientiHelper {
         style: baseStyle,
         maxLines: maxLines,
         textAlign: textAlign,
-        overflow: overflow,
+        overflow: effectiveOverflow,
+        softWrap: softWrap,
       );
     }
 
@@ -134,7 +139,8 @@ class IngredientiHelper {
       TextSpan(children: spans),
       maxLines: maxLines,
       textAlign: textAlign,
-      overflow: overflow,
+      overflow: effectiveOverflow,
+      softWrap: softWrap,
     );
   }
 }

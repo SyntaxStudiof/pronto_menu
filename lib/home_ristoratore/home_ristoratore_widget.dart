@@ -179,40 +179,105 @@ class _HomeRistoratoreWidgetState extends State<HomeRistoratoreWidget> {
                                       ),
                                     ],
                                   ),
-                                  Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      borderRadius:
-                                          BorderRadius.circular(12.0),
-                                      hoverColor: theme.colorScheme.primary
-                                          .withValues(alpha: 0.1),
-                                      onTap: () {
-                                        scaffoldKey.currentState!
-                                            .openEndDrawer();
-                                      },
-                                      child: Container(
-                                        width: 40.0,
-                                        height: 40.0,
-                                        decoration: BoxDecoration(
-                                          color: theme.colorScheme.primary
-                                              .withValues(alpha: 0.08),
-                                          borderRadius:
-                                              BorderRadius.circular(12.0),
-                                          border: Border.all(
-                                            color: theme.dividerColor
-                                                .withValues(alpha: 0.15),
-                                            width: 1.0,
-                                          ),
-                                        ),
-                                        child: Center(
-                                          child: Icon(
-                                            Icons.grid_view_rounded,
-                                            color: theme.colorScheme.primary,
-                                            size: 22.0,
-                                          ),
-                                        ),
+                                  StreamBuilder<List<TicketsRecord>>(
+                                    stream: queryTicketsRecord(
+                                      queryBuilder: (q) => q.where(
+                                        'ristoratore_ref',
+                                        isEqualTo: currentUserReference,
                                       ),
                                     ),
+                                    builder: (context, snapshot) {
+                                      final hasUnreadReply =
+                                          (snapshot.data ?? []).any(
+                                        (t) =>
+                                            t.rispostaAdmin.trim().isNotEmpty &&
+                                            !t.rispostaLetta,
+                                      );
+
+                                      return Material(
+                                        color: Colors.transparent,
+                                        child: InkWell(
+                                          borderRadius:
+                                              BorderRadius.circular(12.0),
+                                          hoverColor: theme.colorScheme.primary
+                                              .withValues(alpha: 0.1),
+                                          onTap: () {
+                                            scaffoldKey.currentState!
+                                                .openEndDrawer();
+                                          },
+                                          child: Container(
+                                            width: 40.0,
+                                            height: 40.0,
+                                            decoration: BoxDecoration(
+                                              color: theme.colorScheme.primary
+                                                  .withValues(alpha: 0.08),
+                                              borderRadius:
+                                                  BorderRadius.circular(12.0),
+                                              border: Border.all(
+                                                color: theme.dividerColor
+                                                    .withValues(alpha: 0.15),
+                                                width: 1.0,
+                                              ),
+                                            ),
+                                            child: Stack(
+                                              alignment: Alignment.center,
+                                              clipBehavior: Clip.none,
+                                              children: [
+                                                Icon(
+                                                  Icons.grid_view_rounded,
+                                                  color:
+                                                      theme.colorScheme.primary,
+                                                  size: 22.0,
+                                                ),
+                                                if (hasUnreadReply)
+                                                  Positioned(
+                                                    top: -2.0,
+                                                    right: -2.0,
+                                                    child: Container(
+                                                      width: 16.0,
+                                                      height: 16.0,
+                                                      decoration: BoxDecoration(
+                                                        color: const Color(
+                                                            0xFFEF4444),
+                                                        shape: BoxShape.circle,
+                                                        border: Border.all(
+                                                          color:
+                                                              theme.cardColor,
+                                                          width: 2.0,
+                                                        ),
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: const Color(
+                                                                    0xFFEF4444)
+                                                                .withValues(
+                                                                    alpha: 0.4),
+                                                            blurRadius: 4.0,
+                                                            offset:
+                                                                const Offset(
+                                                                    0, 1),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      alignment:
+                                                          Alignment.center,
+                                                      child: const Text(
+                                                        '!',
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 9.5,
+                                                          fontWeight:
+                                                              FontWeight.w900,
+                                                          height: 1.0,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
                                   ),
                                 ],
                               ),

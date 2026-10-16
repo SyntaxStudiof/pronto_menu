@@ -70,5 +70,19 @@ service cloud.firestore {
       allow write: if request.auth != null;
       allow delete: if request.auth != null;
     }
+
+    match /ActionLogs/{document} {
+      allow create: if request.auth != null;
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+      allow delete: if request.auth != null;
+    }
+
+    match /action_logs/{document} {
+      allow create: if request.auth != null;
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+      allow delete: if request.auth != null;
+    }
   }
 }

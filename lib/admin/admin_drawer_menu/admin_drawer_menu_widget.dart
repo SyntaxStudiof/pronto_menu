@@ -1,9 +1,8 @@
 import '/auth/firebase_auth/auth_util.dart';
+import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'admin_drawer_menu_model.dart';
 export 'admin_drawer_menu_model.dart';
@@ -50,6 +49,7 @@ class _AdminDrawerMenuWidgetState extends State<AdminDrawerMenuWidget> {
     required Color iconColor,
     required Color iconBgColor,
     required VoidCallback onTap,
+    Widget? trailingBadge,
     bool isDestructive = false,
   }) {
     final theme = Theme.of(context);
@@ -84,12 +84,24 @@ class _AdminDrawerMenuWidgetState extends State<AdminDrawerMenuWidget> {
               ),
               const SizedBox(width: 14.0),
               Expanded(
-                child: Text(
-                  title,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: isDestructive ? theme.colorScheme.error : null,
-                  ),
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: isDestructive ? theme.colorScheme.error : null,
+                        ),
+                      ),
+                    ),
+                    if (trailingBadge != null) ...[
+                      const SizedBox(width: 8.0),
+                      trailingBadge,
+                    ],
+                  ],
                 ),
               ),
               Icon(
@@ -245,6 +257,30 @@ class _AdminDrawerMenuWidgetState extends State<AdminDrawerMenuWidget> {
                     const SizedBox(height: 4.0),
                     _buildMenuItem(
                       context: context,
+                      title: 'Metriche Business',
+                      icon: Icons.insights_rounded,
+                      iconColor: const Color(0xFFF59E0B),
+                      iconBgColor: const Color(0xFFF59E0B).withValues(alpha: 0.12),
+                      onTap: () async {
+                        Navigator.pop(context);
+                        context.pushNamed(AdminMetricheWidget.routeName);
+                      },
+                    ),
+                    const SizedBox(height: 4.0),
+                    _buildMenuItem(
+                      context: context,
+                      title: 'Cronologia Azioni',
+                      icon: Icons.manage_history_rounded,
+                      iconColor: const Color(0xFF2563EB),
+                      iconBgColor: const Color(0xFF2563EB).withValues(alpha: 0.12),
+                      onTap: () async {
+                        Navigator.pop(context);
+                        context.pushNamed(AdminCronologiaAzioniWidget.routeName);
+                      },
+                    ),
+                    const SizedBox(height: 4.0),
+                    _buildMenuItem(
+                      context: context,
                       title: 'Il mio menu',
                       icon: Icons.restaurant_menu_rounded,
                       iconColor: const Color(0xFF2563EB),
@@ -263,15 +299,58 @@ class _AdminDrawerMenuWidgetState extends State<AdminDrawerMenuWidget> {
                       },
                     ),
                     const SizedBox(height: 4.0),
-                    _buildMenuItem(
-                      context: context,
-                      title: 'Supporto clienti',
-                      icon: Icons.support_agent_rounded,
-                      iconColor: const Color(0xFF059669),
-                      iconBgColor: const Color(0xFF059669).withValues(alpha: 0.12),
-                      onTap: () async {
-                        Navigator.pop(context);
-                        context.pushNamed(AdminTicketsWidget.routeName);
+                    StreamBuilder<List<TicketsRecord>>(
+                      stream: queryTicketsRecord(),
+                      builder: (context, snapshot) {
+                        final apertiCount = snapshot.hasData
+                            ? snapshot.data!.where((t) {
+                                final s = t.stato.trim().toLowerCase();
+                                return s == 'aperto' || s.isEmpty;
+                              }).length
+                            : 0;
+
+                        return _buildMenuItem(
+                          context: context,
+                          title: 'Supporto clienti',
+                          icon: Icons.support_agent_rounded,
+                          iconColor: const Color(0xFF059669),
+                          iconBgColor:
+                              const Color(0xFF059669).withValues(alpha: 0.12),
+                          trailingBadge: apertiCount > 0
+                              ? Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8.0,
+                                    vertical: 2.5,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFEF4444),
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: const Color(0xFFEF4444)
+                                            .withValues(alpha: 0.35),
+                                        blurRadius: 4.0,
+                                        offset: const Offset(0, 1),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Text(
+                                    apertiCount > 99
+                                        ? '99+'
+                                        : apertiCount.toString(),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 11.5,
+                                    ),
+                                  ),
+                                )
+                              : null,
+                          onTap: () async {
+                            Navigator.pop(context);
+                            context.pushNamed(AdminTicketsWidget.routeName);
+                          },
+                        );
                       },
                     ),
                   ],

@@ -1,6 +1,7 @@
 import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
+import '/services/audit_log_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -131,10 +132,18 @@ class _PopupCategoriaWidgetState extends State<PopupCategoriaWidget> {
                 ),
                 FFButtonWidget(
                   onPressed: () async {
+                    final oldName = widget.nomeAttuale ?? '';
+                    final newName = _model.textController.text.trim();
                     await widget.refCategoria!
                         .update(createCategoriesRecordData(
-                      name: _model.textController.text,
+                      name: newName,
                     ));
+                    await AuditLogService.logAction(
+                      azione: "Ha modificato la categoria '$oldName' in '$newName'",
+                      dettagli: "Rinominata categoria da '$oldName' a '$newName'",
+                      tipoAzione: 'modifica',
+                      tipoEntita: 'categoria',
+                    );
                     Navigator.pop(context);
                   },
                   text: 'Sostituisci nome categoria',
@@ -177,7 +186,7 @@ class _PopupCategoriaWidgetState extends State<PopupCategoriaWidget> {
                     if (confirmDialogResponse) {
                       _model.piattiDaEliminare = await queryPiattiRecordOnce(
                         queryBuilder: (piattiRecord) => piattiRecord.where(
-                          'Categoria',
+                           'Categoria',
                           isEqualTo: widget.refCategoria?.id,
                         ),
                       );
@@ -188,7 +197,17 @@ class _PopupCategoriaWidgetState extends State<PopupCategoriaWidget> {
                             _model.piattiDaEliminare![loop1Index];
                         await currentLoop1Item.reference.delete();
                       }
+                      final nomeCat = widget.nomeAttuale ?? 'Senza nome';
+                      final countPiatti = _model.piattiDaEliminare?.length ?? 0;
                       await widget.refCategoria!.delete();
+                      await AuditLogService.logAction(
+                        azione: "Ha cliccato 'Elimina' sulla categoria $nomeCat",
+                        dettagli: countPiatti > 0
+                            ? "Eliminata la categoria '$nomeCat' e i suoi $countPiatti piatti associati"
+                            : "Eliminata la categoria '$nomeCat'",
+                        tipoAzione: 'eliminazione',
+                        tipoEntita: 'categoria',
+                      );
                       Navigator.pop(context);
                       context.safePop();
                     }

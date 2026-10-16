@@ -1971,8 +1971,10 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                                                               ingredientiOriginali:
                                                                   listViewNomePiattiRecord.ingredienti,
                                                               ingredientiEsauriti: _ingredientiEsauriti,
-                                                              maxLines: 2,
-                                                              baseStyle: theme.textTheme.bodySmall?.copyWith(color: theme.hintColor),
+                                                              baseStyle: theme.textTheme.bodySmall?.copyWith(
+                                                                color: theme.hintColor,
+                                                                height: 1.35,
+                                                              ),
                                                             ),
                                                           ),
                                                         if (listViewNomePiattiRecord.intolleranze.isNotEmpty ||
@@ -2422,8 +2424,10 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                                                               ingredientiOriginali:
                                                                   listViewPrezzoPiattiRecord.ingredienti,
                                                               ingredientiEsauriti: _ingredientiEsauriti,
-                                                              maxLines: 2,
-                                                              baseStyle: theme.textTheme.bodySmall?.copyWith(color: theme.hintColor),
+                                                              baseStyle: theme.textTheme.bodySmall?.copyWith(
+                                                                color: theme.hintColor,
+                                                                height: 1.35,
+                                                              ),
                                                             ),
                                                           ),
                                                         if (listViewPrezzoPiattiRecord.intolleranze.isNotEmpty ||
