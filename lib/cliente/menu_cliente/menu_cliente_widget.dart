@@ -1151,7 +1151,7 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
               automaticallyImplyLeading: false,
               elevation: 2.0,
               centerTitle: true,
-              leadingWidth: context.canPop() ? 104.0 : 72.0,
+              leadingWidth: context.canPop() ? 126.0 : 84.0,
               leading: Align(
                 alignment: Alignment.centerLeft,
                 child: Padding(
