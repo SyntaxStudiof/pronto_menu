@@ -99,12 +99,13 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
   late TextEditingController _hexController;
   late TextEditingController _bannerUrlController;
   bool _isSavingCloud = false;
+  bool _isPreviewExpanded = true;
 
   @override
   void initState() {
     super.initState();
     _model = createModel(context, () => PersonalizzazioneModel());
-    _mainTab = widget.initialTab.clamp(0, 4);
+    _mainTab = widget.initialTab.clamp(0, 2);
     _hexController = TextEditingController();
     _bannerUrlController = TextEditingController();
 
@@ -412,17 +413,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // 1. Selettore modalità (Chiaro / Scuro / Sistema)
-                        _buildThemeModeCard(
-                          context: context,
-                          themeProvider: themeProvider,
-                          primaryColor: primaryColor,
-                          isDark: isDark,
-                        ),
-
-                        const SizedBox(height: 10.0),
-
-                        // 2. Finestra di Anteprima Bloccata (Pizza Margherita)
+                        // 1. Finestra di Anteprima Elegante (Collapsible con Theme Toggle integrato)
                         _buildStickyPreviewCard(
                           context: context,
                           themeProvider: themeProvider,
@@ -434,22 +425,22 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                           bodyFont: themeProvider.bodyFont,
                         ),
 
-                        const SizedBox(height: 10.0),
+                        const SizedBox(height: 8.0),
 
-                        // 3. Switcher principale: 5 schede
-                        _buildMainTabSwitcher(
+                        // 2. Switcher principale a 3 sezioni simmetriche (senza scroll orizzontale)
+                        _buildMain3TabSwitcher(
                           context: context,
                           primaryColor: primaryColor,
                           isDark: isDark,
                         ),
 
-                        const SizedBox(height: 8.0),
+                        const SizedBox(height: 6.0),
                       ],
                     ),
                   ),
 
                   // ═════════════════════════════════════════════════════════════
-                  // 📜 AREA SCROLLABILE (CONTROLLI PRESET O SELEZIONE DEI FONT)
+                  // 📜 AREA SCROLLABILE (3 MACRO-AREE ORGANIZZATE)
                   // ═════════════════════════════════════════════════════════════
                   Expanded(
                     child: SingleChildScrollView(
@@ -460,43 +451,23 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                       child: AnimatedSwitcher(
                         duration: const Duration(milliseconds: 250),
                         child: switch (_mainTab) {
-                          0 => _buildPresetList(
-                              key: const ValueKey('presets_tab'),
+                          0 => _buildBrandAndStyleTab(
+                              key: const ValueKey('brand_style_tab'),
                               context: context,
                               themeProvider: themeProvider,
                               currentStyle: currentStyle,
+                              primaryColor: primaryColor,
                               isDark: isDark,
                             ),
-                          1 => _buildColorCustomizationView(
-                              key: const ValueKey('colors_tab'),
+                          1 => _buildDishesAndBadgesTab(
+                              key: const ValueKey('dishes_badges_tab'),
                               context: context,
                               themeProvider: themeProvider,
                               primaryColor: primaryColor,
                               isDark: isDark,
                             ),
-                          2 => _buildDishLayoutCustomizationView(
-                              key: const ValueKey('dish_layout_tab'),
-                              context: context,
-                              themeProvider: themeProvider,
-                              primaryColor: primaryColor,
-                              isDark: isDark,
-                            ),
-                          3 => _buildBannerTextureCustomizationView(
-                              key: const ValueKey('banner_texture_tab'),
-                              context: context,
-                              themeProvider: themeProvider,
-                              primaryColor: primaryColor,
-                              isDark: isDark,
-                            ),
-                          4 => _buildBadgeCustomizationView(
-                              key: const ValueKey('badges_tab'),
-                              context: context,
-                              themeProvider: themeProvider,
-                              primaryColor: primaryColor,
-                              isDark: isDark,
-                            ),
-                          _ => _buildFontCustomizationView(
-                              key: const ValueKey('fonts_tab'),
+                          _ => _buildBackgroundAndCoverTab(
+                              key: const ValueKey('bg_cover_tab'),
                               context: context,
                               themeProvider: themeProvider,
                               primaryColor: primaryColor,
@@ -526,124 +497,136 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // 1. SELETTORE MODALITÀ
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 1. COMPONENTI DI SUPPORTO & SELETTORI
   // ═══════════════════════════════════════════════════════════════════════════
 
-  Widget _buildThemeModeCard({
-    required BuildContext context,
+  Widget _buildMiniThemeModeSegment({
     required ThemeProvider themeProvider,
     required Color primaryColor,
     required bool isDark,
+    required ColorScheme colorScheme,
   }) {
-    final theme = Theme.of(context);
     final currentMode = themeProvider.themeMode;
-
-    return Card(
-      elevation: 1.0,
-      shadowColor: isDark
-          ? Colors.black.withValues(alpha: 0.35)
-          : Colors.black.withValues(alpha: 0.05),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.0),
-        side: BorderSide.none,
+    return Container(
+      padding: const EdgeInsets.all(2.0),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+        borderRadius: BorderRadius.circular(8.0),
       ),
-      color: theme.colorScheme.surface,
-      margin: EdgeInsets.zero,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
-        child: Row(
-          children: [
-            Expanded(
-              child: _buildThemeModePill(
-                context: context,
-                label: 'Chiaro',
-                icon: Icons.wb_sunny_rounded,
-                isSelected: currentMode == ThemeMode.light,
-                primaryColor: primaryColor,
-                isDark: isDark,
-                onTap: () => themeProvider.setThemeMode(ThemeMode.light),
-              ),
-            ),
-            const SizedBox(width: 6.0),
-            Expanded(
-              child: _buildThemeModePill(
-                context: context,
-                label: 'Scuro',
-                icon: Icons.dark_mode_rounded,
-                isSelected: currentMode == ThemeMode.dark,
-                primaryColor: primaryColor,
-                isDark: isDark,
-                onTap: () => themeProvider.setThemeMode(ThemeMode.dark),
-              ),
-            ),
-            const SizedBox(width: 6.0),
-            Expanded(
-              child: _buildThemeModePill(
-                context: context,
-                label: 'Sistema',
-                icon: Icons.devices_rounded,
-                isSelected: currentMode == ThemeMode.system,
-                primaryColor: primaryColor,
-                isDark: isDark,
-                onTap: () => themeProvider.setThemeMode(ThemeMode.system),
-              ),
-            ),
-          ],
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildMiniThemeBtn(
+            icon: Icons.wb_sunny_rounded,
+            isSelected: currentMode == ThemeMode.light,
+            tooltip: 'Chiaro',
+            primaryColor: primaryColor,
+            isDark: isDark,
+            onTap: () => themeProvider.setThemeMode(ThemeMode.light),
+          ),
+          _buildMiniThemeBtn(
+            icon: Icons.dark_mode_rounded,
+            isSelected: currentMode == ThemeMode.dark,
+            tooltip: 'Scuro',
+            primaryColor: primaryColor,
+            isDark: isDark,
+            onTap: () => themeProvider.setThemeMode(ThemeMode.dark),
+          ),
+          _buildMiniThemeBtn(
+            icon: Icons.devices_rounded,
+            isSelected: currentMode == ThemeMode.system,
+            tooltip: 'Sistema',
+            primaryColor: primaryColor,
+            isDark: isDark,
+            onTap: () => themeProvider.setThemeMode(ThemeMode.system),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildThemeModePill({
-    required BuildContext context,
-    required String label,
+  Widget _buildMiniThemeBtn({
     required IconData icon,
     required bool isSelected,
+    required String tooltip,
     required Color primaryColor,
     required bool isDark,
     required VoidCallback onTap,
   }) {
-    final theme = Theme.of(context);
-    final Color activeBg = primaryColor.withValues(alpha: isDark ? 0.22 : 0.12);
-    final Color inactiveBg = theme.colorScheme.surfaceContainerHigh;
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(10.0),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 7.0),
-        decoration: BoxDecoration(
-          color: isSelected ? activeBg : inactiveBg,
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: 16.0,
-              color: isSelected ? primaryColor : theme.colorScheme.onSurfaceVariant,
-            ),
-            const SizedBox(width: 6.0),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 12.0,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                color: isSelected
-                    ? primaryColor
-                    : theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(6.0),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          padding: const EdgeInsets.all(4.5),
+          decoration: BoxDecoration(
+            color: isSelected ? primaryColor : Colors.transparent,
+            borderRadius: BorderRadius.circular(6.0),
+          ),
+          child: Icon(
+            icon,
+            size: 13.0,
+            color: isSelected
+                ? Colors.white
+                : (isDark ? Colors.white70 : Colors.black54),
+          ),
         ),
       ),
     );
   }
 
+  Widget _buildSectionHeader({
+    required BuildContext context,
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color primaryColor,
+  }) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(top: 4.0, bottom: 8.0),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(7.0),
+            decoration: BoxDecoration(
+              color: primaryColor.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            child: Icon(icon, size: 16.0, color: primaryColor),
+          ),
+          const SizedBox(width: 10.0),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+                Text(
+                  subtitle,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    fontSize: 11.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   // ═══════════════════════════════════════════════════════════════════════════
-  // 2. FINESTRA DI ANTEPRIMA BLOCCATA IN ALTO (STICKY)
+  // 2. FINESTRA DI ANTEPRIMA BLOCCATA IN ALTO (STICKY & COLLAPSIBLE)
   // ═══════════════════════════════════════════════════════════════════════════
 
   Widget _buildStickyPreviewCard({
@@ -688,202 +671,238 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                 color: colorScheme.surface,
                 borderRadius: BorderRadius.circular(16.0),
               ),
-        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 12.0),
+        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Header anteprima con tag preset e layout
+            // Barra di comando superiore dell'anteprima
             Row(
               children: [
-                Expanded(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.remove_red_eye_rounded,
-                        size: 14.0,
-                        color: primaryColor,
-                      ),
-                      const SizedBox(width: 5.0),
-                      Flexible(
-                        child: Text(
-                          'ANTEPRIMA',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.getFont(
-                            titleFont,
-                            textStyle: TextStyle(
-                              fontSize: 10.5,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.8,
-                              color: primaryColor,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 6.0),
+                // Live Dot + "ANTEPRIMA"
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 6.0, vertical: 2.5),
+                      width: 8.0,
+                      height: 8.0,
                       decoration: BoxDecoration(
-                        color: primaryColor.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(6.0),
-                        border: Border.all(
-                          color: primaryColor.withValues(alpha: 0.3),
-                          width: 1.0,
-                        ),
-                      ),
-                      child: Text(
-                        dishLayout.displayName.split(' ').first.toUpperCase(),
-                        style: GoogleFonts.getFont(
-                          titleFont,
-                          textStyle: TextStyle(
-                            fontSize: 8.5,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.4,
-                            color: primaryColor,
+                        color: Colors.greenAccent.shade700,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.greenAccent.shade700.withValues(alpha: 0.5),
+                            blurRadius: 4.0,
+                            spreadRadius: 1.0,
                           ),
-                        ),
+                        ],
                       ),
                     ),
-                    const SizedBox(width: 5.0),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 7.0, vertical: 2.5),
-                      decoration: BoxDecoration(
-                        color: primaryColor,
-                        borderRadius: BorderRadius.circular(6.0),
-                      ),
-                      child: Text(
-                        styleTag,
-                        style: GoogleFonts.getFont(
-                          titleFont,
-                          textStyle: const TextStyle(
-                            fontSize: 9.0,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.5,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-
-            if (resolvedBanner.isNotEmpty) ...[
-              const SizedBox(height: 8.0),
-              Container(
-                height: 48.0,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10.0),
-                  image: DecorationImage(
-                    image: NetworkImage(resolvedBanner),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10.0),
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.transparent,
-                        Colors.black.withValues(alpha: 0.65),
-                      ],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
-                  alignment: Alignment.bottomLeft,
-                  child: Row(
-                    children: [
-                      const Icon(Icons.wallpaper_rounded, color: Colors.white, size: 13.0),
-                      const SizedBox(width: 5.0),
-                      Text(
-                        'Banner Menu Attivo',
-                        style: GoogleFonts.getFont(
-                          titleFont,
-                          textStyle: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10.5,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-
-            const SizedBox(height: 10.0),
-
-            // Dettagli piatto (Pizza Margherita) animato in base al DishCardLayout e BadgeStyle
-            _buildDishCardPreviewBody(
-              context: context,
-              style: style,
-              dishLayout: dishLayout,
-              badgeStyle: themeProvider.badgeStyle,
-              primaryColor: primaryColor,
-              dishIcon: dishIcon,
-              titleFont: titleFont,
-              bodyFont: bodyFont,
-              colorScheme: colorScheme,
-              isDark: isDark,
-            ),
-
-            const SizedBox(height: 10.0),
-
-            // Pulsante interattivo compatto con titleFont
-            _buildInteractiveFakeButton(style, primaryColor, titleFont),
-
-            const SizedBox(height: 8.0),
-
-            // Pulsante per aprire il Simulatore a schermo intero
-            InkWell(
-              onTap: () => _openSimulator(context, themeProvider),
-              borderRadius: BorderRadius.circular(8.0),
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 10.0),
-                decoration: BoxDecoration(
-                  color: primaryColor.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(8.0),
-                  border: Border.all(
-                    color: primaryColor.withValues(alpha: 0.22),
-                    width: 1.0,
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.fullscreen_rounded, color: primaryColor, size: 16.0),
                     const SizedBox(width: 6.0),
                     Text(
-                      'Prova Menù dal Vivo a Schermo Intero',
+                      'ANTEPRIMA',
                       style: GoogleFonts.getFont(
                         titleFont,
                         textStyle: TextStyle(
-                          fontSize: 11.5,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 11.0,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.8,
                           color: primaryColor,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 4.0),
-                    Icon(Icons.arrow_forward_ios_rounded, color: primaryColor, size: 10.0),
                   ],
                 ),
-              ),
+                const SizedBox(width: 8.0),
+                // Se collassata, mostriamo subito il nome del preset
+                if (!_isPreviewExpanded) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(6.0),
+                    ),
+                    child: Text(
+                      styleTag,
+                      style: TextStyle(
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.w700,
+                        color: primaryColor,
+                      ),
+                    ),
+                  ),
+                ],
+                const Spacer(),
+                // Selettore compatto modalità Chiaro / Scuro integrato
+                _buildMiniThemeModeSegment(
+                  themeProvider: themeProvider,
+                  primaryColor: primaryColor,
+                  isDark: isDark,
+                  colorScheme: colorScheme,
+                ),
+                const SizedBox(width: 6.0),
+                // Tasto rapido simulatore a schermo intero
+                Tooltip(
+                  message: 'Simulatore Menù',
+                  child: InkWell(
+                    onTap: () => _openSimulator(context, themeProvider),
+                    borderRadius: BorderRadius.circular(6.0),
+                    child: Container(
+                      padding: const EdgeInsets.all(4.5),
+                      decoration: BoxDecoration(
+                        color: primaryColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(6.0),
+                      ),
+                      child: Icon(Icons.fullscreen_rounded, size: 15.0, color: primaryColor),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 4.0),
+                // Tasto espandi / riduci anteprima per dare più spazio
+                Tooltip(
+                  message: _isPreviewExpanded ? 'Riduci anteprima' : 'Espandi anteprima',
+                  child: InkWell(
+                    onTap: () => setState(() => _isPreviewExpanded = !_isPreviewExpanded),
+                    borderRadius: BorderRadius.circular(6.0),
+                    child: Container(
+                      padding: const EdgeInsets.all(4.5),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+                        borderRadius: BorderRadius.circular(6.0),
+                      ),
+                      child: Icon(
+                        _isPreviewExpanded
+                            ? Icons.keyboard_arrow_up_rounded
+                            : Icons.keyboard_arrow_down_rounded,
+                        size: 15.0,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
+
+            if (_isPreviewExpanded) ...[
+              const SizedBox(height: 8.0),
+              // Sub-header tags: layout & style
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 6.0, vertical: 2.5),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(6.0),
+                      border: Border.all(
+                        color: primaryColor.withValues(alpha: 0.3),
+                        width: 1.0,
+                      ),
+                    ),
+                    child: Text(
+                      dishLayout.displayName.split(' ').first.toUpperCase(),
+                      style: GoogleFonts.getFont(
+                        titleFont,
+                        textStyle: TextStyle(
+                          fontSize: 8.5,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.4,
+                          color: primaryColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 5.0),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 7.0, vertical: 2.5),
+                    decoration: BoxDecoration(
+                      color: primaryColor,
+                      borderRadius: BorderRadius.circular(6.0),
+                    ),
+                    child: Text(
+                      styleTag,
+                      style: GoogleFonts.getFont(
+                        titleFont,
+                        textStyle: const TextStyle(
+                          fontSize: 9.0,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.5,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              if (resolvedBanner.isNotEmpty) ...[
+                const SizedBox(height: 8.0),
+                Container(
+                  height: 48.0,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10.0),
+                    image: DecorationImage(
+                      image: NetworkImage(resolvedBanner),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.0),
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withValues(alpha: 0.65),
+                        ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
+                    alignment: Alignment.bottomLeft,
+                    child: Row(
+                      children: [
+                        const Icon(Icons.wallpaper_rounded, color: Colors.white, size: 13.0),
+                        const SizedBox(width: 5.0),
+                        Text(
+                          'Banner Menu Attivo',
+                          style: GoogleFonts.getFont(
+                            titleFont,
+                            textStyle: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+
+              const SizedBox(height: 8.0),
+
+              // Dettagli piatto (Pizza Margherita) animato in base al DishCardLayout e BadgeStyle
+              _buildDishCardPreviewBody(
+                context: context,
+                style: style,
+                dishLayout: dishLayout,
+                badgeStyle: themeProvider.badgeStyle,
+                primaryColor: primaryColor,
+                dishIcon: dishIcon,
+                titleFont: titleFont,
+                bodyFont: bodyFont,
+                colorScheme: colorScheme,
+                isDark: isDark,
+              ),
+
+              const SizedBox(height: 8.0),
+
+              // Pulsante interattivo compatto con titleFont
+              _buildInteractiveFakeButton(style, primaryColor, titleFont),
+            ],
           ],
         ),
       ),
@@ -1408,10 +1427,10 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // 3. SWITCHER PRINCIPALE (5 SCHEDE DI PERSONALIZZAZIONE)
+  // 3. SWITCHER PRINCIPALE (3 MACRO-AREE ORGANIZZATE)
   // ═══════════════════════════════════════════════════════════════════════════
 
-  Widget _buildMainTabSwitcher({
+  Widget _buildMain3TabSwitcher({
     required BuildContext context,
     required Color primaryColor,
     required bool isDark,
@@ -1420,21 +1439,18 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     final cardBg = theme.colorScheme.surface;
     final barBg = theme.colorScheme.surfaceContainerHigh;
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      physics: const BouncingScrollPhysics(),
-      child: Container(
-        padding: const EdgeInsets.all(3.0),
-        decoration: BoxDecoration(
-          color: barBg,
-          borderRadius: BorderRadius.circular(14.0),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _buildMainTabPill(
-              title: 'Stile',
-              icon: Icons.auto_awesome_rounded,
+    return Container(
+      padding: const EdgeInsets.all(3.0),
+      decoration: BoxDecoration(
+        color: barBg,
+        borderRadius: BorderRadius.circular(14.0),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _buildMainTabPill(
+              title: 'Brand & Stile',
+              icon: Icons.palette_rounded,
               isSelected: _mainTab == 0,
               primaryColor: primaryColor,
               activeBg: cardBg,
@@ -1443,10 +1459,12 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                 if (_mainTab != 0) setState(() => _mainTab = 0);
               },
             ),
-            const SizedBox(width: 4.0),
-            _buildMainTabPill(
-              title: 'Colori',
-              icon: Icons.palette_rounded,
+          ),
+          const SizedBox(width: 4.0),
+          Expanded(
+            child: _buildMainTabPill(
+              title: 'Piatti & Badge',
+              icon: Icons.restaurant_rounded,
               isSelected: _mainTab == 1,
               primaryColor: primaryColor,
               activeBg: cardBg,
@@ -1455,10 +1473,12 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                 if (_mainTab != 1) setState(() => _mainTab = 1);
               },
             ),
-            const SizedBox(width: 4.0),
-            _buildMainTabPill(
-              title: 'Schede Piatto',
-              icon: Icons.view_agenda_rounded,
+          ),
+          const SizedBox(width: 4.0),
+          Expanded(
+            child: _buildMainTabPill(
+              title: 'Sfondo & Cover',
+              icon: Icons.wallpaper_rounded,
               isSelected: _mainTab == 2,
               primaryColor: primaryColor,
               activeBg: cardBg,
@@ -1467,44 +1487,8 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                 if (_mainTab != 2) setState(() => _mainTab = 2);
               },
             ),
-            const SizedBox(width: 4.0),
-            _buildMainTabPill(
-              title: 'Copertina & Sfondo',
-              icon: Icons.wallpaper_rounded,
-              isSelected: _mainTab == 3,
-              primaryColor: primaryColor,
-              activeBg: cardBg,
-              isDark: isDark,
-              onTap: () {
-                if (_mainTab != 3) setState(() => _mainTab = 3);
-              },
-            ),
-            const SizedBox(width: 4.0),
-            _buildMainTabPill(
-              title: 'Badge & Dettagli',
-              icon: Icons.label_rounded,
-              isSelected: _mainTab == 4,
-              primaryColor: primaryColor,
-              activeBg: cardBg,
-              isDark: isDark,
-              onTap: () {
-                if (_mainTab != 4) setState(() => _mainTab = 4);
-              },
-            ),
-            const SizedBox(width: 4.0),
-            _buildMainTabPill(
-              title: 'Caratteri',
-              icon: Icons.font_download_rounded,
-              isSelected: _mainTab == 5,
-              primaryColor: primaryColor,
-              activeBg: cardBg,
-              isDark: isDark,
-              onTap: () {
-                if (_mainTab != 5) setState(() => _mainTab = 5);
-              },
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -1523,7 +1507,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
       borderRadius: BorderRadius.circular(11.0),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 7.0),
+        padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 7.0),
         decoration: BoxDecoration(
           color: isSelected ? activeBg : Colors.transparent,
           borderRadius: BorderRadius.circular(11.0),
@@ -1541,27 +1525,175 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               icon,
-              size: 15.0,
-              color: isSelected ? primaryColor : (isDark ? const Color(0xFF9E9E9E) : const Color(0xFF6B7280)),
+              size: 14.5,
+              color: isSelected
+                  ? primaryColor
+                  : (isDark ? const Color(0xFF9E9E9E) : const Color(0xFF6B7280)),
             ),
-            const SizedBox(width: 5.0),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 12.0,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                color: isSelected
-                    ? (isDark ? Colors.white : Colors.black87)
-                    : (isDark ? const Color(0xFF9E9E9E) : const Color(0xFF6B7280)),
+            const SizedBox(width: 4.0),
+            Flexible(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  title,
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                    color: isSelected
+                        ? (isDark ? Colors.white : Colors.black87)
+                        : (isDark ? const Color(0xFF9E9E9E) : const Color(0xFF6B7280)),
+                  ),
+                ),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 4. STRUTTURA DELLE 3 MACRO-AREE
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  Widget _buildBrandAndStyleTab({
+    Key? key,
+    required BuildContext context,
+    required ThemeProvider themeProvider,
+    required AppDesignStyle currentStyle,
+    required Color primaryColor,
+    required bool isDark,
+  }) {
+    final dividerColor = Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.35);
+
+    return Column(
+      key: key,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildSectionHeader(
+          context: context,
+          title: 'Stile Gastronomico & Mood',
+          subtitle: 'Scegli un preset studiato per il tuo locale con 1 click',
+          icon: Icons.auto_awesome_rounded,
+          primaryColor: primaryColor,
+        ),
+        _buildPresetList(
+          context: context,
+          themeProvider: themeProvider,
+          currentStyle: currentStyle,
+          isDark: isDark,
+        ),
+        const SizedBox(height: 12.0),
+        Divider(color: dividerColor, height: 1.0),
+        const SizedBox(height: 14.0),
+        _buildSectionHeader(
+          context: context,
+          title: 'Colore Primario del Brand',
+          subtitle: 'Personalizza la palette principale o digita un codice HEX',
+          icon: Icons.color_lens_rounded,
+          primaryColor: primaryColor,
+        ),
+        _buildColorCustomizationView(
+          context: context,
+          themeProvider: themeProvider,
+          primaryColor: primaryColor,
+          isDark: isDark,
+        ),
+        const SizedBox(height: 12.0),
+        Divider(color: dividerColor, height: 1.0),
+        const SizedBox(height: 14.0),
+        _buildSectionHeader(
+          context: context,
+          title: 'Tipografia & Font',
+          subtitle: 'Imposta i caratteri tipografici per titoli e descrizioni',
+          icon: Icons.font_download_rounded,
+          primaryColor: primaryColor,
+        ),
+        _buildFontCustomizationView(
+          context: context,
+          themeProvider: themeProvider,
+          primaryColor: primaryColor,
+          isDark: isDark,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDishesAndBadgesTab({
+    Key? key,
+    required BuildContext context,
+    required ThemeProvider themeProvider,
+    required Color primaryColor,
+    required bool isDark,
+  }) {
+    final dividerColor = Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.35);
+
+    return Column(
+      key: key,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildSectionHeader(
+          context: context,
+          title: 'Layout Schede Piatto',
+          subtitle: 'Scegli la struttura visiva per presentare le tue pietanze',
+          icon: Icons.view_agenda_rounded,
+          primaryColor: primaryColor,
+        ),
+        _buildDishLayoutCustomizationView(
+          context: context,
+          themeProvider: themeProvider,
+          primaryColor: primaryColor,
+          isDark: isDark,
+        ),
+        const SizedBox(height: 12.0),
+        Divider(color: dividerColor, height: 1.0),
+        const SizedBox(height: 14.0),
+        _buildSectionHeader(
+          context: context,
+          title: 'Stile Badge & Tag',
+          subtitle: 'Personalizza l\'aspetto di prezzi, allergeni e promozioni',
+          icon: Icons.label_rounded,
+          primaryColor: primaryColor,
+        ),
+        _buildBadgeCustomizationView(
+          context: context,
+          themeProvider: themeProvider,
+          primaryColor: primaryColor,
+          isDark: isDark,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBackgroundAndCoverTab({
+    Key? key,
+    required BuildContext context,
+    required ThemeProvider themeProvider,
+    required Color primaryColor,
+    required bool isDark,
+  }) {
+    return Column(
+      key: key,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildSectionHeader(
+          context: context,
+          title: 'Copertina & Sfondo Menù',
+          subtitle: 'Aggiungi un banner fotografico e texture raffinate al menù',
+          icon: Icons.wallpaper_rounded,
+          primaryColor: primaryColor,
+        ),
+        _buildBannerTextureCustomizationView(
+          context: context,
+          themeProvider: themeProvider,
+          primaryColor: primaryColor,
+          isDark: isDark,
+        ),
+      ],
     );
   }
 
