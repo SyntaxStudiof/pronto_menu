@@ -377,44 +377,13 @@ class _DettagliPiattoPopupWidgetState extends State<DettagliPiattoPopupWidget> {
                   ),
                 ),
               if (widget.piattoSelezionato != null) ...[
-                const SizedBox(height: 18.0),
-                Wrap(
-                  alignment: WrapAlignment.center,
-                  spacing: 10.0,
-                  runSpacing: 8.0,
-                  children: [
-                    if (widget.solaConsultazione)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 10.0),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF673AB7).withValues(alpha: 0.10),
-                          borderRadius: BorderRadius.circular(12.0),
-                          border: Border.all(
-                            color: const Color(0xFF673AB7).withValues(alpha: 0.20),
-                          ),
-                        ),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.visibility_rounded,
-                              size: 16.0,
-                              color: Color(0xFF673AB7),
-                            ),
-                            SizedBox(width: 8.0),
-                            Text(
-                              'Menù in sola consultazione',
-                              style: TextStyle(
-                                fontSize: 13.0,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF673AB7),
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    else ...[
+                if (!widget.solaConsultazione) ...[
+                  const SizedBox(height: 18.0),
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 10.0,
+                    runSpacing: 8.0,
+                    children: [
                       if (widget.modifichePiattiAttive &&
                           widget.ristoranteRef != null)
                         OutlinedButton.icon(
@@ -517,8 +486,8 @@ class _DettagliPiattoPopupWidgetState extends State<DettagliPiattoPopupWidget> {
                         ),
                       ),
                     ],
-                  ],
-                ),
+                  ),
+                ],
               ],
             ],
           ),
