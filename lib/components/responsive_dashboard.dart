@@ -91,8 +91,34 @@ class DashboardDesktopShell extends StatefulWidget {
 }
 
 class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
+  static const List<String> _viewIds = [
+    'menu',
+    'ordini',
+    'storico',
+    'anteprima_cliente',
+    'qr_code',
+    'personalizzazione',
+    'dispensa',
+    'cestino',
+    'profilo',
+    'impostazioni',
+    'supporto',
+    'admin',
+  ];
+
   late String _currentViewId;
+  final Set<String> _visitedViews = {};
   bool _forceMobilePreview = false;
+  late Stream<List<OrdersRecord>> _badgeCountStream;
+
+  void _switchView(String newId) {
+    if (_currentViewId != newId) {
+      setState(() {
+        _currentViewId = newId;
+        _visitedViews.add(newId);
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -107,6 +133,14 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
       default:
         _currentViewId = 'menu';
     }
+    _visitedViews.add(_currentViewId);
+
+    _badgeCountStream = queryOrdersRecord(
+      queryBuilder: (q) => q
+          .where('visto', isEqualTo: false)
+          .where('stato_ordine', isEqualTo: 'in_attesa'),
+      limit: 20,
+    );
   }
 
   _SidebarSection _getSectionInfo(String viewId) {
@@ -413,7 +447,7 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
                         isSelected: _currentViewId == 'menu',
                         colorScheme: colorScheme,
                         isDark: isDark,
-                        onTap: () => setState(() => _currentViewId = 'menu'),
+                        onTap: () => _switchView('menu'),
                       ),
                       _buildSidebarItem(
                         icon: Icons.soup_kitchen_rounded,
@@ -421,12 +455,8 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
                         isSelected: _currentViewId == 'ordini',
                         colorScheme: colorScheme,
                         isDark: isDark,
-                        badgeCountStream: queryOrdersRecord(
-                          queryBuilder: (q) => q
-                              .where('visto', isEqualTo: false)
-                              .where('stato_ordine', isEqualTo: 'in_attesa'),
-                        ),
-                        onTap: () => setState(() => _currentViewId = 'ordini'),
+                        badgeCountStream: _badgeCountStream,
+                        onTap: () => _switchView('ordini'),
                       ),
                       _buildSidebarItem(
                         icon: Icons.receipt_long_rounded,
@@ -434,7 +464,7 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
                         isSelected: _currentViewId == 'storico',
                         colorScheme: colorScheme,
                         isDark: isDark,
-                        onTap: () => setState(() => _currentViewId = 'storico'),
+                        onTap: () => _switchView('storico'),
                       ),
 
                       const SizedBox(height: 14.0),
@@ -446,7 +476,7 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
                         colorScheme: colorScheme,
                         isDark: isDark,
                         iconColor: const Color(0xFF10B981),
-                        onTap: () => setState(() => _currentViewId = 'anteprima_cliente'),
+                        onTap: () => _switchView('anteprima_cliente'),
                       ),
                       _buildSidebarItem(
                         icon: Icons.qr_code_2_rounded,
@@ -455,7 +485,7 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
                         colorScheme: colorScheme,
                         isDark: isDark,
                         iconColor: const Color(0xFF0EA5E9),
-                        onTap: () => setState(() => _currentViewId = 'qr_code'),
+                        onTap: () => _switchView('qr_code'),
                       ),
                       _buildSidebarItem(
                         icon: Icons.palette_rounded,
@@ -464,7 +494,7 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
                         colorScheme: colorScheme,
                         isDark: isDark,
                         iconColor: const Color(0xFF8B5CF6),
-                        onTap: () => setState(() => _currentViewId = 'personalizzazione'),
+                        onTap: () => _switchView('personalizzazione'),
                       ),
                       if (widget.userDoc?.dispensaAttiva == true)
                         _buildSidebarItem(
@@ -474,7 +504,7 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
                           colorScheme: colorScheme,
                           isDark: isDark,
                           iconColor: const Color(0xFFF97316),
-                          onTap: () => setState(() => _currentViewId = 'dispensa'),
+                          onTap: () => _switchView('dispensa'),
                         ),
                       _buildSidebarItem(
                         icon: Icons.delete_outline_rounded,
@@ -483,7 +513,7 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
                         colorScheme: colorScheme,
                         isDark: isDark,
                         iconColor: const Color(0xFFD97706),
-                        onTap: () => setState(() => _currentViewId = 'cestino'),
+                        onTap: () => _switchView('cestino'),
                       ),
 
                       const SizedBox(height: 14.0),
@@ -495,7 +525,7 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
                         colorScheme: colorScheme,
                         isDark: isDark,
                         iconColor: const Color(0xFF2563EB),
-                        onTap: () => setState(() => _currentViewId = 'profilo'),
+                        onTap: () => _switchView('profilo'),
                       ),
                       _buildSidebarItem(
                         icon: Icons.settings_rounded,
@@ -504,7 +534,7 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
                         colorScheme: colorScheme,
                         isDark: isDark,
                         iconColor: const Color(0xFF64748B),
-                        onTap: () => setState(() => _currentViewId = 'impostazioni'),
+                        onTap: () => _switchView('impostazioni'),
                       ),
                       _buildSidebarItem(
                         icon: Icons.help_outline_rounded,
@@ -513,7 +543,7 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
                         colorScheme: colorScheme,
                         isDark: isDark,
                         iconColor: const Color(0xFF059669),
-                        onTap: () => setState(() => _currentViewId = 'supporto'),
+                        onTap: () => _switchView('supporto'),
                       ),
                       if (currentUserDocument?.isAdmin == true)
                         _buildSidebarItem(
@@ -523,7 +553,7 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
                           colorScheme: colorScheme,
                           isDark: isDark,
                           iconColor: const Color(0xFFDC2626),
-                          onTap: () => setState(() => _currentViewId = 'admin'),
+                          onTap: () => _switchView('admin'),
                         ),
                     ],
                   ),
@@ -776,58 +806,89 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
   ) {
     final targetRef = docRef ?? currentUserReference;
 
-    switch (_currentViewId) {
-      case 'menu':
-        return DesktopMenuView(ristoranteRef: targetRef);
-      case 'ordini':
-        return DesktopOrdersTableView(
-          ristoranteRef: targetRef,
-          initialStatusFilter: 'all',
-        );
-      case 'storico':
-        return DesktopOrdersTableView(
-          ristoranteRef: targetRef,
-          initialStatusFilter: 'Completato',
-        );
-      case 'anteprima_cliente':
-        return DesktopClientPreviewView(
-          ristoranteRef: targetRef,
-          onNavigateToQR: () => setState(() => _currentViewId = 'qr_code'),
-        );
-      case 'qr_code':
-        return const ImpostazioniQRWidget(embedded: true);
-      case 'personalizzazione':
-        return PersonalizzazioneWidget(
-          ristoranteRef: targetRef,
-          embedded: true,
-        );
-      case 'dispensa':
-        return GestioneDispensaWidget(
-          ristoranteRef: targetRef,
-          embedded: true,
-        );
-      case 'cestino':
-        return const CestinoWidget(embedded: true);
-      case 'profilo':
-        return ProfiloUtenteWidget(
-          ristoranteRef: targetRef,
-          embedded: true,
-        );
-      case 'impostazioni':
-        return ImpostazioniUtenteWidget(
-          ristoranteRef: targetRef,
-          embedded: true,
-        );
-      case 'supporto':
-        return SupportoRistoratoreWidget(
-          ristoranteRef: targetRef,
-          embedded: true,
-        );
-      case 'admin':
-        return const AdminDashboardWidget(embedded: true);
-      default:
-        return DesktopMenuView(ristoranteRef: targetRef);
-    }
+    final currentIndex = _viewIds.indexOf(_currentViewId);
+    final effectiveIndex = currentIndex >= 0 ? currentIndex : 0;
+
+    return IndexedStack(
+      index: effectiveIndex,
+      children: _viewIds.map((id) {
+        if (!_visitedViews.contains(id)) {
+          return const SizedBox.shrink();
+        }
+        switch (id) {
+          case 'menu':
+            return DesktopMenuView(
+              key: const PageStorageKey('tab_view_menu'),
+              ristoranteRef: targetRef,
+            );
+          case 'ordini':
+            return DesktopOrdersTableView(
+              key: const PageStorageKey('tab_view_ordini'),
+              ristoranteRef: targetRef,
+              initialStatusFilter: 'all',
+            );
+          case 'storico':
+            return DesktopOrdersTableView(
+              key: const PageStorageKey('tab_view_storico'),
+              ristoranteRef: targetRef,
+              initialStatusFilter: 'Completato',
+            );
+          case 'anteprima_cliente':
+            return DesktopClientPreviewView(
+              key: const PageStorageKey('tab_view_anteprima_cliente'),
+              ristoranteRef: targetRef,
+              onNavigateToQR: () => _switchView('qr_code'),
+            );
+          case 'qr_code':
+            return const ImpostazioniQRWidget(
+              key: PageStorageKey('tab_view_qr_code'),
+              embedded: true,
+            );
+          case 'personalizzazione':
+            return PersonalizzazioneWidget(
+              key: const PageStorageKey('tab_view_personalizzazione'),
+              ristoranteRef: targetRef,
+              embedded: true,
+            );
+          case 'dispensa':
+            return GestioneDispensaWidget(
+              key: const PageStorageKey('tab_view_dispensa'),
+              ristoranteRef: targetRef,
+              embedded: true,
+            );
+          case 'cestino':
+            return const CestinoWidget(
+              key: PageStorageKey('tab_view_cestino'),
+              embedded: true,
+            );
+          case 'profilo':
+            return ProfiloUtenteWidget(
+              key: const PageStorageKey('tab_view_profilo'),
+              ristoranteRef: targetRef,
+              embedded: true,
+            );
+          case 'impostazioni':
+            return ImpostazioniUtenteWidget(
+              key: const PageStorageKey('tab_view_impostazioni'),
+              ristoranteRef: targetRef,
+              embedded: true,
+            );
+          case 'supporto':
+            return SupportoRistoratoreWidget(
+              key: const PageStorageKey('tab_view_supporto'),
+              ristoranteRef: targetRef,
+              embedded: true,
+            );
+          case 'admin':
+            return const AdminDashboardWidget(
+              key: PageStorageKey('tab_view_admin'),
+              embedded: true,
+            );
+          default:
+            return const SizedBox.shrink();
+        }
+      }).toList(),
+    );
   }
 
   Widget _buildNavCategoryHeader(String title, bool isDark) {

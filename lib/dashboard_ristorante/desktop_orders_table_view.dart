@@ -20,17 +20,55 @@ class DesktopOrdersTableView extends StatefulWidget {
 }
 
 class _DesktopOrdersTableViewState extends State<DesktopOrdersTableView> {
+  // Global cache across instances so data is instantly rendered on tab switches
+  static final Map<String, List<OrdersRecord>> _globalOrdersCache = {};
+
   String _selectedFilter = 'all'; // 'all', 'in_attesa', 'in_preparazione', 'Completato'
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   bool _sortAscending = false;
   int _sortColumnIndex = 1; // 1 = data/orario
 
+  late Stream<List<OrdersRecord>> _ordersStream;
+  List<OrdersRecord>? _cachedOrders;
+
+  String get _cacheKey =>
+      '${widget.ristoranteRef?.id ?? 'default'}_${widget.initialStatusFilter ?? 'all'}';
+
   @override
   void initState() {
     super.initState();
     if (widget.initialStatusFilter != null) {
       _selectedFilter = widget.initialStatusFilter!;
+    }
+    _cachedOrders = _globalOrdersCache[_cacheKey];
+    _initOrdersStream();
+  }
+
+  void _initOrdersStream() {
+    _ordersStream = queryOrdersRecord(
+      queryBuilder: (orders) {
+        if (widget.initialStatusFilter == 'Completato') {
+          return orders.where('stato_ordine', isEqualTo: 'Completato');
+        } else if (widget.initialStatusFilter != null && widget.initialStatusFilter != 'all') {
+          return orders.where('stato_ordine', isEqualTo: widget.initialStatusFilter);
+        }
+        return orders.orderBy('data_creazione', descending: true);
+      },
+      limit: 100,
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant DesktopOrdersTableView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.ristoranteRef != widget.ristoranteRef ||
+        oldWidget.initialStatusFilter != widget.initialStatusFilter) {
+      if (widget.initialStatusFilter != null) {
+        _selectedFilter = widget.initialStatusFilter!;
+      }
+      _cachedOrders = _globalOrdersCache[_cacheKey];
+      _initOrdersStream();
     }
   }
 
@@ -49,11 +87,14 @@ class _DesktopOrdersTableViewState extends State<DesktopOrdersTableView> {
     final docRef = widget.ristoranteRef;
 
     return StreamBuilder<List<OrdersRecord>>(
-      stream: queryOrdersRecord(
-        queryBuilder: (orders) => orders.orderBy('data_creazione', descending: true),
-      ),
+      stream: _ordersStream,
+      initialData: _cachedOrders,
       builder: (context, snapshot) {
-        if (snapshot.hasError) {
+        if (snapshot.hasData && snapshot.data != null) {
+          _cachedOrders = snapshot.data;
+          _globalOrdersCache[_cacheKey] = snapshot.data!;
+        }
+        if (snapshot.hasError && !snapshot.hasData) {
           return Center(
             child: Padding(
               padding: const EdgeInsets.all(32.0),

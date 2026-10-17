@@ -26,10 +26,21 @@ class DesktopMenuView extends StatefulWidget {
 }
 
 class _DesktopMenuViewState extends State<DesktopMenuView> {
+  static final Map<String, List<CategoriesRecord>> _globalCategoriesCache = {};
+  static final Map<String, List<PiattiRecord>> _globalDishesCache = {};
+
   DocumentReference? _selectedCategoryRef;
   String _dishSearchQuery = '';
   final TextEditingController _dishSearchController = TextEditingController();
   PiattiRecord? _editingDish;
+
+  Stream<List<CategoriesRecord>>? _categoriesStream;
+  List<CategoriesRecord>? _cachedCategories;
+
+  Stream<List<PiattiRecord>>? _dishesStream;
+  List<PiattiRecord>? _cachedDishes;
+  DocumentReference? _currentDishStreamCatRef;
+  DocumentReference? _lastDocRef;
 
   @override
   void dispose() {
@@ -123,14 +134,26 @@ class _DesktopMenuViewState extends State<DesktopMenuView> {
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
     final docRef = widget.ristoranteRef ?? currentUserReference!;
+    final catCacheKey = docRef.id;
 
-    return StreamBuilder<List<CategoriesRecord>>(
-      stream: queryCategoriesRecord(
+    if (_categoriesStream == null || _lastDocRef != docRef) {
+      _lastDocRef = docRef;
+      _cachedCategories = _globalCategoriesCache[catCacheKey];
+      _categoriesStream = queryCategoriesRecord(
         queryBuilder: (q) => q
             .where('proprietario', isEqualTo: docRef)
             .orderBy('ordine_categoria'),
-      ),
+      );
+    }
+
+    return StreamBuilder<List<CategoriesRecord>>(
+      stream: _categoriesStream,
+      initialData: _cachedCategories,
       builder: (context, catSnapshot) {
+        if (catSnapshot.hasData && catSnapshot.data != null) {
+          _cachedCategories = catSnapshot.data;
+          _globalCategoriesCache[catCacheKey] = catSnapshot.data!;
+        }
         if (!catSnapshot.hasData) {
           return Center(
             child: SpinKitPulse(
@@ -156,6 +179,21 @@ class _DesktopMenuViewState extends State<DesktopMenuView> {
         final currentCategory = categories.firstWhereOrNull(
           (c) => c.reference == _selectedCategoryRef,
         );
+
+        if (currentCategory != null) {
+          final dishCacheKey = '${docRef.id}_${currentCategory.reference.id}';
+          if (_dishesStream == null ||
+              _currentDishStreamCatRef != currentCategory.reference) {
+            _currentDishStreamCatRef = currentCategory.reference;
+            _cachedDishes = _globalDishesCache[dishCacheKey];
+            _dishesStream = queryPiattiRecord(
+              queryBuilder: (q) => q
+                  .where('proprietario', isEqualTo: docRef)
+                  .where('Categoria', isEqualTo: currentCategory.reference.id)
+                  .where('isCestinato', isEqualTo: false),
+            );
+          }
+        }
 
         return Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -552,13 +590,14 @@ class _DesktopMenuViewState extends State<DesktopMenuView> {
                               // Contenuto Piatti
                               Expanded(
                                 child: StreamBuilder<List<PiattiRecord>>(
-                                  stream: queryPiattiRecord(
-                                    queryBuilder: (q) => q
-                                        .where('proprietario', isEqualTo: docRef)
-                                        .where('Categoria', isEqualTo: currentCategory.reference.id)
-                                        .where('isCestinato', isEqualTo: false),
-                                  ),
+                                  stream: _dishesStream,
+                                  initialData: _cachedDishes,
                                   builder: (context, snapshot) {
+                                    if (snapshot.hasData && snapshot.data != null) {
+                                      _cachedDishes = snapshot.data;
+                                      final dKey = '${docRef.id}_${currentCategory.reference.id}';
+                                      _globalDishesCache[dKey] = snapshot.data!;
+                                    }
                                     if (!snapshot.hasData) {
                                       return Center(
                                         child: SpinKitPulse(color: colorScheme.primary, size: 40.0),
