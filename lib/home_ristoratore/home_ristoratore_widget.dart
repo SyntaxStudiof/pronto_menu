@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
+import '/theme_provider.dart';
 import 'home_ristoratore_model.dart';
 export 'home_ristoratore_model.dart';
 
@@ -85,6 +86,27 @@ class _HomeRistoratoreWidgetState extends State<HomeRistoratoreWidget> {
             ),
           );
         }
+
+        final userDoc = snapshot.data!;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!context.mounted) return;
+          final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+          if (userDoc.hasTemaScelto() || userDoc.hasColorePrimario()) {
+            if (themeProvider.designStyle.name != userDoc.temaScelto ||
+                themeProvider.primaryColorHex != userDoc.colorePrimario) {
+              themeProvider.syncFromRestaurant(
+                temaScelto: userDoc.temaScelto,
+                colorePrimarioHex: userDoc.colorePrimario,
+                fontTitoli: userDoc.fontTitoli,
+                fontTesti: userDoc.fontTesti,
+                layoutPiatti: userDoc.layoutPiatti,
+                bannerCopertina: userDoc.bannerCopertina,
+                textureSfondo: userDoc.textureSfondo,
+                stileBadge: userDoc.stileBadge,
+              );
+            }
+          }
+        });
 
         return GestureDetector(
           onTap: () {

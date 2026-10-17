@@ -248,6 +248,8 @@ class ThemeProvider extends ChangeNotifier {
 
   AppDesignStyle get designStyle => _designStyle;
   Color get primaryColor => _primaryColor;
+  String get primaryColorHex =>
+      '#${_primaryColor.toARGB32().toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}';
   ThemeMode get themeMode => _themeMode;
   String get titleFont => _titleFont;
   String get bodyFont => _bodyFont;
@@ -351,6 +353,8 @@ class ThemeProvider extends ChangeNotifier {
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keyDesignStyle, style.name);
+    final hex = '#${_primaryColor.toARGB32().toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}';
+    await prefs.setString(_keyPrimaryColor, hex);
     await prefs.setString(_keyTitleFont, _titleFont);
     await prefs.setString(_keyBodyFont, _bodyFont);
   }
@@ -442,7 +446,7 @@ class ThemeProvider extends ChangeNotifier {
   }
 
   /// Syncs all customization properties from a restaurant profile (e.g. from Firestore).
-  void syncFromRestaurant({
+  Future<void> syncFromRestaurant({
     String? temaScelto,
     String? colorePrimarioHex,
     String? fontTitoli,
@@ -451,7 +455,7 @@ class ThemeProvider extends ChangeNotifier {
     String? bannerCopertina,
     String? textureSfondo,
     String? stileBadge,
-  }) {
+  }) async {
     if (temaScelto != null && temaScelto.isNotEmpty) {
       for (final style in AppDesignStyle.values) {
         if (style.name == temaScelto) {
@@ -495,6 +499,19 @@ class ThemeProvider extends ChangeNotifier {
       _badgeStyle = BadgeStyleExtension.fromString(stileBadge);
     }
     notifyListeners();
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_keyDesignStyle, _designStyle.name);
+      final hex = '#${_primaryColor.toARGB32().toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}';
+      await prefs.setString(_keyPrimaryColor, hex);
+      await prefs.setString(_keyTitleFont, _titleFont);
+      await prefs.setString(_keyBodyFont, _bodyFont);
+      await prefs.setString(_keyDishCardLayout, _dishCardLayout.name);
+      await prefs.setString(_keyCoverBanner, _coverBanner);
+      await prefs.setString(_keyBackgroundTexture, _backgroundTexture.name);
+      await prefs.setString(_keyBadgeStyle, _badgeStyle.value);
+    } catch (_) {}
   }
 
   /// Updates the theme mode (light, dark, system) and persists the preference.

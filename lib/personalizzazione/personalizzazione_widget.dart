@@ -198,7 +198,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
 
     try {
       final hexColor = '#${themeProvider.primaryColor.toARGB32().toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}';
-      await docRef.update({
+      await docRef.set({
         'temaScelto': themeProvider.designStyle.name,
         'colore_primario': hexColor,
         'font_titoli': themeProvider.titleFont,
@@ -207,7 +207,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
         'banner_copertina': themeProvider.coverBanner,
         'texture_sfondo': themeProvider.backgroundTexture.name,
         'stile_badge': themeProvider.badgeStyle.value,
-      });
+      }, SetOptions(merge: true));
 
       if (!mounted) return;
 
@@ -252,6 +252,26 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     }
   }
 
+  Future<void> _autoSaveToCloud(ThemeProvider themeProvider) async {
+    try {
+      final docRef = widget.ristoranteRef ?? currentUserReference;
+      if (docRef == null) return;
+      final hexColor = '#${themeProvider.primaryColor.toARGB32().toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}';
+      await docRef.set({
+        'temaScelto': themeProvider.designStyle.name,
+        'colore_primario': hexColor,
+        'font_titoli': themeProvider.titleFont,
+        'font_testi': themeProvider.bodyFont,
+        'layout_piatti': themeProvider.dishCardLayout.name,
+        'banner_copertina': themeProvider.coverBanner,
+        'texture_sfondo': themeProvider.backgroundTexture.name,
+        'stile_badge': themeProvider.badgeStyle.value,
+      }, SetOptions(merge: true));
+    } catch (e) {
+      debugPrint('Errore auto-salvataggio tema cloud: $e');
+    }
+  }
+
   void _onFakeButtonTap() {
     setState(() {
       _isFakeButtonAdded = true;
@@ -277,6 +297,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
         .padLeft(8, '0')
         .substring(2)
         .toUpperCase();
+    _autoSaveToCloud(themeProvider);
   }
 
   void _openSimulator(BuildContext context, ThemeProvider themeProvider) {
