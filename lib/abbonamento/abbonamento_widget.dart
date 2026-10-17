@@ -255,6 +255,7 @@ class _AbbonamentoWidgetState extends State<AbbonamentoWidget> {
     final theme = Theme.of(context);
     final canPop = Navigator.of(context).canPop();
     final isAnnual = _model.billingInterval == 'annuale';
+    final haUsatoProva = valueOrDefault<bool>(currentUserDocument?.haUsatoProva, false);
 
     return GestureDetector(
       onTap: () {
@@ -481,11 +482,11 @@ class _AbbonamentoWidgetState extends State<AbbonamentoWidget> {
                                   child: Row(
                                     crossAxisAlignment: CrossAxisAlignment.stretch,
                                     children: [
-                                      Expanded(child: _buildCardPro(theme, isAnnual)),
+                                      Expanded(child: _buildCardPro(theme, isAnnual, haUsatoProva)),
                                       const SizedBox(width: 16.0),
-                                      Expanded(child: _buildCardPlus(theme, isAnnual)),
+                                      Expanded(child: _buildCardPlus(theme, isAnnual, haUsatoProva)),
                                       const SizedBox(width: 16.0),
-                                      Expanded(child: _buildCardUltra(theme, isAnnual)),
+                                      Expanded(child: _buildCardUltra(theme, isAnnual, haUsatoProva)),
                                     ],
                                   ),
                                 );
@@ -494,11 +495,11 @@ class _AbbonamentoWidgetState extends State<AbbonamentoWidget> {
                               // Su mobile / schermi compatti: lista verticale di card
                               return Column(
                                 children: [
-                                  _buildCardPro(theme, isAnnual),
+                                  _buildCardPro(theme, isAnnual, haUsatoProva),
                                   const SizedBox(height: 20.0),
-                                  _buildCardPlus(theme, isAnnual),
+                                  _buildCardPlus(theme, isAnnual, haUsatoProva),
                                   const SizedBox(height: 20.0),
-                                  _buildCardUltra(theme, isAnnual),
+                                  _buildCardUltra(theme, isAnnual, haUsatoProva),
                                 ],
                               );
                             },
@@ -528,7 +529,7 @@ class _AbbonamentoWidgetState extends State<AbbonamentoWidget> {
                                 const SizedBox(width: 10.0),
                                 Expanded(
                                   child: Text(
-                                    'Nessun vincolo contrattuale • Disdici quando vuoi in un click • 0% commissioni sul venduto',
+                                    '7 giorni di prova gratuita su tutti i piani • Disdici quando vuoi in un click • 0% commissioni',
                                     style: theme.textTheme.bodySmall?.copyWith(
                                       color: theme.hintColor,
                                       height: 1.3,
@@ -606,7 +607,7 @@ class _AbbonamentoWidgetState extends State<AbbonamentoWidget> {
   }
 
   // ─── CARD 1: PRONTOMENU PRO ─────────────────────────────────────────────
-  Widget _buildCardPro(ThemeData theme, bool isAnnual) {
+  Widget _buildCardPro(ThemeData theme, bool isAnnual, bool haUsatoProva) {
     const accentColor = Color(0xFF0D9488); // Teal
     final price = isAnnual ? '69,90€' : '6,90€';
     final period = isAnnual ? '/ anno' : '/ mese';
@@ -649,6 +650,29 @@ class _AbbonamentoWidgetState extends State<AbbonamentoWidget> {
                     fontWeight: FontWeight.bold,
                     letterSpacing: 0.6,
                   ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 9.0, vertical: 4.0),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF2E7D32).withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.verified_rounded, color: Color(0xFF2E7D32), size: 13.0),
+                    SizedBox(width: 4.0),
+                    Text(
+                      '7 GG PROVA',
+                      style: TextStyle(
+                        color: Color(0xFF2E7D32),
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.4,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -699,7 +723,28 @@ class _AbbonamentoWidgetState extends State<AbbonamentoWidget> {
               fontSize: 11.5,
             ),
           ),
-          const Divider(height: 28.0),
+          const SizedBox(height: 6.0),
+          Row(
+            children: [
+              const Icon(
+                Icons.check_circle_outline_rounded,
+                size: 13.0,
+                color: Color(0xFF2E7D32),
+              ),
+              const SizedBox(width: 4.0),
+              Text(
+                haUsatoProva
+                    ? 'Attivazione immediata'
+                    : '7 giorni di prova gratis a 0€',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: const Color(0xFF2E7D32),
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const Divider(height: 24.0),
           _buildCheckItem(theme, 'Menu Digitale QR Code nativo per i tavoli'),
           _buildCheckItem(theme, 'Categorie e sottocategorie illimitate'),
           _buildCheckItem(theme, 'Allergeni completi & preferenze (Senza glutine, lattosio...)'),
@@ -713,7 +758,7 @@ class _AbbonamentoWidgetState extends State<AbbonamentoWidget> {
               tierName: 'ProntoMenu Pro',
               priceFormatted: '$price $period',
             ),
-            text: 'Scegli Piano Pro',
+            text: !haUsatoProva ? 'Inizia Prova Gratuita (7 gg)' : 'Scegli Piano Pro',
             options: FFButtonOptions(
               height: 46.0,
               color: accentColor,
@@ -731,7 +776,7 @@ class _AbbonamentoWidgetState extends State<AbbonamentoWidget> {
   }
 
   // ─── CARD 2: PRONTOMENU PLUS (CONSIGLIATO) ──────────────────────────────
-  Widget _buildCardPlus(ThemeData theme, bool isAnnual) {
+  Widget _buildCardPlus(ThemeData theme, bool isAnnual, bool haUsatoProva) {
     final price = isAnnual ? '109,90€' : '11,90€';
     final period = isAnnual ? '/ anno' : '/ mese';
     final subtitlePrice = isAnnual ? 'equivale a 9,15€ al mese' : 'fatturato mensilmente';
@@ -778,6 +823,29 @@ class _AbbonamentoWidgetState extends State<AbbonamentoWidget> {
                         fontSize: 11.0,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.6,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 9.0, vertical: 4.0),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF2E7D32).withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.verified_rounded, color: Color(0xFF2E7D32), size: 13.0),
+                    SizedBox(width: 4.0),
+                    Text(
+                      '7 GG PROVA',
+                      style: TextStyle(
+                        color: Color(0xFF2E7D32),
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.4,
                       ),
                     ),
                   ],
@@ -832,7 +900,28 @@ class _AbbonamentoWidgetState extends State<AbbonamentoWidget> {
               fontSize: 11.5,
             ),
           ),
-          const Divider(height: 28.0),
+          const SizedBox(height: 6.0),
+          Row(
+            children: [
+              const Icon(
+                Icons.check_circle_outline_rounded,
+                size: 13.0,
+                color: Color(0xFF2E7D32),
+              ),
+              const SizedBox(width: 4.0),
+              Text(
+                haUsatoProva
+                    ? 'Attivazione immediata'
+                    : '7 giorni di prova gratis a 0€',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: const Color(0xFF2E7D32),
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const Divider(height: 24.0),
           _buildCheckItem(theme, 'Tutto ciò che include ProntoMenu Pro', isBold: true),
           _buildCheckItem(theme, 'Ricezione ordini in tempo reale dai tavoli'),
           _buildCheckItem(theme, 'Schermi dedicati Cucina e Cassa per le comande'),
@@ -846,7 +935,7 @@ class _AbbonamentoWidgetState extends State<AbbonamentoWidget> {
               tierName: 'ProntoMenu Plus',
               priceFormatted: '$price $period',
             ),
-            text: 'Scegli Piano Plus ⭐',
+            text: !haUsatoProva ? 'Inizia Prova Gratuita (7 gg) ⭐' : 'Scegli Piano Plus ⭐',
             options: FFButtonOptions(
               height: 46.0,
               color: primaryColor,
@@ -864,7 +953,7 @@ class _AbbonamentoWidgetState extends State<AbbonamentoWidget> {
   }
 
   // ─── CARD 3: PRONTOMENU ULTRA (TUTTO INCLUSO) ───────────────────────────
-  Widget _buildCardUltra(ThemeData theme, bool isAnnual) {
+  Widget _buildCardUltra(ThemeData theme, bool isAnnual, bool haUsatoProva) {
     const accentColor = Color(0xFF7C3AED); // Purple
     final price = isAnnual ? '289,90€' : '29,90€';
     final period = isAnnual ? '/ anno' : '/ mese';
@@ -911,6 +1000,29 @@ class _AbbonamentoWidgetState extends State<AbbonamentoWidget> {
                         fontSize: 11.0,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.6,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF2E7D32).withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.verified_rounded, color: Color(0xFF2E7D32), size: 13.0),
+                    SizedBox(width: 4.0),
+                    Text(
+                      '7 GG PROVA',
+                      style: TextStyle(
+                        color: Color(0xFF2E7D32),
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.4,
                       ),
                     ),
                   ],
@@ -965,7 +1077,28 @@ class _AbbonamentoWidgetState extends State<AbbonamentoWidget> {
               fontSize: 11.5,
             ),
           ),
-          const Divider(height: 28.0),
+          const SizedBox(height: 6.0),
+          Row(
+            children: [
+              const Icon(
+                Icons.check_circle_outline_rounded,
+                size: 13.0,
+                color: Color(0xFF2E7D32),
+              ),
+              const SizedBox(width: 4.0),
+              Text(
+                haUsatoProva
+                    ? 'Attivazione immediata'
+                    : '7 giorni di prova gratis a 0€',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: const Color(0xFF2E7D32),
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const Divider(height: 24.0),
           _buildCheckItem(theme, 'Tutto ciò che include ProntoMenu Plus', isBold: true),
           _buildCheckItem(theme, 'Foto piatti in alta risoluzione sul menù digitale', isBold: true),
           _buildCheckItem(theme, 'Jukebox Digitale per richieste musicali dei clienti'),
@@ -980,7 +1113,7 @@ class _AbbonamentoWidgetState extends State<AbbonamentoWidget> {
               tierName: 'ProntoMenu Ultra',
               priceFormatted: '$price $period',
             ),
-            text: 'Scegli Piano Ultra 👑',
+            text: !haUsatoProva ? 'Inizia Prova Gratuita (7 gg) 👑' : 'Scegli Piano Ultra 👑',
             options: FFButtonOptions(
               height: 46.0,
               color: accentColor,
