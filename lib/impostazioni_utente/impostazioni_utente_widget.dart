@@ -116,445 +116,524 @@ class _ImpostazioniUtenteWidgetState extends State<ImpostazioniUtenteWidget> {
           top: true,
           child: Align(
             alignment: Alignment.topCenter,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 680.0),
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 18.0,
-                  vertical: 12.0,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // ── Header intro ──────────────────────────────────────────
-                    Padding(
-                      padding: const EdgeInsets.only(left: 4.0, bottom: 16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Preferenze & Configurazione',
-                            style: theme.textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: colorScheme.onSurface,
-                            ),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final isDesktop = widget.embedded || constraints.maxWidth >= 850;
+
+                return ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: isDesktop ? 1200.0 : 680.0),
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isDesktop ? 24.0 : 18.0,
+                      vertical: 16.0,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // ── Header intro ──────────────────────────────────────────
+                        Padding(
+                          padding: const EdgeInsets.only(left: 4.0, bottom: 20.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Preferenze & Configurazione',
+                                style: theme.textTheme.headlineSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: colorScheme.onSurface,
+                                ),
+                              ),
+                              const SizedBox(height: 4.0),
+                              Text(
+                                'Gestisci l\'aspetto visivo, l\'ordinamento del menu e le impostazioni del tuo locale.',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 4.0),
-                          Text(
-                            'Gestisci l\'aspetto visivo, l\'ordinamento del menu e le impostazioni del tuo account.',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                          ),
+                        ),
+
+                        if (isDesktop)
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Colonna Sinistra (Aspetto, Mutaforma, Jukebox)
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    _buildAspettoMenuSection(context, colorScheme),
+                                    const SizedBox(height: 24.0),
+                                    _buildMutaformaSection(context, colorScheme),
+                                    const SizedBox(height: 24.0),
+                                    _buildJukeboxSection(context, colorScheme),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 24.0),
+                              // Colonna Destra (Dispensa, Account, Info/Privacy)
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    _buildDispensaSection(context, colorScheme),
+                                    const SizedBox(height: 24.0),
+                                    _buildAccountSection(context, colorScheme),
+                                    const SizedBox(height: 24.0),
+                                    _buildPrivacySection(context, colorScheme),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          )
+                        else ...[
+                          _buildAspettoMenuSection(context, colorScheme),
+                          const SizedBox(height: 24.0),
+                          _buildMutaformaSection(context, colorScheme),
+                          const SizedBox(height: 24.0),
+                          _buildJukeboxSection(context, colorScheme),
+                          const SizedBox(height: 24.0),
+                          _buildDispensaSection(context, colorScheme),
+                          const SizedBox(height: 24.0),
+                          _buildAccountSection(context, colorScheme),
+                          const SizedBox(height: 24.0),
+                          _buildPrivacySection(context, colorScheme),
                         ],
-                      ),
-                    ),
 
-                    // ── Sezione 1: Personalizzazione & Menu ────────────────────
-                    _buildSectionHeader(
-                      context: context,
-                      title: 'ASPETTO & MENU',
-                    ),
-                    const SizedBox(height: 8.0),
-                    _buildSettingsCard(
-                      context: context,
-                      children: [
-                        _buildSettingsTile(
-                          context: context,
-                          icon: Icons.palette_rounded,
-                          iconBgColor: colorScheme.primary.withValues(alpha: 0.15),
-                          iconColor: colorScheme.primary,
-                          title: 'Personalizzazione',
-                          subtitle: 'Preset di design, stile grafico e tema',
-                          trailingBadge: (currentUserDocument != null && !currentUserDocument!.hasPlus)
-                              ? _buildTierBadge('PLUS', colorScheme.primary)
-                              : null,
-                          onTap: () {
-                            if (currentUserDocument != null && !currentUserDocument!.hasPlus) {
-                              _mostraUpgradePrompt(
-                                context,
-                                requiredPlan: 'Plus',
-                                featureName: 'La personalizzazione grafica e del tema',
-                              );
-                              return;
-                            }
-                            context.pushNamed(
-                              PersonalizzazioneWidget.routeName,
-                              queryParameters: {
-                                'ristoranteRef': serializeParam(
-                                  widget.ristoranteRef,
-                                  ParamType.DocumentReference,
-                                ),
-                              }.withoutNulls,
-                              extra: <String, dynamic>{
-                                '__transition_info__': const TransitionInfo(
-                                  hasTransition: true,
-                                  transitionType: PageTransitionType.rightToLeft,
-                                ),
-                              },
-                            );
-                          },
-                        ),
-                        _buildDivider(colorScheme),
-                        _buildSettingsTile(
-                          context: context,
-                          icon: Icons.format_list_bulleted_rounded,
-                          iconBgColor: const Color(0xFF3B82F6).withValues(alpha: 0.15),
-                          iconColor: const Color(0xFF3B82F6),
-                          title: 'Ordina categorie',
-                          subtitle: 'Organizza la sequenza delle portate nel menu',
-                          onTap: () {
-                            context.pushNamed(
-                              ImpostazioniCategorieWidget.routeName,
-                              extra: <String, dynamic>{
-                                '__transition_info__': const TransitionInfo(
-                                  hasTransition: true,
-                                  transitionType: PageTransitionType.rightToLeft,
-                                ),
-                              },
-                            );
-                          },
-                        ),
-                        _buildDivider(colorScheme),
-                        _buildSettingsTile(
-                          context: context,
-                          icon: Icons.account_tree_rounded,
-                          iconBgColor: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
-                          iconColor: const Color(0xFF8B5CF6),
-                          title: 'Gestione sottocategorie',
-                          subtitle: 'Modifica, crea o elimina le sottocategorie del menu',
-                          onTap: () {
-                            context.pushNamed(
-                              ImpostazioniSottocategorieWidget.routeName,
-                              extra: <String, dynamic>{
-                                '__transition_info__': const TransitionInfo(
-                                  hasTransition: true,
-                                  transitionType: PageTransitionType.rightToLeft,
-                                ),
-                              },
-                            );
-                          },
-                        ),
+                        const SizedBox(height: 36.0),
                       ],
                     ),
-
-                    const SizedBox(height: 24.0),
-
-                    // ── Sezione: Menù Mutaforma (Fasce Orarie) ───────────────
-                    _buildSectionHeader(
-                      context: context,
-                      title: 'MENÙ MUTAFORMA (FASCE ORARIE)',
-                    ),
-                    const SizedBox(height: 8.0),
-                    _buildSettingsCard(
-                      context: context,
-                      children: [
-                        _buildSettingsSwitchTile(
-                          context: context,
-                          icon: Icons.auto_awesome_rounded,
-                          iconBgColor:
-                              const Color(0xFF6366F1).withValues(alpha: 0.15),
-                          iconColor: const Color(0xFF6366F1),
-                          title: 'Attiva Menù Mutaforma',
-                          subtitle:
-                              'Mostra ai clienti il menù adatto in base all\'orario (Colazione, Pranzo, Aperitivo, Cena). Gli altri menù saranno invisibili.',
-                          trailingBadge: (currentUserDocument != null && !currentUserDocument!.hasPlus)
-                              ? _buildTierBadge('PLUS', const Color(0xFF6366F1))
-                              : null,
-                          value: valueOrDefault<bool>(
-                              currentUserDocument?.menuMutaformaAttivo, false),
-                          onChanged: (val) async {
-                            if (currentUserDocument != null && !currentUserDocument!.hasPlus) {
-                              _mostraUpgradePrompt(
-                                context,
-                                requiredPlan: 'Plus',
-                                featureName: 'I Menù Mutaforma per fasce orarie',
-                              );
-                              return;
-                            }
-                            await currentUserReference?.update({
-                              'menu_mutaforma_attivo': val,
-                            });
-                            safeSetState(() {});
-                          },
-                        ),
-                        if (valueOrDefault<bool>(
-                            currentUserDocument?.menuMutaformaAttivo, false)) ...[
-                          _buildDivider(colorScheme),
-                          _buildSettingsTile(
-                            context: context,
-                            icon: Icons.schedule_rounded,
-                            iconBgColor:
-                                const Color(0xFF4F46E5).withValues(alpha: 0.15),
-                            iconColor: const Color(0xFF4F46E5),
-                            title: 'Configura Menù & Orari',
-                            subtitle:
-                                'Crea fasce orarie e assegna quali categorie mostrare ai clienti',
-                            onTap: () {
-                              context.pushNamed(
-                                ImpostazioniMutaformaWidget.routeName,
-                                extra: <String, dynamic>{
-                                  '__transition_info__': const TransitionInfo(
-                                    hasTransition: true,
-                                    transitionType:
-                                        PageTransitionType.rightToLeft,
-                                  ),
-                                },
-                              );
-                            },
-                          ),
-                        ],
-                      ],
-                    ),
-
-                    const SizedBox(height: 24.0),
-
-                    // ── Sezione: Intrattenimento & Jukebox ───────────────────
-                    _buildSectionHeader(
-                      context: context,
-                      title: 'INTRATTENIMENTO & JUKEBOX',
-                    ),
-                    const SizedBox(height: 8.0),
-                    _buildSettingsCard(
-                      context: context,
-                      children: [
-                        _buildSettingsTile(
-                          context: context,
-                          icon: Icons.music_note_rounded,
-                          iconBgColor:
-                              const Color(0xFF1DB954).withValues(alpha: 0.15),
-                          iconColor: const Color(0xFF1DB954),
-                          title: 'Jukebox & Musica',
-                          subtitle:
-                              'Consenti ai clienti di richiedere brani dalla tua playlist Spotify',
-                          trailingBadge: (currentUserDocument != null && !currentUserDocument!.hasUltra)
-                              ? _buildTierBadge('ULTRA', const Color(0xFF7C3AED))
-                              : null,
-                          onTap: () {
-                            if (currentUserDocument != null && !currentUserDocument!.hasUltra) {
-                              _mostraUpgradePrompt(
-                                context,
-                                requiredPlan: 'Ultra',
-                                featureName: 'Il Jukebox Digitale e la musica per i clienti',
-                              );
-                              return;
-                            }
-                            context.pushNamed(
-                              ImpostazioniJukeboxWidget.routeName,
-                              extra: <String, dynamic>{
-                                '__transition_info__': const TransitionInfo(
-                                  hasTransition: true,
-                                  transitionType:
-                                      PageTransitionType.rightToLeft,
-                                ),
-                              },
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 24.0),
-
-                    // ── Sezione: Dispensa & Ingredienti ─────────────────────
-                    _buildSectionHeader(
-                      context: context,
-                      title: 'DISPENSA & INGREDIENTI',
-                    ),
-                    const SizedBox(height: 8.0),
-                    _buildSettingsCard(
-                      context: context,
-                      children: [
-                        _buildSettingsSwitchTile(
-                          context: context,
-                          icon: Icons.kitchen_rounded,
-                          iconBgColor:
-                              const Color(0xFFF97316).withValues(alpha: 0.15),
-                          iconColor: const Color(0xFFF97316),
-                          title: 'Gestione Dispensa',
-                          subtitle:
-                              'Traccia scorte, autocompleta gli ingredienti dei piatti e sbarra quelli esauriti nel menu cliente',
-                          value: valueOrDefault<bool>(
-                              currentUserDocument?.dispensaAttiva, false),
-                          onChanged: (val) async {
-                            await currentUserReference?.update({
-                              'dispensa_attiva': val,
-                            });
-                            safeSetState(() {});
-                          },
-                        ),
-                        if (valueOrDefault<bool>(
-                            currentUserDocument?.dispensaAttiva, false)) ...[
-                          _buildDivider(colorScheme),
-                          _buildSettingsTile(
-                            context: context,
-                            icon: Icons.inventory_2_rounded,
-                            iconBgColor:
-                                const Color(0xFFEA580C).withValues(alpha: 0.15),
-                            iconColor: const Color(0xFFEA580C),
-                            title: 'Apri Dispensa',
-                            subtitle:
-                                'Visualizza ingredienti, gestisci scorte, esauriti e prezzi aggiunte',
-                            onTap: () {
-                              context.pushNamed(
-                                GestioneDispensaWidget.routeName,
-                                queryParameters: {
-                                  'ristoranteRef': serializeParam(
-                                    widget.ristoranteRef,
-                                    ParamType.DocumentReference,
-                                  ),
-                                }.withoutNulls,
-                                extra: <String, dynamic>{
-                                  '__transition_info__': const TransitionInfo(
-                                    hasTransition: true,
-                                    transitionType:
-                                        PageTransitionType.rightToLeft,
-                                  ),
-                                },
-                              );
-                            },
-                          ),
-                        ],
-                        _buildDivider(colorScheme),
-                        _buildSettingsSwitchTile(
-                          context: context,
-                          icon: Icons.tune_rounded,
-                          iconBgColor:
-                              const Color(0xFF10B981).withValues(alpha: 0.15),
-                          iconColor: const Color(0xFF10B981),
-                          title: 'Modifiche ai Piatti dai Clienti',
-                          subtitle: valueOrDefault<bool>(
-                                  currentUserDocument?.dispensaAttiva, false)
-                              ? 'I clienti potranno aggiungere ingredienti dalla tua dispensa (con i prezzi impostati) o togliere ingredienti'
-                              : 'I clienti potranno scrivere a mano le aggiunte desiderate o togliere ingredienti',
-                          value: valueOrDefault<bool>(
-                              currentUserDocument?.modifichePiattiAttive, true),
-                          onChanged: (val) async {
-                            await currentUserReference?.update({
-                              'modifiche_piatti_attive': val,
-                            });
-                            safeSetState(() {});
-                          },
-                        ),
-                        if (!valueOrDefault<bool>(
-                                currentUserDocument?.dispensaAttiva, false) &&
-                            valueOrDefault<bool>(
-                                currentUserDocument?.modifichePiattiAttive, true)) ...[
-                          _buildDivider(colorScheme),
-                          _buildSettingsTile(
-                            context: context,
-                            icon: Icons.price_change_rounded,
-                            iconBgColor:
-                                const Color(0xFF3B82F6).withValues(alpha: 0.15),
-                            iconColor: const Color(0xFF3B82F6),
-                            title: 'Prezzo Aggiunta Manuale',
-                            subtitle:
-                                'Costo per ciascun ingrediente scritto a mano: € ${(currentUserDocument?.prezzoAggiuntaManuale ?? 0.0).toStringAsFixed(2)}',
-                            onTap: () => _mostraDialogPrezzoManuale(
-                              context,
-                              currentUserDocument?.prezzoAggiuntaManuale ?? 0.0,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-
-                    const SizedBox(height: 24.0),
-
-                    // ── Sezione 2: Abbonamento & Account ───────────────────────
-                    _buildSectionHeader(
-                      context: context,
-                      title: 'ACCOUNT & PIANO',
-                    ),
-                    const SizedBox(height: 8.0),
-                    _buildSettingsCard(
-                      context: context,
-                      children: [
-                        _buildSettingsTile(
-                          context: context,
-                          icon: Icons.workspace_premium_rounded,
-                          iconBgColor: const Color(0xFFF59E0B).withValues(alpha: 0.15),
-                          iconColor: const Color(0xFFF59E0B),
-                          title: 'Gestisci abbonamento',
-                          subtitle: 'Piano attivo, rinnovo e fatturazione',
-                          onTap: () {
-                            context.pushNamed(
-                              PaginaAbbonamentoWidget.routeName,
-                              extra: <String, dynamic>{
-                                '__transition_info__': const TransitionInfo(
-                                  hasTransition: true,
-                                  transitionType: PageTransitionType.rightToLeft,
-                                ),
-                              },
-                            );
-                          },
-                        ),
-                        if (FFAppState().loginProvider == 'password') ...[
-                          _buildDivider(colorScheme),
-                          _buildSettingsTile(
-                            context: context,
-                            icon: Icons.lock_reset_rounded,
-                            iconBgColor: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
-                            iconColor: const Color(0xFF8B5CF6),
-                            title: 'Cambia password',
-                            subtitle: 'Aggiorna le credenziali di accesso',
-                            onTap: () {
-                              context.pushNamed(
-                                CambiaPasswordWidget.routeName,
-                                extra: <String, dynamic>{
-                                  '__transition_info__': const TransitionInfo(
-                                    hasTransition: true,
-                                    transitionType: PageTransitionType.rightToLeft,
-                                  ),
-                                },
-                              );
-                            },
-                          ),
-                        ],
-                      ],
-                    ),
-
-                    const SizedBox(height: 24.0),
-
-                    // ── Sezione 3: Legale & Info ───────────────────────────────
-                    _buildSectionHeader(
-                      context: context,
-                      title: 'INFO & PRIVACY',
-                    ),
-                    const SizedBox(height: 8.0),
-                    _buildSettingsCard(
-                      context: context,
-                      children: [
-                        _buildSettingsTile(
-                          context: context,
-                          icon: Icons.shield_outlined,
-                          iconBgColor: const Color(0xFF10B981).withValues(alpha: 0.15),
-                          iconColor: const Color(0xFF10B981),
-                          title: 'Informativa sulla privacy',
-                          subtitle: 'Trattamento dei dati personali e termini legali',
-                          onTap: () {
-                            context.pushNamed(
-                              PrivacyPolicyWidget.routeName,
-                              extra: <String, dynamic>{
-                                '__transition_info__': const TransitionInfo(
-                                  hasTransition: true,
-                                  transitionType: PageTransitionType.rightToLeft,
-                                ),
-                              },
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 36.0),
-                  ],
-                ),
-              ),
+                  ),
+                );
+              },
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildAspettoMenuSection(BuildContext context, ColorScheme colorScheme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildSectionHeader(
+          context: context,
+          title: 'ASPETTO & MENU',
+        ),
+        const SizedBox(height: 8.0),
+        _buildSettingsCard(
+          context: context,
+          children: [
+            _buildSettingsTile(
+              context: context,
+              icon: Icons.palette_rounded,
+              iconBgColor: colorScheme.primary.withValues(alpha: 0.15),
+              iconColor: colorScheme.primary,
+              title: 'Personalizzazione',
+              subtitle: 'Preset di design, stile grafico e tema',
+              trailingBadge: (currentUserDocument != null && !currentUserDocument!.hasPlus)
+                  ? _buildTierBadge('PLUS', colorScheme.primary)
+                  : null,
+              onTap: () {
+                if (currentUserDocument != null && !currentUserDocument!.hasPlus) {
+                  _mostraUpgradePrompt(
+                    context,
+                    requiredPlan: 'Plus',
+                    featureName: 'La personalizzazione grafica e del tema',
+                  );
+                  return;
+                }
+                context.pushNamed(
+                  PersonalizzazioneWidget.routeName,
+                  queryParameters: {
+                    'ristoranteRef': serializeParam(
+                      widget.ristoranteRef,
+                      ParamType.DocumentReference,
+                    ),
+                  }.withoutNulls,
+                  extra: <String, dynamic>{
+                    '__transition_info__': const TransitionInfo(
+                      hasTransition: true,
+                      transitionType: PageTransitionType.rightToLeft,
+                    ),
+                  },
+                );
+              },
+            ),
+            _buildDivider(colorScheme),
+            _buildSettingsTile(
+              context: context,
+              icon: Icons.format_list_bulleted_rounded,
+              iconBgColor: const Color(0xFF3B82F6).withValues(alpha: 0.15),
+              iconColor: const Color(0xFF3B82F6),
+              title: 'Ordina categorie',
+              subtitle: 'Organizza la sequenza delle portate nel menu',
+              onTap: () {
+                context.pushNamed(
+                  ImpostazioniCategorieWidget.routeName,
+                  extra: <String, dynamic>{
+                    '__transition_info__': const TransitionInfo(
+                      hasTransition: true,
+                      transitionType: PageTransitionType.rightToLeft,
+                    ),
+                  },
+                );
+              },
+            ),
+            _buildDivider(colorScheme),
+            _buildSettingsTile(
+              context: context,
+              icon: Icons.account_tree_rounded,
+              iconBgColor: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
+              iconColor: const Color(0xFF8B5CF6),
+              title: 'Gestione sottocategorie',
+              subtitle: 'Modifica, crea o elimina le sottocategorie del menu',
+              onTap: () {
+                context.pushNamed(
+                  ImpostazioniSottocategorieWidget.routeName,
+                  extra: <String, dynamic>{
+                    '__transition_info__': const TransitionInfo(
+                      hasTransition: true,
+                      transitionType: PageTransitionType.rightToLeft,
+                    ),
+                  },
+                );
+              },
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMutaformaSection(BuildContext context, ColorScheme colorScheme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildSectionHeader(
+          context: context,
+          title: 'MENÙ MUTAFORMA (FASCE ORARIE)',
+        ),
+        const SizedBox(height: 8.0),
+        _buildSettingsCard(
+          context: context,
+          children: [
+            _buildSettingsSwitchTile(
+              context: context,
+              icon: Icons.auto_awesome_rounded,
+              iconBgColor:
+                  const Color(0xFF6366F1).withValues(alpha: 0.15),
+              iconColor: const Color(0xFF6366F1),
+              title: 'Attiva MenÙ Mutaforma',
+              subtitle:
+                  'Mostra ai clienti il menù adatto in base all\'orario (Colazione, Pranzo, Aperitivo, Cena). Gli altri menù saranno invisibili.',
+              trailingBadge: (currentUserDocument != null && !currentUserDocument!.hasPlus)
+                  ? _buildTierBadge('PLUS', const Color(0xFF6366F1))
+                  : null,
+              value: valueOrDefault<bool>(
+                  currentUserDocument?.menuMutaformaAttivo, false),
+              onChanged: (val) async {
+                if (currentUserDocument != null && !currentUserDocument!.hasPlus) {
+                  _mostraUpgradePrompt(
+                    context,
+                    requiredPlan: 'Plus',
+                    featureName: 'I Menù Mutaforma per fasce orarie',
+                  );
+                  return;
+                }
+                await currentUserReference?.update({
+                  'menu_mutaforma_attivo': val,
+                });
+                safeSetState(() {});
+              },
+            ),
+            if (valueOrDefault<bool>(
+                currentUserDocument?.menuMutaformaAttivo, false)) ...[
+              _buildDivider(colorScheme),
+              _buildSettingsTile(
+                context: context,
+                icon: Icons.schedule_rounded,
+                iconBgColor:
+                    const Color(0xFF4F46E5).withValues(alpha: 0.15),
+                iconColor: const Color(0xFF4F46E5),
+                title: 'Configura Menù & Orari',
+                subtitle:
+                    'Crea fasce orarie e assegna quali categorie mostrare ai clienti',
+                onTap: () {
+                  context.pushNamed(
+                    ImpostazioniMutaformaWidget.routeName,
+                    extra: <String, dynamic>{
+                      '__transition_info__': const TransitionInfo(
+                        hasTransition: true,
+                        transitionType:
+                            PageTransitionType.rightToLeft,
+                      ),
+                    },
+                  );
+                },
+              ),
+            ],
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildJukeboxSection(BuildContext context, ColorScheme colorScheme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildSectionHeader(
+          context: context,
+          title: 'INTRATTENIMENTO & JUKEBOX',
+        ),
+        const SizedBox(height: 8.0),
+        _buildSettingsCard(
+          context: context,
+          children: [
+            _buildSettingsTile(
+              context: context,
+              icon: Icons.music_note_rounded,
+              iconBgColor:
+                  const Color(0xFF1DB954).withValues(alpha: 0.15),
+              iconColor: const Color(0xFF1DB954),
+              title: 'Jukebox & Musica',
+              subtitle:
+                  'Consenti ai clienti di richiedere brani dalla tua playlist Spotify',
+              trailingBadge: (currentUserDocument != null && !currentUserDocument!.hasUltra)
+                  ? _buildTierBadge('ULTRA', const Color(0xFF7C3AED))
+                  : null,
+              onTap: () {
+                if (currentUserDocument != null && !currentUserDocument!.hasUltra) {
+                  _mostraUpgradePrompt(
+                    context,
+                    requiredPlan: 'Ultra',
+                    featureName: 'Il Jukebox Digitale e la musica per i clienti',
+                  );
+                  return;
+                }
+                context.pushNamed(
+                  ImpostazioniJukeboxWidget.routeName,
+                  extra: <String, dynamic>{
+                    '__transition_info__': const TransitionInfo(
+                      hasTransition: true,
+                      transitionType:
+                          PageTransitionType.rightToLeft,
+                    ),
+                  },
+                );
+              },
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDispensaSection(BuildContext context, ColorScheme colorScheme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildSectionHeader(
+          context: context,
+          title: 'DISPENSA & INGREDIENTI',
+        ),
+        const SizedBox(height: 8.0),
+        _buildSettingsCard(
+          context: context,
+          children: [
+            _buildSettingsSwitchTile(
+              context: context,
+              icon: Icons.kitchen_rounded,
+              iconBgColor:
+                  const Color(0xFFF97316).withValues(alpha: 0.15),
+              iconColor: const Color(0xFFF97316),
+              title: 'Gestione Dispensa',
+              subtitle:
+                  'Traccia scorte, autocompleta gli ingredienti dei piatti e sbarra quelli esauriti nel menu cliente',
+              value: valueOrDefault<bool>(
+                  currentUserDocument?.dispensaAttiva, false),
+              onChanged: (val) async {
+                await currentUserReference?.update({
+                  'dispensa_attiva': val,
+                });
+                safeSetState(() {});
+              },
+            ),
+            if (valueOrDefault<bool>(
+                currentUserDocument?.dispensaAttiva, false)) ...[
+              _buildDivider(colorScheme),
+              _buildSettingsTile(
+                context: context,
+                icon: Icons.inventory_2_rounded,
+                iconBgColor:
+                    const Color(0xFFEA580C).withValues(alpha: 0.15),
+                iconColor: const Color(0xFFEA580C),
+                title: 'Apri Dispensa',
+                subtitle:
+                    'Visualizza ingredienti, gestisci scorte, esauriti e prezzi aggiunte',
+                onTap: () {
+                  context.pushNamed(
+                    GestioneDispensaWidget.routeName,
+                    queryParameters: {
+                      'ristoranteRef': serializeParam(
+                        widget.ristoranteRef,
+                        ParamType.DocumentReference,
+                      ),
+                    }.withoutNulls,
+                    extra: <String, dynamic>{
+                      '__transition_info__': const TransitionInfo(
+                        hasTransition: true,
+                        transitionType:
+                            PageTransitionType.rightToLeft,
+                      ),
+                    },
+                  );
+                },
+              ),
+            ],
+            _buildDivider(colorScheme),
+            _buildSettingsSwitchTile(
+              context: context,
+              icon: Icons.tune_rounded,
+              iconBgColor:
+                  const Color(0xFF10B981).withValues(alpha: 0.15),
+              iconColor: const Color(0xFF10B981),
+              title: 'Modifiche ai Piatti dai Clienti',
+              subtitle: valueOrDefault<bool>(
+                      currentUserDocument?.dispensaAttiva, false)
+                  ? 'I clienti potranno aggiungere ingredienti dalla tua dispensa (con i prezzi impostati) o togliere ingredienti'
+                  : 'I clienti potranno scrivere a mano le aggiunte desiderate o togliere ingredienti',
+              value: valueOrDefault<bool>(
+                  currentUserDocument?.modifichePiattiAttive, true),
+              onChanged: (val) async {
+                await currentUserReference?.update({
+                  'modifiche_piatti_attive': val,
+                });
+                safeSetState(() {});
+              },
+            ),
+            if (!valueOrDefault<bool>(
+                    currentUserDocument?.dispensaAttiva, false) &&
+                valueOrDefault<bool>(
+                    currentUserDocument?.modifichePiattiAttive, true)) ...[
+              _buildDivider(colorScheme),
+              _buildSettingsTile(
+                context: context,
+                icon: Icons.price_change_rounded,
+                iconBgColor:
+                    const Color(0xFF3B82F6).withValues(alpha: 0.15),
+                iconColor: const Color(0xFF3B82F6),
+                title: 'Prezzo Aggiunta Manuale',
+                subtitle:
+                    'Costo per ciascun ingrediente scritto a mano: € ${(currentUserDocument?.prezzoAggiuntaManuale ?? 0.0).toStringAsFixed(2)}',
+                onTap: () => _mostraDialogPrezzoManuale(
+                  context,
+                  currentUserDocument?.prezzoAggiuntaManuale ?? 0.0,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAccountSection(BuildContext context, ColorScheme colorScheme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildSectionHeader(
+          context: context,
+          title: 'ACCOUNT & PIANO',
+        ),
+        const SizedBox(height: 8.0),
+        _buildSettingsCard(
+          context: context,
+          children: [
+            _buildSettingsTile(
+              context: context,
+              icon: Icons.workspace_premium_rounded,
+              iconBgColor: const Color(0xFFF59E0B).withValues(alpha: 0.15),
+              iconColor: const Color(0xFFF59E0B),
+              title: 'Gestisci abbonamento',
+              subtitle: 'Piano attivo, rinnovo e fatturazione',
+              onTap: () {
+                context.pushNamed(
+                  PaginaAbbonamentoWidget.routeName,
+                  extra: <String, dynamic>{
+                    '__transition_info__': const TransitionInfo(
+                      hasTransition: true,
+                      transitionType: PageTransitionType.rightToLeft,
+                    ),
+                  },
+                );
+              },
+            ),
+            if (FFAppState().loginProvider == 'password') ...[
+              _buildDivider(colorScheme),
+              _buildSettingsTile(
+                context: context,
+                icon: Icons.lock_reset_rounded,
+                iconBgColor: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
+                iconColor: const Color(0xFF8B5CF6),
+                title: 'Cambia password',
+                subtitle: 'Aggiorna le credenziali di accesso',
+                onTap: () {
+                  context.pushNamed(
+                    CambiaPasswordWidget.routeName,
+                    extra: <String, dynamic>{
+                      '__transition_info__': const TransitionInfo(
+                        hasTransition: true,
+                        transitionType: PageTransitionType.rightToLeft,
+                      ),
+                    },
+                  );
+                },
+              ),
+            ],
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPrivacySection(BuildContext context, ColorScheme colorScheme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildSectionHeader(
+          context: context,
+          title: 'INFO & PRIVACY',
+        ),
+        const SizedBox(height: 8.0),
+        _buildSettingsCard(
+          context: context,
+          children: [
+            _buildSettingsTile(
+              context: context,
+              icon: Icons.shield_outlined,
+              iconBgColor: const Color(0xFF10B981).withValues(alpha: 0.15),
+              iconColor: const Color(0xFF10B981),
+              title: 'Informativa sulla privacy',
+              subtitle: 'Trattamento dei dati personali e termini legali',
+              onTap: () {
+                context.pushNamed(
+                  PrivacyPolicyWidget.routeName,
+                  extra: <String, dynamic>{
+                    '__transition_info__': const TransitionInfo(
+                      hasTransition: true,
+                      transitionType: PageTransitionType.rightToLeft,
+                    ),
+                  },
+                );
+              },
+            ),
+          ],
+        ),
+      ],
     );
   }
 

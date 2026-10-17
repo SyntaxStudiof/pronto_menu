@@ -427,97 +427,297 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
         ),
         body: SafeArea(
           top: true,
-          child: Align(
-            alignment: Alignment.topCenter,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 680.0),
-              child: Column(
-                children: [
-                  // ═════════════════════════════════════════════════════════════
-                  // 📌 AREA FISSA IN ALTO (STICKY / BLOCCATA DURANTE LO SCROLL)
-                  // ═════════════════════════════════════════════════════════════
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // 1. Finestra di Anteprima Elegante (Collapsible con Theme Toggle integrato)
-                        _buildStickyPreviewCard(
-                          context: context,
-                          themeProvider: themeProvider,
-                          style: currentStyle,
-                          primaryColor: primaryColor,
-                          isDark: isDark,
-                          customTheme: customTheme,
-                          titleFont: themeProvider.titleFont,
-                          bodyFont: themeProvider.bodyFont,
-                        ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final isDesktop = constraints.maxWidth >= 900 || widget.embedded;
 
-                        const SizedBox(height: 8.0),
-
-                        // 2. Switcher principale a 3 sezioni simmetriche (senza scroll orizzontale)
-                        _buildMain3TabSwitcher(
-                          context: context,
-                          primaryColor: primaryColor,
-                          isDark: isDark,
-                        ),
-
-                        const SizedBox(height: 6.0),
-                      ],
-                    ),
-                  ),
-
-                  // ═════════════════════════════════════════════════════════════
-                  // 📜 AREA SCROLLABILE (3 MACRO-AREE ORGANIZZATE)
-                  // ═════════════════════════════════════════════════════════════
-                  Expanded(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0,
-                        vertical: 6.0,
-                      ),
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 250),
-                        child: switch (_mainTab) {
-                          0 => _buildBrandAndStyleTab(
-                              key: const ValueKey('brand_style_tab'),
+              if (isDesktop) {
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // ═════════════════════════════════════════════════════════
+                    // COLONNA SINISTRA: IMPOSTAZIONI, TAB & SALVATAGGIO (~60%)
+                    // ═════════════════════════════════════════════════════════
+                    Expanded(
+                      flex: 6,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // Switcher principale dei Tab
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(28.0, 20.0, 28.0, 10.0),
+                            child: _buildMain3TabSwitcher(
                               context: context,
-                              themeProvider: themeProvider,
-                              currentStyle: currentStyle,
                               primaryColor: primaryColor,
                               isDark: isDark,
                             ),
-                          1 => _buildDishesAndBadgesTab(
-                              key: const ValueKey('dishes_badges_tab'),
-                              context: context,
-                              themeProvider: themeProvider,
-                              primaryColor: primaryColor,
-                              isDark: isDark,
+                          ),
+
+                          // Area scrollabile dei controlli
+                          Expanded(
+                            child: SingleChildScrollView(
+                              padding: const EdgeInsets.fromLTRB(28.0, 8.0, 28.0, 24.0),
+                              child: AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 250),
+                                child: switch (_mainTab) {
+                                  0 => _buildBrandAndStyleTab(
+                                      key: const ValueKey('brand_style_tab'),
+                                      context: context,
+                                      themeProvider: themeProvider,
+                                      currentStyle: currentStyle,
+                                      primaryColor: primaryColor,
+                                      isDark: isDark,
+                                    ),
+                                  1 => _buildDishesAndBadgesTab(
+                                      key: const ValueKey('dishes_badges_tab'),
+                                      context: context,
+                                      themeProvider: themeProvider,
+                                      primaryColor: primaryColor,
+                                      isDark: isDark,
+                                    ),
+                                  _ => _buildBackgroundAndCoverTab(
+                                      key: const ValueKey('bg_cover_tab'),
+                                      context: context,
+                                      themeProvider: themeProvider,
+                                      primaryColor: primaryColor,
+                                      isDark: isDark,
+                                    ),
+                                },
+                              ),
                             ),
-                          _ => _buildBackgroundAndCoverTab(
-                              key: const ValueKey('bg_cover_tab'),
-                              context: context,
-                              themeProvider: themeProvider,
-                              primaryColor: primaryColor,
-                              isDark: isDark,
-                            ),
-                        },
+                          ),
+
+                          // Barra di pubblicazione fissa in basso
+                          _buildPublishBottomBar(
+                            context: context,
+                            themeProvider: themeProvider,
+                            primaryColor: primaryColor,
+                            isDark: isDark,
+                          ),
+                        ],
                       ),
                     ),
-                  ),
 
-                  // ═════════════════════════════════════════════════════════════
-                  // 🚀 BOTTONE SALVA & PUBBLICA NEL MENÙ (STICKY BOTTOM BAR)
-                  // ═════════════════════════════════════════════════════════════
-                  _buildPublishBottomBar(
-                    context: context,
-                    themeProvider: themeProvider,
-                    primaryColor: primaryColor,
-                    isDark: isDark,
+                    // Divisore verticale
+                    VerticalDivider(
+                      width: 1.0,
+                      thickness: 1.0,
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.08)
+                          : const Color(0xFFE2E8F0),
+                    ),
+
+                    // ═════════════════════════════════════════════════════════
+                    // COLONNA DESTRA: LIVE PREVIEW SEMPRE VISIBILE (~40%)
+                    // ═════════════════════════════════════════════════════════
+                    Expanded(
+                      flex: 5,
+                      child: Container(
+                        color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+                        padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 24.0),
+                        child: Center(
+                          child: SingleChildScrollView(
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 520.0),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  // Header Card Anteprima Live
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Container(
+                                            width: 10.0,
+                                            height: 10.0,
+                                            decoration: const BoxDecoration(
+                                              color: Color(0xFF10B981),
+                                              shape: BoxShape.circle,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8.0),
+                                          Text(
+                                            'ANTEPRIMA LIVE CLIENTE',
+                                            style: TextStyle(
+                                              fontSize: 12.0,
+                                              fontWeight: FontWeight.bold,
+                                              letterSpacing: 0.8,
+                                              color: isDark
+                                                  ? Colors.white70
+                                                  : const Color(0xFF475569),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10.0, vertical: 4.0),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF10B981)
+                                              .withValues(alpha: 0.12),
+                                          borderRadius: BorderRadius.circular(6.0),
+                                        ),
+                                        child: const Text(
+                                          'Sincronizzato in tempo reale',
+                                          style: TextStyle(
+                                            fontSize: 11.0,
+                                            fontWeight: FontWeight.w600,
+                                            color: Color(0xFF10B981),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16.0),
+
+                                  // Preview Card integrata con forceExpanded
+                                  _buildStickyPreviewCard(
+                                    context: context,
+                                    themeProvider: themeProvider,
+                                    style: currentStyle,
+                                    primaryColor: primaryColor,
+                                    isDark: isDark,
+                                    customTheme: customTheme,
+                                    titleFont: themeProvider.titleFont,
+                                    bodyFont: themeProvider.bodyFont,
+                                    forceExpanded: true,
+                                  ),
+
+                                  const SizedBox(height: 16.0),
+
+                                  // Box di aiuto per il ristoratore
+                                  Container(
+                                    padding: const EdgeInsets.all(14.0),
+                                    decoration: BoxDecoration(
+                                      color: isDark
+                                          ? Colors.white.withValues(alpha: 0.04)
+                                          : Colors.white,
+                                      borderRadius: BorderRadius.circular(12.0),
+                                      border: Border.all(
+                                        color: isDark
+                                            ? Colors.white.withValues(alpha: 0.08)
+                                            : const Color(0xFFE2E8F0),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.tips_and_updates_outlined,
+                                          size: 20.0,
+                                          color: colorScheme.primary,
+                                        ),
+                                        const SizedBox(width: 10.0),
+                                        Expanded(
+                                          child: Text(
+                                            'Tutte le modifiche a font, colori e layout dei piatti si aggiornano istantaneamente in questa card prima di essere pubblicate.',
+                                            style: TextStyle(
+                                              fontSize: 12.0,
+                                              height: 1.35,
+                                              color: isDark
+                                                  ? const Color(0xFF94A3B8)
+                                                  : const Color(0xFF64748B),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }
+
+              // Modalità Mobile classica
+              return Align(
+                alignment: Alignment.topCenter,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 680.0),
+                  child: Column(
+                    children: [
+                      // Area fissa in alto
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _buildStickyPreviewCard(
+                              context: context,
+                              themeProvider: themeProvider,
+                              style: currentStyle,
+                              primaryColor: primaryColor,
+                              isDark: isDark,
+                              customTheme: customTheme,
+                              titleFont: themeProvider.titleFont,
+                              bodyFont: themeProvider.bodyFont,
+                            ),
+                            const SizedBox(height: 8.0),
+                            _buildMain3TabSwitcher(
+                              context: context,
+                              primaryColor: primaryColor,
+                              isDark: isDark,
+                            ),
+                            const SizedBox(height: 6.0),
+                          ],
+                        ),
+                      ),
+
+                      // Area scrollabile
+                      Expanded(
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16.0,
+                            vertical: 6.0,
+                          ),
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 250),
+                            child: switch (_mainTab) {
+                              0 => _buildBrandAndStyleTab(
+                                  key: const ValueKey('brand_style_tab'),
+                                  context: context,
+                                  themeProvider: themeProvider,
+                                  currentStyle: currentStyle,
+                                  primaryColor: primaryColor,
+                                  isDark: isDark,
+                                ),
+                              1 => _buildDishesAndBadgesTab(
+                                  key: const ValueKey('dishes_badges_tab'),
+                                  context: context,
+                                  themeProvider: themeProvider,
+                                  primaryColor: primaryColor,
+                                  isDark: isDark,
+                                ),
+                              _ => _buildBackgroundAndCoverTab(
+                                  key: const ValueKey('bg_cover_tab'),
+                                  context: context,
+                                  themeProvider: themeProvider,
+                                  primaryColor: primaryColor,
+                                  isDark: isDark,
+                                ),
+                            },
+                          ),
+                        ),
+                      ),
+
+                      // Bottone Salva & Pubblica
+                      _buildPublishBottomBar(
+                        context: context,
+                        themeProvider: themeProvider,
+                        primaryColor: primaryColor,
+                        isDark: isDark,
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           ),
         ),
       ),
@@ -666,6 +866,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     required AppCustomTheme? customTheme,
     required String titleFont,
     required String bodyFont,
+    bool forceExpanded = false,
   }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
@@ -679,6 +880,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
       theme: theme,
     );
     final dishLayout = themeProvider.dishCardLayout;
+    final isExpanded = forceExpanded || _isPreviewExpanded;
 
     final Color contrastPrimaryText = isDark
         ? (primaryColor.computeLuminance() < 0.40
@@ -751,7 +953,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                 ),
                 const SizedBox(width: 8.0),
                 // Se collassata, mostriamo subito il nome del preset
-                if (!_isPreviewExpanded) ...[
+                if (!isExpanded) ...[
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
                     decoration: BoxDecoration(
@@ -793,33 +995,35 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                     ),
                   ),
                 ),
-                const SizedBox(width: 4.0),
-                // Tasto espandi / riduci anteprima per dare più spazio
-                Tooltip(
-                  message: _isPreviewExpanded ? 'Riduci anteprima' : 'Espandi anteprima',
-                  child: InkWell(
-                    onTap: () => setState(() => _isPreviewExpanded = !_isPreviewExpanded),
-                    borderRadius: BorderRadius.circular(6.0),
-                    child: Container(
-                      padding: const EdgeInsets.all(4.5),
-                      decoration: BoxDecoration(
-                        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
-                        borderRadius: BorderRadius.circular(6.0),
-                      ),
-                      child: Icon(
-                        _isPreviewExpanded
-                            ? Icons.keyboard_arrow_up_rounded
-                            : Icons.keyboard_arrow_down_rounded,
-                        size: 15.0,
-                        color: colorScheme.onSurfaceVariant,
+                if (!forceExpanded) ...[
+                  const SizedBox(width: 4.0),
+                  // Tasto espandi / riduci anteprima per dare più spazio
+                  Tooltip(
+                    message: _isPreviewExpanded ? 'Riduci anteprima' : 'Espandi anteprima',
+                    child: InkWell(
+                      onTap: () => setState(() => _isPreviewExpanded = !_isPreviewExpanded),
+                      borderRadius: BorderRadius.circular(6.0),
+                      child: Container(
+                        padding: const EdgeInsets.all(4.5),
+                        decoration: BoxDecoration(
+                          color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+                          borderRadius: BorderRadius.circular(6.0),
+                        ),
+                        child: Icon(
+                          _isPreviewExpanded
+                              ? Icons.keyboard_arrow_up_rounded
+                              : Icons.keyboard_arrow_down_rounded,
+                          size: 15.0,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     ),
                   ),
-                ),
+                ],
               ],
             ),
 
-            if (_isPreviewExpanded) ...[
+            if (isExpanded) ...[
               const SizedBox(height: 8.0),
               // Sub-header tags: layout & style
               Row(

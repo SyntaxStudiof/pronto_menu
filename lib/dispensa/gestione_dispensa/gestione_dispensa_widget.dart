@@ -594,7 +594,7 @@ class _GestioneDispensaWidgetState extends State<GestioneDispensaWidget> {
           child: Align(
             alignment: Alignment.topCenter,
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 800.0),
+              constraints: BoxConstraints(maxWidth: widget.embedded ? 1360.0 : 800.0),
               child: StreamBuilder<List<DispensaRecord>>(
                 stream: queryDispensaRecord(
                   queryBuilder: (q) => q.where('proprietario', isEqualTo: _targetRistoranteRef),
@@ -793,13 +793,34 @@ class _GestioneDispensaWidgetState extends State<GestioneDispensaWidget> {
                             ? _buildEmptyStateInitial(context)
                             : listaFiltrata.isEmpty
                                 ? _buildEmptyStateNoResults(context, querySearch)
-                                : ListView.separated(
-                                    padding: const EdgeInsets.fromLTRB(16.0, 4.0, 16.0, 24.0),
-                                    itemCount: listaFiltrata.length,
-                                    separatorBuilder: (_, __) => const SizedBox(height: 10.0),
-                                    itemBuilder: (context, index) {
-                                      final item = listaFiltrata[index];
-                                      return _buildIngredientCard(context, item);
+                                : LayoutBuilder(
+                                    builder: (context, constraints) {
+                                      final isWide = widget.embedded || constraints.maxWidth >= 760;
+                                      if (isWide) {
+                                        return GridView.builder(
+                                          padding: const EdgeInsets.fromLTRB(16.0, 4.0, 16.0, 24.0),
+                                          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                                            maxCrossAxisExtent: 460.0,
+                                            mainAxisExtent: 110.0,
+                                            crossAxisSpacing: 12.0,
+                                            mainAxisSpacing: 12.0,
+                                          ),
+                                          itemCount: listaFiltrata.length,
+                                          itemBuilder: (context, index) {
+                                            final item = listaFiltrata[index];
+                                            return _buildIngredientCard(context, item);
+                                          },
+                                        );
+                                      }
+                                      return ListView.separated(
+                                        padding: const EdgeInsets.fromLTRB(16.0, 4.0, 16.0, 24.0),
+                                        itemCount: listaFiltrata.length,
+                                        separatorBuilder: (_, __) => const SizedBox(height: 10.0),
+                                        itemBuilder: (context, index) {
+                                          final item = listaFiltrata[index];
+                                          return _buildIngredientCard(context, item);
+                                        },
+                                      );
                                     },
                                   ),
                       ),
