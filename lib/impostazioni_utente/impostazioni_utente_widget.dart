@@ -12,9 +12,11 @@ class ImpostazioniUtenteWidget extends StatefulWidget {
   const ImpostazioniUtenteWidget({
     super.key,
     this.ristoranteRef,
+    this.embedded = false,
   });
 
   final DocumentReference? ristoranteRef;
+  final bool embedded;
 
   static String routeName = 'impostazioniUtente';
   static String routePath = '/impostazioniUtente';
@@ -55,7 +57,9 @@ class _ImpostazioniUtenteWidgetState extends State<ImpostazioniUtenteWidget> {
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: colorScheme.surfaceContainerLowest,
-        appBar: AppBar(
+        appBar: widget.embedded
+            ? null
+            : AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0.0,
           scrolledUnderElevation: 0.0,

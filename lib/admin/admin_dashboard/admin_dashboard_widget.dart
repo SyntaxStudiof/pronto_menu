@@ -15,7 +15,12 @@ import 'admin_dashboard_model.dart';
 export 'admin_dashboard_model.dart';
 
 class AdminDashboardWidget extends StatefulWidget {
-  const AdminDashboardWidget({super.key});
+  const AdminDashboardWidget({
+    super.key,
+    this.embedded = false,
+  });
+
+  final bool embedded;
 
   static String routeName = 'AdminDashboard';
   static String routePath = '/adminDashboard';
@@ -108,7 +113,9 @@ class _AdminDashboardWidgetState extends State<AdminDashboardWidget> {
                 child: const AdminDrawerMenuWidget(),
               ),
             ),
-            appBar: AppBar(
+            appBar: widget.embedded
+                ? null
+                : AppBar(
               automaticallyImplyLeading: false,
               leading: const SizedBox(width: 48.0),
               title: Row(

@@ -13,9 +13,11 @@ class GestioneDispensaWidget extends StatefulWidget {
   const GestioneDispensaWidget({
     super.key,
     this.ristoranteRef,
+    this.embedded = false,
   });
 
   final DocumentReference? ristoranteRef;
+  final bool embedded;
 
   static String routeName = 'gestione_dispensa';
   static String routePath = '/gestioneDispensa';
@@ -517,7 +519,9 @@ class _GestioneDispensaWidgetState extends State<GestioneDispensaWidget> {
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: colorScheme.surfaceContainerLowest,
-        appBar: AppBar(
+        appBar: widget.embedded
+            ? null
+            : AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0.0,
           scrolledUnderElevation: 0.0,

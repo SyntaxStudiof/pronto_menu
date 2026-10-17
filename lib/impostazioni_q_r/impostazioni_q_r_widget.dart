@@ -8,7 +8,12 @@ import 'impostazioni_q_r_model.dart';
 export 'impostazioni_q_r_model.dart';
 
 class ImpostazioniQRWidget extends StatefulWidget {
-  const ImpostazioniQRWidget({super.key});
+  const ImpostazioniQRWidget({
+    super.key,
+    this.embedded = false,
+  });
+
+  final bool embedded;
 
   static String routeName = 'ImpostazioniQR';
   static String routePath = '/impostazioniQR';
@@ -55,7 +60,9 @@ class _ImpostazioniQRWidgetState extends State<ImpostazioniQRWidget> {
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: theme.scaffoldBackgroundColor,
-        appBar: AppBar(
+        appBar: widget.embedded
+            ? null
+            : AppBar(
           backgroundColor: theme.appBarTheme.backgroundColor ?? theme.cardColor,
           automaticallyImplyLeading: false,
           leading: IconButton(

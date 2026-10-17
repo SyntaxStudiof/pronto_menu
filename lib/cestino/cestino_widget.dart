@@ -16,7 +16,12 @@ export 'cestino_model.dart';
 
 /// qua le pagine rimarrano per 7 ulteriori giorni
 class CestinoWidget extends StatefulWidget {
-  const CestinoWidget({super.key});
+  const CestinoWidget({
+    super.key,
+    this.embedded = false,
+  });
+
+  final bool embedded;
 
   static String routeName = 'Cestino';
   static String routePath = '/cestino';
@@ -104,7 +109,9 @@ class _CestinoWidgetState extends State<CestinoWidget> {
             size: 28.0,
           ),
         ),
-        appBar: AppBar(
+        appBar: widget.embedded
+            ? null
+            : AppBar(
           automaticallyImplyLeading: false,
           leading: FlutterFlowIconButton(
             borderRadius: 30.0,

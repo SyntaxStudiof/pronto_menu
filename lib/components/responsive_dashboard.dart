@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/dashboard_ristorante/desktop_orders_table_view.dart';
+import '/dashboard_ristorante/desktop_menu_view.dart';
+import '/dashboard_ristorante/desktop_client_preview_view.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/theme_provider.dart';
 import '/index.dart';
@@ -89,35 +91,113 @@ class DashboardDesktopShell extends StatefulWidget {
 }
 
 class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
-  late int _activeNavIndex;
+  late String _currentViewId;
   bool _forceMobilePreview = false;
 
   @override
   void initState() {
     super.initState();
-    _activeNavIndex = widget.initialNavIndex;
+    switch (widget.initialNavIndex) {
+      case 1:
+        _currentViewId = 'ordini';
+        break;
+      case 2:
+        _currentViewId = 'storico';
+        break;
+      default:
+        _currentViewId = 'menu';
+    }
   }
 
-  final List<_SidebarSection> _navSections = const [
-    _SidebarSection(
-      index: 0,
-      title: 'Menù & Categorie',
-      subtitle: 'Gestione piatti, prezzi e categorie',
-      icon: Icons.restaurant_menu_rounded,
-    ),
-    _SidebarSection(
-      index: 1,
-      title: 'Ordini Live',
-      subtitle: 'Comande in cucina in tempo reale',
-      icon: Icons.soup_kitchen_rounded,
-    ),
-    _SidebarSection(
-      index: 2,
-      title: 'Storico & Cassa',
-      subtitle: 'Comande completate e riepilogo vendite',
-      icon: Icons.receipt_long_rounded,
-    ),
-  ];
+  _SidebarSection _getSectionInfo(String viewId) {
+    switch (viewId) {
+      case 'ordini':
+        return const _SidebarSection(
+          id: 'ordini',
+          title: 'Ordini Live',
+          subtitle: 'Comande in cucina in tempo reale',
+          icon: Icons.soup_kitchen_rounded,
+        );
+      case 'storico':
+        return const _SidebarSection(
+          id: 'storico',
+          title: 'Storico & Cassa',
+          subtitle: 'Comande completate e riepilogo vendite',
+          icon: Icons.receipt_long_rounded,
+        );
+      case 'anteprima_cliente':
+        return const _SidebarSection(
+          id: 'anteprima_cliente',
+          title: 'Anteprima Menù Cliente',
+          subtitle: 'Visualizzazione fedele su smartphone',
+          icon: Icons.visibility_rounded,
+        );
+      case 'qr_code':
+        return const _SidebarSection(
+          id: 'qr_code',
+          title: 'QR Code Menù',
+          subtitle: 'Generatore, stampa e download del QR code',
+          icon: Icons.qr_code_2_rounded,
+        );
+      case 'personalizzazione':
+        return const _SidebarSection(
+          id: 'personalizzazione',
+          title: 'Personalizza Stile',
+          subtitle: 'Temi, palette colori, font e layout piatti',
+          icon: Icons.palette_rounded,
+        );
+      case 'dispensa':
+        return const _SidebarSection(
+          id: 'dispensa',
+          title: 'Gestione Dispensa',
+          subtitle: 'Giacenze, scorte e ingredienti esauriti',
+          icon: Icons.kitchen_rounded,
+        );
+      case 'cestino':
+        return const _SidebarSection(
+          id: 'cestino',
+          title: 'Cestino Piatti',
+          subtitle: 'Piatti eliminati temporaneamente',
+          icon: Icons.delete_outline_rounded,
+        );
+      case 'profilo':
+        return const _SidebarSection(
+          id: 'profilo',
+          title: 'Il mio Profilo',
+          subtitle: 'Dati anagrafici e del ristorante',
+          icon: Icons.person_rounded,
+        );
+      case 'impostazioni':
+        return const _SidebarSection(
+          id: 'impostazioni',
+          title: 'Impostazioni',
+          subtitle: 'Configurazioni generali e preferenze',
+          icon: Icons.settings_rounded,
+        );
+      case 'supporto':
+        return const _SidebarSection(
+          id: 'supporto',
+          title: 'Supporto Clienti',
+          subtitle: 'Assistenza e ticket per il ristoratore',
+          icon: Icons.help_outline_rounded,
+        );
+      case 'admin':
+        return const _SidebarSection(
+          id: 'admin',
+          title: 'Admin Dashboard',
+          subtitle: 'Pannello di controllo amministrativo',
+          icon: Icons.admin_panel_settings_rounded,
+        );
+      case 'menu':
+      default:
+        return const _SidebarSection(
+          id: 'menu',
+          title: 'Menù & Categorie',
+          subtitle: 'Gestione piatti, prezzi e categorie',
+          icon: Icons.restaurant_menu_rounded,
+        );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -151,10 +231,7 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
         ? widget.userDoc!.displayName
         : (currentUserDisplayName.isNotEmpty ? currentUserDisplayName : 'Il tuo Ristorante');
 
-    final activeSection = _navSections.firstWhere(
-      (s) => s.index == _activeNavIndex,
-      orElse: () => _navSections[0],
-    );
+    final activeSection = _getSectionInfo(_currentViewId);
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
@@ -333,15 +410,15 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
                       _buildSidebarItem(
                         icon: Icons.restaurant_menu_rounded,
                         title: 'Menù & Categorie',
-                        isSelected: _activeNavIndex == 0,
+                        isSelected: _currentViewId == 'menu',
                         colorScheme: colorScheme,
                         isDark: isDark,
-                        onTap: () => setState(() => _activeNavIndex = 0),
+                        onTap: () => setState(() => _currentViewId = 'menu'),
                       ),
                       _buildSidebarItem(
                         icon: Icons.soup_kitchen_rounded,
                         title: 'Ordini Live',
-                        isSelected: _activeNavIndex == 1,
+                        isSelected: _currentViewId == 'ordini',
                         colorScheme: colorScheme,
                         isDark: isDark,
                         badgeCountStream: queryOrdersRecord(
@@ -349,15 +426,15 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
                               .where('visto', isEqualTo: false)
                               .where('stato_ordine', isEqualTo: 'in_attesa'),
                         ),
-                        onTap: () => setState(() => _activeNavIndex = 1),
+                        onTap: () => setState(() => _currentViewId = 'ordini'),
                       ),
                       _buildSidebarItem(
                         icon: Icons.receipt_long_rounded,
                         title: 'Storico & Cassa',
-                        isSelected: _activeNavIndex == 2,
+                        isSelected: _currentViewId == 'storico',
                         colorScheme: colorScheme,
                         isDark: isDark,
-                        onTap: () => setState(() => _activeNavIndex = 2),
+                        onTap: () => setState(() => _currentViewId = 'storico'),
                       ),
 
                       const SizedBox(height: 14.0),
@@ -365,86 +442,48 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
                       _buildSidebarItem(
                         icon: Icons.visibility_rounded,
                         title: 'Vedi come Cliente',
-                        isSelected: false,
+                        isSelected: _currentViewId == 'anteprima_cliente',
                         colorScheme: colorScheme,
                         isDark: isDark,
                         iconColor: const Color(0xFF10B981),
-                        onTap: () {
-                          context.pushNamed(
-                            HubClienteWidget.routeName,
-                            queryParameters: {
-                              'ristoranteRef': serializeParam(
-                                docRef,
-                                ParamType.DocumentReference,
-                              ),
-                              'isAnteprima': serializeParam(
-                                true,
-                                ParamType.bool,
-                              ),
-                            }.withoutNulls,
-                          );
-                        },
+                        onTap: () => setState(() => _currentViewId = 'anteprima_cliente'),
                       ),
                       _buildSidebarItem(
                         icon: Icons.qr_code_2_rounded,
                         title: 'QR Code Menù',
-                        isSelected: false,
+                        isSelected: _currentViewId == 'qr_code',
                         colorScheme: colorScheme,
                         isDark: isDark,
                         iconColor: const Color(0xFF0EA5E9),
-                        onTap: () {
-                          context.pushNamed(ImpostazioniQRWidget.routeName);
-                        },
+                        onTap: () => setState(() => _currentViewId = 'qr_code'),
                       ),
                       _buildSidebarItem(
                         icon: Icons.palette_rounded,
                         title: 'Personalizza Stile',
-                        isSelected: false,
+                        isSelected: _currentViewId == 'personalizzazione',
                         colorScheme: colorScheme,
                         isDark: isDark,
                         iconColor: const Color(0xFF8B5CF6),
-                        onTap: () {
-                          context.pushNamed(
-                            PersonalizzazioneWidget.routeName,
-                            queryParameters: {
-                              'ristoranteRef': serializeParam(
-                                docRef,
-                                ParamType.DocumentReference,
-                              ),
-                            }.withoutNulls,
-                          );
-                        },
+                        onTap: () => setState(() => _currentViewId = 'personalizzazione'),
                       ),
                       if (widget.userDoc?.dispensaAttiva == true)
                         _buildSidebarItem(
                           icon: Icons.kitchen_rounded,
                           title: 'Dispensa',
-                          isSelected: false,
+                          isSelected: _currentViewId == 'dispensa',
                           colorScheme: colorScheme,
                           isDark: isDark,
                           iconColor: const Color(0xFFF97316),
-                          onTap: () {
-                            context.pushNamed(
-                              GestioneDispensaWidget.routeName,
-                              queryParameters: {
-                                'ristoranteRef': serializeParam(
-                                  docRef,
-                                  ParamType.DocumentReference,
-                                ),
-                              }.withoutNulls,
-                            );
-                          },
+                          onTap: () => setState(() => _currentViewId = 'dispensa'),
                         ),
                       _buildSidebarItem(
                         icon: Icons.delete_outline_rounded,
                         title: 'Cestino',
-                        isSelected: false,
+                        isSelected: _currentViewId == 'cestino',
                         colorScheme: colorScheme,
                         isDark: isDark,
                         iconColor: const Color(0xFFD97706),
-                        onTap: () {
-                          context.pushNamed(CestinoWidget.routeName);
-                        },
+                        onTap: () => setState(() => _currentViewId = 'cestino'),
                       ),
 
                       const SizedBox(height: 14.0),
@@ -452,71 +491,39 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
                       _buildSidebarItem(
                         icon: Icons.person_rounded,
                         title: 'Il mio Profilo',
-                        isSelected: false,
+                        isSelected: _currentViewId == 'profilo',
                         colorScheme: colorScheme,
                         isDark: isDark,
                         iconColor: const Color(0xFF2563EB),
-                        onTap: () {
-                          context.pushNamed(
-                            ProfiloUtenteWidget.routeName,
-                            queryParameters: {
-                              'ristoranteRef': serializeParam(
-                                docRef,
-                                ParamType.DocumentReference,
-                              ),
-                            }.withoutNulls,
-                          );
-                        },
+                        onTap: () => setState(() => _currentViewId = 'profilo'),
                       ),
                       _buildSidebarItem(
                         icon: Icons.settings_rounded,
                         title: 'Impostazioni',
-                        isSelected: false,
+                        isSelected: _currentViewId == 'impostazioni',
                         colorScheme: colorScheme,
                         isDark: isDark,
                         iconColor: const Color(0xFF64748B),
-                        onTap: () {
-                          context.pushNamed(
-                            ImpostazioniUtenteWidget.routeName,
-                            queryParameters: {
-                              'ristoranteRef': serializeParam(
-                                docRef,
-                                ParamType.DocumentReference,
-                              ),
-                            }.withoutNulls,
-                          );
-                        },
+                        onTap: () => setState(() => _currentViewId = 'impostazioni'),
                       ),
                       _buildSidebarItem(
                         icon: Icons.help_outline_rounded,
                         title: 'Supporto Clienti',
-                        isSelected: false,
+                        isSelected: _currentViewId == 'supporto',
                         colorScheme: colorScheme,
                         isDark: isDark,
                         iconColor: const Color(0xFF059669),
-                        onTap: () {
-                          context.pushNamed(
-                            SupportoRistoratoreWidget.routeName,
-                            queryParameters: {
-                              'ristoranteRef': serializeParam(
-                                docRef,
-                                ParamType.DocumentReference,
-                              ),
-                            }.withoutNulls,
-                          );
-                        },
+                        onTap: () => setState(() => _currentViewId = 'supporto'),
                       ),
                       if (currentUserDocument?.isAdmin == true)
                         _buildSidebarItem(
                           icon: Icons.admin_panel_settings_rounded,
                           title: 'Admin Dashboard',
-                          isSelected: false,
+                          isSelected: _currentViewId == 'admin',
                           colorScheme: colorScheme,
                           isDark: isDark,
                           iconColor: const Color(0xFFDC2626),
-                          onTap: () {
-                            context.pushNamed(AdminDashboardWidget.routeName);
-                          },
+                          onTap: () => setState(() => _currentViewId = 'admin'),
                         ),
                     ],
                   ),
@@ -751,17 +758,7 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
 
                 // Canvas Centrale
                 Expanded(
-                  child: _activeNavIndex == 1
-                      ? DesktopOrdersTableView(
-                          ristoranteRef: docRef,
-                          initialStatusFilter: 'all',
-                        )
-                      : (_activeNavIndex == 2
-                          ? DesktopOrdersTableView(
-                              ristoranteRef: docRef,
-                              initialStatusFilter: 'Completato',
-                            )
-                          : _buildMenuConstructionView(activeSection, docRef, isDark, colorScheme)),
+                  child: _buildCanvasContent(activeSection, docRef, isDark, colorScheme),
                 ),
               ],
             ),
@@ -771,116 +768,66 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
     );
   }
 
-  Widget _buildMenuConstructionView(
+  Widget _buildCanvasContent(
     _SidebarSection activeSection,
     DocumentReference? docRef,
     bool isDark,
     ColorScheme colorScheme,
   ) {
-    return Center(
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 620.0),
-        padding: const EdgeInsets.all(40.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 88.0,
-              height: 88.0,
-              decoration: BoxDecoration(
-                color: colorScheme.primary.withValues(alpha: 0.08),
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: colorScheme.primary.withValues(alpha: 0.2),
-                  width: 2.0,
-                ),
-              ),
-              alignment: Alignment.center,
-              child: Icon(
-                activeSection.icon,
-                size: 42.0,
-                color: colorScheme.primary,
-              ),
-            ),
-            const SizedBox(height: 24.0),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 5.0),
-              decoration: BoxDecoration(
-                color: colorScheme.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(16.0),
-              ),
-              child: Text(
-                'SEZIONE: ${activeSection.title.toUpperCase()}',
-                style: TextStyle(
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.primary,
-                  letterSpacing: 0.8,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16.0),
-            Text(
-              'Dashboard in costruzione',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 28.0,
-                fontWeight: FontWeight.w800,
-                letterSpacing: -0.5,
-                color: isDark ? Colors.white : const Color(0xFF0F172A),
-              ),
-            ),
-            const SizedBox(height: 12.0),
-            Text(
-              'Stiamo sviluppando la vista desktop per la gestione di "${activeSection.title}" su schermi grandi. Dal menu laterale puoi passare alla tabella Ordini Live in tempo reale o aprire la gestione menù.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14.5,
-                height: 1.5,
-                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-              ),
-            ),
-            const SizedBox(height: 28.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton.icon(
-                  onPressed: () => setState(() => _activeNavIndex = 1),
-                  icon: const Icon(Icons.table_restaurant_rounded, size: 16.0),
-                  label: const Text(
-                    'Vai alla Tabella Ordini Live',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.0),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: colorScheme.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12.0),
-                OutlinedButton.icon(
-                  onPressed: () => setState(() => _forceMobilePreview = true),
-                  icon: const Icon(Icons.open_in_new_rounded, size: 16.0),
-                  label: const Text(
-                    'Apri Menù Mobile',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.0),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
+    final targetRef = docRef ?? currentUserReference;
+
+    switch (_currentViewId) {
+      case 'menu':
+        return DesktopMenuView(ristoranteRef: targetRef);
+      case 'ordini':
+        return DesktopOrdersTableView(
+          ristoranteRef: targetRef,
+          initialStatusFilter: 'all',
+        );
+      case 'storico':
+        return DesktopOrdersTableView(
+          ristoranteRef: targetRef,
+          initialStatusFilter: 'Completato',
+        );
+      case 'anteprima_cliente':
+        return DesktopClientPreviewView(
+          ristoranteRef: targetRef,
+          onNavigateToQR: () => setState(() => _currentViewId = 'qr_code'),
+        );
+      case 'qr_code':
+        return const ImpostazioniQRWidget(embedded: true);
+      case 'personalizzazione':
+        return PersonalizzazioneWidget(
+          ristoranteRef: targetRef,
+          embedded: true,
+        );
+      case 'dispensa':
+        return GestioneDispensaWidget(
+          ristoranteRef: targetRef,
+          embedded: true,
+        );
+      case 'cestino':
+        return const CestinoWidget(embedded: true);
+      case 'profilo':
+        return ProfiloUtenteWidget(
+          ristoranteRef: targetRef,
+          embedded: true,
+        );
+      case 'impostazioni':
+        return ImpostazioniUtenteWidget(
+          ristoranteRef: targetRef,
+          embedded: true,
+        );
+      case 'supporto':
+        return SupportoRistoratoreWidget(
+          ristoranteRef: targetRef,
+          embedded: true,
+        );
+      case 'admin':
+        return const AdminDashboardWidget(embedded: true);
+      default:
+        return DesktopMenuView(ristoranteRef: targetRef);
+    }
   }
 
   Widget _buildNavCategoryHeader(String title, bool isDark) {
@@ -989,13 +936,13 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
 
 class _SidebarSection {
   const _SidebarSection({
-    required this.index,
+    required this.id,
     required this.title,
     required this.subtitle,
     required this.icon,
   });
 
-  final int index;
+  final String id;
   final String title;
   final String subtitle;
   final IconData icon;

@@ -14,9 +14,11 @@ class SupportoRistoratoreWidget extends StatefulWidget {
   const SupportoRistoratoreWidget({
     super.key,
     this.ristoranteRef,
+    this.embedded = false,
   });
 
   final DocumentReference? ristoranteRef;
+  final bool embedded;
 
   static String routeName = 'SupportoRistoratore';
   static String routePath = '/supportoRistoratore';
@@ -150,7 +152,9 @@ class _SupportoRistoratoreWidgetState extends State<SupportoRistoratoreWidget> {
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: theme.scaffoldBackgroundColor,
-        appBar: AppBar(
+        appBar: widget.embedded
+            ? null
+            : AppBar(
           backgroundColor: theme.appBarTheme.backgroundColor ?? theme.cardColor,
           elevation: 0.0,
           centerTitle: true,

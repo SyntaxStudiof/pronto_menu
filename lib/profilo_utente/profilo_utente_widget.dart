@@ -17,9 +17,11 @@ class ProfiloUtenteWidget extends StatefulWidget {
   const ProfiloUtenteWidget({
     super.key,
     this.ristoranteRef,
+    this.embedded = false,
   });
 
   final DocumentReference? ristoranteRef;
+  final bool embedded;
 
   static String routeName = 'ProfiloUtente';
   static String routePath = '/profiloUtente';
@@ -124,7 +126,9 @@ class _ProfiloUtenteWidgetState extends State<ProfiloUtenteWidget> {
       },
       child: Scaffold(
         key: scaffoldKey,
-        appBar: AppBar(
+        appBar: widget.embedded
+            ? null
+            : AppBar(
           automaticallyImplyLeading: false,
           leading: IconButton(
             icon: const Icon(
@@ -136,7 +140,7 @@ class _ProfiloUtenteWidgetState extends State<ProfiloUtenteWidget> {
                 HomeRistoratoreWidget.routeName,
                 queryParameters: {
                   'ristoranteRef': serializeParam(
-                    widget.ristoranteRef,
+                    widget.ristoranteRef ?? currentUserReference,
                     ParamType.DocumentReference,
                   ),
                 }.withoutNulls,
@@ -195,7 +199,7 @@ class _ProfiloUtenteWidgetState extends State<ProfiloUtenteWidget> {
         body: SafeArea(
           top: true,
           child: StreamBuilder<UsersRecord>(
-            stream: UsersRecord.getDocument(widget.ristoranteRef!),
+            stream: UsersRecord.getDocument(widget.ristoranteRef ?? currentUserReference!),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
                 return Center(

@@ -18,10 +18,12 @@ class PersonalizzazioneWidget extends StatefulWidget {
     super.key,
     this.ristoranteRef,
     this.initialTab = 0,
+    this.embedded = false,
   });
 
   final DocumentReference? ristoranteRef;
   final int initialTab;
+  final bool embedded;
 
   static String routeName = 'personalizzazione';
   static String routePath = '/personalizzazione';
@@ -347,7 +349,9 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: colorScheme.surfaceContainerLowest,
-        appBar: AppBar(
+        appBar: widget.embedded
+            ? null
+            : AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
           scrolledUnderElevation: 0,
