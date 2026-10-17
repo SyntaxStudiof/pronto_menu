@@ -35,6 +35,7 @@ class HomeRistoratoreWidget extends StatefulWidget {
 
 class _HomeRistoratoreWidgetState extends State<HomeRistoratoreWidget> {
   late HomeRistoratoreModel _model;
+  bool _hasInitialSyncedTheme = false;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -89,12 +90,12 @@ class _HomeRistoratoreWidgetState extends State<HomeRistoratoreWidget> {
         }
 
         final userDoc = snapshot.data!;
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!context.mounted) return;
-          final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-          if (userDoc.hasTemaScelto() || userDoc.hasColorePrimario()) {
-            if (themeProvider.designStyle.name != userDoc.temaScelto ||
-                themeProvider.primaryColorHex != userDoc.colorePrimario) {
+        if (!_hasInitialSyncedTheme) {
+          _hasInitialSyncedTheme = true;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!context.mounted) return;
+            final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+            if (userDoc.hasTemaScelto() || userDoc.hasColorePrimario()) {
               themeProvider.syncFromRestaurant(
                 temaScelto: userDoc.temaScelto,
                 colorePrimarioHex: userDoc.colorePrimario,
@@ -106,8 +107,8 @@ class _HomeRistoratoreWidgetState extends State<HomeRistoratoreWidget> {
                 stileBadge: userDoc.stileBadge,
               );
             }
-          }
-        });
+          });
+        }
 
         return GestureDetector(
           onTap: () {
@@ -890,7 +891,7 @@ class _HomeRistoratoreWidgetState extends State<HomeRistoratoreWidget> {
                           ),
                         ),
                         Align(
-                          alignment: AlignmentDirectional(0.0, 1.0),
+                          alignment: const AlignmentDirectional(0.0, 1.0),
                           child: wrapWithModel(
                             model: _model.navBarDinamicaModel,
                             updateCallback: () => safeSetState(() {}),
@@ -904,13 +905,13 @@ class _HomeRistoratoreWidgetState extends State<HomeRistoratoreWidget> {
                     );
                   } else {
                     return Align(
-                      alignment: AlignmentDirectional(0.0, 0.0),
+                      alignment: const AlignmentDirectional(0.0, 0.0),
                       child: Container(
                         width: double.infinity,
                         height: double.infinity,
-                        alignment: AlignmentDirectional(0.0, 0.0),
+                        alignment: const AlignmentDirectional(0.0, 0.0),
                         child: Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
                               24.0, 0.0, 24.0, 0.0),
                           child: SingleChildScrollView(
                             controller: _model.columnController,
@@ -919,7 +920,7 @@ class _HomeRistoratoreWidgetState extends State<HomeRistoratoreWidget> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Padding(
-                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
                                       0.0, 0.0, 0.0, 16.0),
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(8.0),
@@ -932,7 +933,7 @@ class _HomeRistoratoreWidgetState extends State<HomeRistoratoreWidget> {
                                   ),
                                 ),
                                 Padding(
-                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
                                       0.0, 0.0, 0.0, 8.0),
                                   child: Text(
                                     'Sblocca il tuo menu',
@@ -942,7 +943,7 @@ class _HomeRistoratoreWidgetState extends State<HomeRistoratoreWidget> {
                                   ),
                                 ),
                                 Padding(
-                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
                                       0.0, 0.0, 0.0, 32.0),
                                   child: Text(
                                     'Il tuo abbonamento non è attivo.\nAbbonati ora per ricevere ordini \ne gestire il tuo ristorante senza limiti.',
@@ -959,10 +960,10 @@ class _HomeRistoratoreWidgetState extends State<HomeRistoratoreWidget> {
                                   options: FFButtonOptions(
                                     width: 280.0,
                                     height: 50.0,
-                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                    padding: const EdgeInsetsDirectional.fromSTEB(
                                         16.0, 0.0, 16.0, 0.0),
                                     iconAlignment: IconAlignment.end,
-                                    iconPadding: EdgeInsetsDirectional.fromSTEB(
+                                    iconPadding: const EdgeInsetsDirectional.fromSTEB(
                                         0.0, 0.0, 0.0, 0.0),
                                     elevation: 0.0,
                                     borderRadius: BorderRadius.circular(12.0),

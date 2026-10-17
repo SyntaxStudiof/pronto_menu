@@ -100,6 +100,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
   late TextEditingController _bannerUrlController;
   bool _isSavingCloud = false;
   bool _isPreviewExpanded = true;
+  bool _hasLoadedTheme = false;
 
   @override
   void initState() {
@@ -131,6 +132,8 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
   }
 
   Future<void> _loadRestaurantTheme(ThemeProvider themeProvider) async {
+    if (_hasLoadedTheme) return;
+    _hasLoadedTheme = true;
     try {
       final docRef = widget.ristoranteRef ?? currentUserReference;
       if (docRef != null) {
@@ -2034,6 +2037,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
               child: InkWell(
                 onTap: () {
                   themeProvider.setBadgeStyle(bStyle);
+                  _autoSaveToCloud(themeProvider);
                 },
                 borderRadius: BorderRadius.circular(14.0),
                 child: Padding(
@@ -2411,7 +2415,10 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                 isSelected: isSelected,
                 primaryColor: primaryColor,
                 colorScheme: colorScheme,
-                onTap: () => themeProvider.setTitleFont(opt.family),
+                onTap: () {
+                  themeProvider.setTitleFont(opt.family);
+                  _autoSaveToCloud(themeProvider);
+                },
               ),
             );
           }),
@@ -2438,7 +2445,10 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                 isSelected: isSelected,
                 primaryColor: primaryColor,
                 colorScheme: colorScheme,
-                onTap: () => themeProvider.setBodyFont(opt.family),
+                onTap: () {
+                  themeProvider.setBodyFont(opt.family);
+                  _autoSaveToCloud(themeProvider);
+                },
               ),
             );
           }),
@@ -2774,6 +2784,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                     .padLeft(8, '0')
                     .substring(2)
                     .toUpperCase();
+                _autoSaveToCloud(themeProvider);
               },
               borderRadius: BorderRadius.circular(14.0),
               child: AnimatedContainer(
@@ -2959,6 +2970,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                       .padLeft(8, '0')
                       .substring(2)
                       .toUpperCase();
+                  _autoSaveToCloud(themeProvider);
                 },
                 style: TextButton.styleFrom(
                   visualDensity: VisualDensity.compact,
@@ -3082,6 +3094,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
         final newColor = Color(intVal);
         themeProvider.setPrimaryColor(newColor);
         _hexController.text = cleanHex.toUpperCase();
+        _autoSaveToCloud(themeProvider);
         return;
       }
     }
@@ -3161,6 +3174,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
               child: InkWell(
                 onTap: () {
                   themeProvider.setDishCardLayout(layout);
+                  _autoSaveToCloud(themeProvider);
                 },
                 borderRadius: BorderRadius.circular(14.0),
                 child: Padding(
@@ -3314,6 +3328,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                   onPressed: () {
                     themeProvider.setCoverBanner('');
                     _bannerUrlController.clear();
+                    _autoSaveToCloud(themeProvider);
                   },
                   icon: const Icon(Icons.close_rounded, size: 14.0),
                   label: const Text('Rimuovi', style: TextStyle(fontSize: 11.5)),
@@ -3349,6 +3364,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
             onTap: () {
               themeProvider.setCoverBanner('');
               _bannerUrlController.clear();
+              _autoSaveToCloud(themeProvider);
             },
             borderRadius: BorderRadius.circular(12.0),
             child: Padding(
@@ -3413,6 +3429,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                 onTap: () {
                   themeProvider.setCoverBanner(b.id);
                   _bannerUrlController.text = b.id;
+                  _autoSaveToCloud(themeProvider);
                 },
                 child: Container(
                   decoration: BoxDecoration(
@@ -3538,6 +3555,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                       final val = _bannerUrlController.text.trim();
                       if (val.isNotEmpty) {
                         themeProvider.setCoverBanner(val);
+                        _autoSaveToCloud(themeProvider);
                         FocusScope.of(context).unfocus();
                       }
                     },
@@ -3613,6 +3631,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
               child: InkWell(
                 onTap: () {
                   themeProvider.setBackgroundTexture(texture);
+                  _autoSaveToCloud(themeProvider);
                 },
                 borderRadius: BorderRadius.circular(12.0),
                 child: Padding(
