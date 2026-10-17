@@ -423,7 +423,7 @@ class _HubClienteWidgetState extends State<HubClienteWidget> {
                             ParamType.bool,
                           ),
                           'solaConsultazione': serializeParam(
-                            !userRecord.hasPlus,
+                            false,
                             ParamType.bool,
                           ),
                         }.withoutNulls,

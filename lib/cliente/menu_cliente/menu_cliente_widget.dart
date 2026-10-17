@@ -1316,7 +1316,7 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                           Column(
                             mainAxisSize: MainAxisSize.max,
                             children: [
-                              if (widget.solaConsultazione)
+                              if (widget.solaConsultazione && (widget.fasciaId != null || mutaformaInPausa))
                                 Container(
                                   width: double.infinity,
                                   margin: const EdgeInsets.fromLTRB(
