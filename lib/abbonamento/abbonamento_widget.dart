@@ -839,7 +839,6 @@ class _AbbonamentoWidgetState extends State<AbbonamentoWidget> {
           _buildCheckItem(theme, 'Prenotazioni tavoli gestibili direttamente sull\'app'),
           _buildCheckItem(theme, 'Menù Mutaforma (più menu per orari, eventi e pranzi)'),
           _buildCheckItem(theme, 'Personalizzazione grafica e colore tema del locale'),
-          _buildCheckItem(theme, 'Zero commissioni sul venduto'),
           const SizedBox(height: 20.0),
           FFButtonWidget(
             onPressed: () => _attivaPiano(
@@ -974,7 +973,6 @@ class _AbbonamentoWidgetState extends State<AbbonamentoWidget> {
           _buildCheckItem(theme, 'Statistiche avanzate e report vendite in tempo reale'),
           _buildCheckItem(theme, 'Cestino di sicurezza e ripristino immediato piatti'),
           _buildCheckItem(theme, 'Assistenza prioritaria dedicata in-app con ticket diretti'),
-          _buildCheckItem(theme, 'Zero commissioni sul venduto'),
           const SizedBox(height: 20.0),
           FFButtonWidget(
             onPressed: () => _attivaPiano(
