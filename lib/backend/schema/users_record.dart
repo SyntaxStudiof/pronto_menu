@@ -90,6 +90,21 @@ class UsersRecord extends FirestoreRecord {
   String get fontTesti => _fontTesti ?? '';
   bool hasFontTesti() => _fontTesti != null;
 
+  // "layout_piatti" field. ('classico', 'foto_grande', 'griglia', 'minimale')
+  String? _layoutPiatti;
+  String get layoutPiatti => _layoutPiatti ?? 'classico';
+  bool hasLayoutPiatti() => _layoutPiatti != null;
+
+  // "banner_copertina" field.
+  String? _bannerCopertina;
+  String get bannerCopertina => _bannerCopertina ?? '';
+  bool hasBannerCopertina() => _bannerCopertina != null;
+
+  // "texture_sfondo" field. ('nessuna', 'pergamena', 'legno', 'ardesia', 'tessuto', 'geometrico')
+  String? _textureSfondo;
+  String get textureSfondo => _textureSfondo ?? 'nessuna';
+  bool hasTextureSfondo() => _textureSfondo != null;
+
   // "ordine_preferito" field.
   String? _ordinePreferito;
   String get ordinePreferito => _ordinePreferito ?? '';
@@ -226,6 +241,9 @@ class UsersRecord extends FirestoreRecord {
     _colorePrimario = snapshotData['colore_primario'] as String?;
     _fontTitoli = snapshotData['font_titoli'] as String?;
     _fontTesti = snapshotData['font_testi'] as String?;
+    _layoutPiatti = snapshotData['layout_piatti'] as String?;
+    _bannerCopertina = snapshotData['banner_copertina'] as String?;
+    _textureSfondo = snapshotData['texture_sfondo'] as String?;
     _ordinePreferito = snapshotData['ordine_preferito'] as String?;
     _isAdmin = snapshotData['isAdmin'] as bool?;
     _isPremium = snapshotData['isPremium'] as bool?;
@@ -304,6 +322,9 @@ Map<String, dynamic> createUsersRecordData({
   String? colorePrimario,
   String? fontTitoli,
   String? fontTesti,
+  String? layoutPiatti,
+  String? bannerCopertina,
+  String? textureSfondo,
   String? ordinePreferito,
   bool? isAdmin,
   bool? isPremium,
@@ -348,6 +369,9 @@ Map<String, dynamic> createUsersRecordData({
       'colore_primario': colorePrimario,
       'font_titoli': fontTitoli,
       'font_testi': fontTesti,
+      'layout_piatti': layoutPiatti,
+      'banner_copertina': bannerCopertina,
+      'texture_sfondo': textureSfondo,
       'ordine_preferito': ordinePreferito,
       'isAdmin': isAdmin,
       'isPremium': isPremium,
@@ -400,6 +424,9 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
         e1?.colorePrimario == e2?.colorePrimario &&
         e1?.fontTitoli == e2?.fontTitoli &&
         e1?.fontTesti == e2?.fontTesti &&
+        e1?.layoutPiatti == e2?.layoutPiatti &&
+        e1?.bannerCopertina == e2?.bannerCopertina &&
+        e1?.textureSfondo == e2?.textureSfondo &&
         e1?.ordinePreferito == e2?.ordinePreferito &&
         e1?.isAdmin == e2?.isAdmin &&
         e1?.isPremium == e2?.isPremium &&
@@ -427,6 +454,9 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
         e?.colorePrimario,
         e?.fontTitoli,
         e?.fontTesti,
+        e?.layoutPiatti,
+        e?.bannerCopertina,
+        e?.textureSfondo,
         e?.ordinePreferito,
         e?.isAdmin,
         e?.isPremium,

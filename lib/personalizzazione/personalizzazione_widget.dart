@@ -7,6 +7,7 @@ import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/theme_provider.dart';
 import '/app_themes.dart';
+import 'personalizzazione_presets.dart';
 import 'personalizzazione_model.dart';
 
 export 'personalizzazione_model.dart';
@@ -95,14 +96,16 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
   ];
 
   late TextEditingController _hexController;
+  late TextEditingController _bannerUrlController;
   bool _isSavingCloud = false;
 
   @override
   void initState() {
     super.initState();
     _model = createModel(context, () => PersonalizzazioneModel());
-    _mainTab = widget.initialTab.clamp(0, 2);
+    _mainTab = widget.initialTab.clamp(0, 4);
     _hexController = TextEditingController();
+    _bannerUrlController = TextEditingController();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
@@ -112,6 +115,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
           .padLeft(8, '0')
           .substring(2)
           .toUpperCase();
+      _bannerUrlController.text = themeProvider.coverBanner;
       _loadRestaurantTheme(themeProvider);
     });
   }
@@ -119,6 +123,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
   @override
   void dispose() {
     _hexController.dispose();
+    _bannerUrlController.dispose();
     _model.dispose();
     super.dispose();
   }
@@ -134,13 +139,25 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
           final colore = data['colore_primario'] as String?;
           final fontTitoli = data['font_titoli'] as String?;
           final fontTesti = data['font_testi'] as String?;
+          final layoutPiatti = data['layout_piatti'] as String?;
+          final bannerCopertina = data['banner_copertina'] as String?;
+          final textureSfondo = data['texture_sfondo'] as String?;
 
-          if (tema != null || colore != null || fontTitoli != null || fontTesti != null) {
+          if (tema != null ||
+              colore != null ||
+              fontTitoli != null ||
+              fontTesti != null ||
+              layoutPiatti != null ||
+              bannerCopertina != null ||
+              textureSfondo != null) {
             themeProvider.syncFromRestaurant(
               temaScelto: tema,
               colorePrimarioHex: colore,
               fontTitoli: fontTitoli,
               fontTesti: fontTesti,
+              layoutPiatti: layoutPiatti,
+              bannerCopertina: bannerCopertina,
+              textureSfondo: textureSfondo,
             );
             if (mounted) {
               _hexController.text = themeProvider.primaryColor
@@ -149,6 +166,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                   .padLeft(8, '0')
                   .substring(2)
                   .toUpperCase();
+              _bannerUrlController.text = themeProvider.coverBanner;
             }
           }
         }
@@ -180,14 +198,17 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
         'colore_primario': hexColor,
         'font_titoli': themeProvider.titleFont,
         'font_testi': themeProvider.bodyFont,
+        'layout_piatti': themeProvider.dishCardLayout.name,
+        'banner_copertina': themeProvider.coverBanner,
+        'texture_sfondo': themeProvider.backgroundTexture.name,
       });
 
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Row(
-            children: const [
+          content: const Row(
+            children: [
               Icon(Icons.check_circle_rounded, color: Colors.white, size: 22.0),
               SizedBox(width: 12.0),
               Expanded(
@@ -353,6 +374,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                         // 2. Finestra di Anteprima Bloccata (Pizza Margherita)
                         _buildStickyPreviewCard(
                           context: context,
+                          themeProvider: themeProvider,
                           style: currentStyle,
                           primaryColor: primaryColor,
                           isDark: isDark,
@@ -363,7 +385,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
 
                         const SizedBox(height: 10.0),
 
-                        // 3. Switcher principale: Design vs Font
+                        // 3. Switcher principale: 5 schede
                         _buildMainTabSwitcher(
                           context: context,
                           primaryColor: primaryColor,
@@ -386,29 +408,43 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                       ),
                       child: AnimatedSwitcher(
                         duration: const Duration(milliseconds: 250),
-                        child: _mainTab == 0
-                            ? _buildPresetList(
-                                key: const ValueKey('presets_tab'),
-                                context: context,
-                                themeProvider: themeProvider,
-                                currentStyle: currentStyle,
-                                isDark: isDark,
-                              )
-                            : (_mainTab == 1
-                                ? _buildColorCustomizationView(
-                                    key: const ValueKey('colors_tab'),
-                                    context: context,
-                                    themeProvider: themeProvider,
-                                    primaryColor: primaryColor,
-                                    isDark: isDark,
-                                  )
-                                : _buildFontCustomizationView(
-                                    key: const ValueKey('fonts_tab'),
-                                    context: context,
-                                    themeProvider: themeProvider,
-                                    primaryColor: primaryColor,
-                                    isDark: isDark,
-                                  )),
+                        child: switch (_mainTab) {
+                          0 => _buildPresetList(
+                              key: const ValueKey('presets_tab'),
+                              context: context,
+                              themeProvider: themeProvider,
+                              currentStyle: currentStyle,
+                              isDark: isDark,
+                            ),
+                          1 => _buildColorCustomizationView(
+                              key: const ValueKey('colors_tab'),
+                              context: context,
+                              themeProvider: themeProvider,
+                              primaryColor: primaryColor,
+                              isDark: isDark,
+                            ),
+                          2 => _buildDishLayoutCustomizationView(
+                              key: const ValueKey('dish_layout_tab'),
+                              context: context,
+                              themeProvider: themeProvider,
+                              primaryColor: primaryColor,
+                              isDark: isDark,
+                            ),
+                          3 => _buildBannerTextureCustomizationView(
+                              key: const ValueKey('banner_texture_tab'),
+                              context: context,
+                              themeProvider: themeProvider,
+                              primaryColor: primaryColor,
+                              isDark: isDark,
+                            ),
+                          _ => _buildFontCustomizationView(
+                              key: const ValueKey('fonts_tab'),
+                              context: context,
+                              themeProvider: themeProvider,
+                              primaryColor: primaryColor,
+                              isDark: isDark,
+                            ),
+                        },
                       ),
                     ),
                   ),
@@ -554,6 +590,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
 
   Widget _buildStickyPreviewCard({
     required BuildContext context,
+    required ThemeProvider themeProvider,
     required AppDesignStyle style,
     required Color primaryColor,
     required bool isDark,
@@ -565,6 +602,14 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     final colorScheme = theme.colorScheme;
     final IconData dishIcon = style.defaultIcon;
     final String styleTag = customTheme?.styleTag ?? 'FINE DINING';
+    final resolvedBanner = PersonalizzazionePresets.resolveBannerUrl(themeProvider.coverBanner);
+    final hasTexture = themeProvider.backgroundTexture != BackgroundTexture.nessuna;
+    final textureDecoration = PersonalizzazionePresets.getTextureDecoration(
+      texture: themeProvider.backgroundTexture,
+      isDark: isDark,
+      theme: theme,
+    );
+    final dishLayout = themeProvider.dishCardLayout;
 
     return Card(
       elevation: 2.0,
@@ -575,15 +620,22 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
         borderRadius: BorderRadius.circular(16.0),
         side: BorderSide.none,
       ),
-      color: colorScheme.surface,
+      color: hasTexture ? Colors.transparent : colorScheme.surface,
       margin: EdgeInsets.zero,
-      child: Padding(
+      clipBehavior: Clip.antiAlias,
+      child: Container(
+        decoration: hasTexture
+            ? textureDecoration.copyWith(borderRadius: BorderRadius.circular(16.0))
+            : BoxDecoration(
+                color: colorScheme.surface,
+                borderRadius: BorderRadius.circular(16.0),
+              ),
         padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 12.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Header anteprima con tag preset
+            // Header anteprima con tag preset e layout
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -609,137 +661,117 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                     ),
                   ],
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 8.0, vertical: 3.0),
-                  decoration: BoxDecoration(
-                    color: primaryColor,
-                    borderRadius: BorderRadius.circular(6.0),
-                  ),
-                  child: Text(
-                    styleTag,
-                    style: GoogleFonts.getFont(
-                      titleFont,
-                      textStyle: const TextStyle(
-                        fontSize: 9.5,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.6,
-                        color: Colors.white,
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 7.0, vertical: 2.5),
+                      decoration: BoxDecoration(
+                        color: primaryColor.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(6.0),
+                        border: Border.all(
+                          color: primaryColor.withValues(alpha: 0.3),
+                          width: 1.0,
+                        ),
+                      ),
+                      child: Text(
+                        dishLayout.displayName.split(' ').first.toUpperCase(),
+                        style: GoogleFonts.getFont(
+                          titleFont,
+                          textStyle: TextStyle(
+                            fontSize: 9.0,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.5,
+                            color: primaryColor,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                    const SizedBox(width: 6.0),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0, vertical: 3.0),
+                      decoration: BoxDecoration(
+                        color: primaryColor,
+                        borderRadius: BorderRadius.circular(6.0),
+                      ),
+                      child: Text(
+                        styleTag,
+                        style: GoogleFonts.getFont(
+                          titleFont,
+                          textStyle: const TextStyle(
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.6,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
 
-            const SizedBox(height: 10.0),
-
-            // Dettagli piatto (Pizza Margherita) con font dedicati live
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // Icona Piatto reattiva al tap
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _dishWiggleTrigger++;
-                    });
-                  },
-                  child: TweenAnimationBuilder<double>(
-                    key: ValueKey('dish_$_dishWiggleTrigger'),
-                    tween: Tween(begin: 0.0, end: 1.0),
-                    duration: const Duration(milliseconds: 380),
-                    curve: Curves.elasticOut,
-                    builder: (context, val, child) {
-                      final scale = 0.85 + (0.15 * val);
-                      final rotation = (1.0 - val) * 0.25;
-                      return Transform.rotate(
-                        angle: rotation,
-                        child: Transform.scale(
-                          scale: scale,
-                          child: child,
-                        ),
-                      );
-                    },
-                    child: Container(
-                      width: 44.0,
-                      height: 44.0,
-                      decoration: BoxDecoration(
-                        color: primaryColor,
-                        borderRadius: switch (style) {
-                          AppDesignStyle.premium => BorderRadius.circular(6.0),
-                          AppDesignStyle.pub => BorderRadius.circular(18.0),
-                          AppDesignStyle.minimal => BorderRadius.zero,
-                          AppDesignStyle.tradizionale =>
-                            BorderRadius.circular(10.0),
-                        },
-                      ),
-                      child: Center(
-                        child: Icon(
-                          dishIcon,
-                          color: Colors.white,
-                          size: 22.0,
-                        ),
-                      ),
-                    ),
+            if (resolvedBanner.isNotEmpty) ...[
+              const SizedBox(height: 8.0),
+              Container(
+                height: 48.0,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10.0),
+                  image: DecorationImage(
+                    image: NetworkImage(resolvedBanner),
+                    fit: BoxFit.cover,
                   ),
                 ),
-
-                const SizedBox(width: 12.0),
-
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10.0),
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.transparent,
+                        Colors.black.withValues(alpha: 0.65),
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
+                  alignment: Alignment.bottomLeft,
+                  child: Row(
                     children: [
-                      // Titolo piatto con titleFont
+                      const Icon(Icons.wallpaper_rounded, color: Colors.white, size: 13.0),
+                      const SizedBox(width: 5.0),
                       Text(
-                        'Pizza Margherita',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        'Banner Menu Attivo',
                         style: GoogleFonts.getFont(
                           titleFont,
-                          textStyle: TextStyle(
-                            fontSize: 15.0,
-                            fontWeight: FontWeight.w700,
-                            color: colorScheme.onSurface,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 2.0),
-                      // Descrizione piatto con bodyFont
-                      Text(
-                        'Pomodoro San Marzano, mozzarella di bufala campana DOP.',
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.getFont(
-                          bodyFont,
-                          textStyle: TextStyle(
-                            fontSize: 11.5,
-                            color: colorScheme.onSurfaceVariant,
-                            height: 1.3,
+                          textStyle: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
                     ],
                   ),
                 ),
+              ),
+            ],
 
-                const SizedBox(width: 8.0),
+            const SizedBox(height: 10.0),
 
-                // Prezzo con titleFont
-                Text(
-                  '€ 9,50',
-                  style: GoogleFonts.getFont(
-                    titleFont,
-                    textStyle: TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w700,
-                      color: primaryColor,
-                    ),
-                  ),
-                ),
-              ],
+            // Dettagli piatto (Pizza Margherita) animato in base al DishCardLayout
+            _buildDishCardPreviewBody(
+              context: context,
+              style: style,
+              dishLayout: dishLayout,
+              primaryColor: primaryColor,
+              dishIcon: dishIcon,
+              titleFont: titleFont,
+              bodyFont: bodyFont,
+              colorScheme: colorScheme,
             ),
 
             const SizedBox(height: 10.0),
@@ -750,6 +782,356 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
         ),
       ),
     );
+  }
+
+  Widget _buildDishCardPreviewBody({
+    required BuildContext context,
+    required AppDesignStyle style,
+    required DishCardLayout dishLayout,
+    required Color primaryColor,
+    required IconData dishIcon,
+    required String titleFont,
+    required String bodyFont,
+    required ColorScheme colorScheme,
+  }) {
+    final BorderRadius radius = switch (style) {
+      AppDesignStyle.premium => BorderRadius.circular(6.0),
+      AppDesignStyle.pub => BorderRadius.circular(18.0),
+      AppDesignStyle.minimal => BorderRadius.zero,
+      AppDesignStyle.tradizionale => BorderRadius.circular(10.0),
+    };
+
+    switch (dishLayout) {
+      case DishCardLayout.fotoGrande:
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              height: 58.0,
+              decoration: BoxDecoration(
+                color: primaryColor.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: Stack(
+                children: [
+                  Center(
+                    child: Icon(dishIcon, color: primaryColor, size: 28.0),
+                  ),
+                  Positioned(
+                    top: 6.0,
+                    right: 8.0,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 7.0, vertical: 3.0),
+                      decoration: BoxDecoration(
+                        color: primaryColor,
+                        borderRadius: BorderRadius.circular(6.0),
+                      ),
+                      child: Text(
+                        '€ 9,50',
+                        style: GoogleFonts.getFont(
+                          titleFont,
+                          textStyle: const TextStyle(
+                            fontSize: 12.0,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 6.0),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Pizza Margherita',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.getFont(
+                      titleFont,
+                      textStyle: TextStyle(
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w700,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 2.0),
+            Text(
+              'Pomodoro San Marzano, mozzarella di bufala campana DOP.',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.getFont(
+                bodyFont,
+                textStyle: TextStyle(
+                  fontSize: 11.0,
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          ],
+        );
+
+      case DishCardLayout.griglia:
+        return Row(
+          children: [
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  color: primaryColor.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(8.0),
+                  border: Border.all(
+                    color: primaryColor.withValues(alpha: 0.2),
+                    width: 1.0,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Center(
+                      child: Icon(dishIcon, color: primaryColor, size: 24.0),
+                    ),
+                    const SizedBox(height: 4.0),
+                    Text(
+                      'Margherita',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.getFont(
+                        titleFont,
+                        textStyle: TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w700,
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 2.0),
+                    Text(
+                      '€ 9,50',
+                      style: GoogleFonts.getFont(
+                        titleFont,
+                        textStyle: TextStyle(
+                          fontSize: 12.0,
+                          fontWeight: FontWeight.bold,
+                          color: primaryColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 8.0),
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  color: primaryColor.withValues(alpha: 0.04),
+                  borderRadius: BorderRadius.circular(8.0),
+                  border: Border.all(
+                    color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+                    width: 1.0,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Center(
+                      child: Icon(Icons.ramen_dining_rounded, color: primaryColor.withValues(alpha: 0.7), size: 24.0),
+                    ),
+                    const SizedBox(height: 4.0),
+                    Text(
+                      'Spaghetti Pom.',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.getFont(
+                        titleFont,
+                        textStyle: TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w700,
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 2.0),
+                    Text(
+                      '€ 8,00',
+                      style: GoogleFonts.getFont(
+                        titleFont,
+                        textStyle: TextStyle(
+                          fontSize: 12.0,
+                          fontWeight: FontWeight.bold,
+                          color: primaryColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        );
+
+      case DishCardLayout.minimale:
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    'Pizza Margherita',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.getFont(
+                      titleFont,
+                      textStyle: TextStyle(
+                        fontSize: 15.0,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.2,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10.0),
+                Text(
+                  '€ 9,50',
+                  style: GoogleFonts.getFont(
+                    titleFont,
+                    textStyle: TextStyle(
+                      fontSize: 15.5,
+                      fontWeight: FontWeight.w700,
+                      color: primaryColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 3.0),
+            Text(
+              'Pomodoro San Marzano DOP, fior di latte campano, basilico fresco.',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.getFont(
+                bodyFont,
+                textStyle: TextStyle(
+                  fontSize: 11.5,
+                  fontStyle: FontStyle.italic,
+                  color: colorScheme.onSurfaceVariant,
+                  height: 1.3,
+                ),
+              ),
+            ),
+          ],
+        );
+
+      case DishCardLayout.classico:
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  _dishWiggleTrigger++;
+                });
+              },
+              child: TweenAnimationBuilder<double>(
+                key: ValueKey('dish_$_dishWiggleTrigger'),
+                tween: Tween(begin: 0.0, end: 1.0),
+                duration: const Duration(milliseconds: 380),
+                curve: Curves.elasticOut,
+                builder: (context, val, child) {
+                  final scale = 0.85 + (0.15 * val);
+                  final rotation = (1.0 - val) * 0.25;
+                  return Transform.rotate(
+                    angle: rotation,
+                    child: Transform.scale(
+                      scale: scale,
+                      child: child,
+                    ),
+                  );
+                },
+                child: Container(
+                  width: 44.0,
+                  height: 44.0,
+                  decoration: BoxDecoration(
+                    color: primaryColor,
+                    borderRadius: radius,
+                  ),
+                  child: Center(
+                    child: Icon(
+                      dishIcon,
+                      color: Colors.white,
+                      size: 22.0,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12.0),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Pizza Margherita',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.getFont(
+                      titleFont,
+                      textStyle: TextStyle(
+                        fontSize: 15.0,
+                        fontWeight: FontWeight.w700,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 2.0),
+                  Text(
+                    'Pomodoro San Marzano, mozzarella di bufala campana DOP.',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.getFont(
+                      bodyFont,
+                      textStyle: TextStyle(
+                        fontSize: 11.5,
+                        color: colorScheme.onSurfaceVariant,
+                        height: 1.3,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8.0),
+            Text(
+              '€ 9,50',
+              style: GoogleFonts.getFont(
+                titleFont,
+                textStyle: TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w700,
+                  color: primaryColor,
+                ),
+              ),
+            ),
+          ],
+        );
+    }
   }
 
   Widget _buildInteractiveFakeButton(
@@ -833,7 +1215,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // 3. SWITCHER PRINCIPALE (DESIGN vs FONT)
+  // 3. SWITCHER PRINCIPALE (5 SCHEDE DI PERSONALIZZAZIONE)
   // ═══════════════════════════════════════════════════════════════════════════
 
   Widget _buildMainTabSwitcher({
@@ -845,16 +1227,19 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     final cardBg = theme.colorScheme.surface;
     final barBg = theme.colorScheme.surfaceContainerHigh;
 
-    return Container(
-      padding: const EdgeInsets.all(3.0),
-      decoration: BoxDecoration(
-        color: barBg,
-        borderRadius: BorderRadius.circular(14.0),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: _buildMainTabPill(
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      physics: const BouncingScrollPhysics(),
+      child: Container(
+        padding: const EdgeInsets.all(3.0),
+        decoration: BoxDecoration(
+          color: barBg,
+          borderRadius: BorderRadius.circular(14.0),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildMainTabPill(
               title: 'Stile',
               icon: Icons.auto_awesome_rounded,
               isSelected: _mainTab == 0,
@@ -865,10 +1250,8 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                 if (_mainTab != 0) setState(() => _mainTab = 0);
               },
             ),
-          ),
-          const SizedBox(width: 4.0),
-          Expanded(
-            child: _buildMainTabPill(
+            const SizedBox(width: 4.0),
+            _buildMainTabPill(
               title: 'Colori',
               icon: Icons.palette_rounded,
               isSelected: _mainTab == 1,
@@ -879,12 +1262,10 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                 if (_mainTab != 1) setState(() => _mainTab = 1);
               },
             ),
-          ),
-          const SizedBox(width: 4.0),
-          Expanded(
-            child: _buildMainTabPill(
-              title: 'Caratteri',
-              icon: Icons.font_download_rounded,
+            const SizedBox(width: 4.0),
+            _buildMainTabPill(
+              title: 'Schede Piatto',
+              icon: Icons.view_agenda_rounded,
               isSelected: _mainTab == 2,
               primaryColor: primaryColor,
               activeBg: cardBg,
@@ -893,8 +1274,32 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                 if (_mainTab != 2) setState(() => _mainTab = 2);
               },
             ),
-          ),
-        ],
+            const SizedBox(width: 4.0),
+            _buildMainTabPill(
+              title: 'Copertina & Sfondo',
+              icon: Icons.wallpaper_rounded,
+              isSelected: _mainTab == 3,
+              primaryColor: primaryColor,
+              activeBg: cardBg,
+              isDark: isDark,
+              onTap: () {
+                if (_mainTab != 3) setState(() => _mainTab = 3);
+              },
+            ),
+            const SizedBox(width: 4.0),
+            _buildMainTabPill(
+              title: 'Caratteri',
+              icon: Icons.font_download_rounded,
+              isSelected: _mainTab == 4,
+              primaryColor: primaryColor,
+              activeBg: cardBg,
+              isDark: isDark,
+              onTap: () {
+                if (_mainTab != 4) setState(() => _mainTab = 4);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -913,7 +1318,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
       borderRadius: BorderRadius.circular(11.0),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 7.0),
         decoration: BoxDecoration(
           color: isSelected ? activeBg : Colors.transparent,
           borderRadius: BorderRadius.circular(11.0),
@@ -938,19 +1343,15 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
               size: 15.0,
               color: isSelected ? primaryColor : (isDark ? const Color(0xFF9E9E9E) : const Color(0xFF6B7280)),
             ),
-            const SizedBox(width: 4.0),
-            Flexible(
-              child: Text(
-                title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 12.0,
-                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                  color: isSelected
-                      ? (isDark ? Colors.white : Colors.black87)
-                      : (isDark ? const Color(0xFF9E9E9E) : const Color(0xFF6B7280)),
-                ),
+            const SizedBox(width: 5.0),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 12.0,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                color: isSelected
+                    ? (isDark ? Colors.white : Colors.black87)
+                    : (isDark ? const Color(0xFF9E9E9E) : const Color(0xFF6B7280)),
               ),
             ),
           ],
@@ -1955,6 +2356,582 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
         content: Text('Codice HEX non valido. Inserisci 6 caratteri es. E63946'),
         behavior: SnackBarBehavior.floating,
       ),
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 4C. TAB 2: LAYOUT DELLE SCHEDE PIATTO
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  Widget _buildDishLayoutCustomizationView({
+    Key? key,
+    required BuildContext context,
+    required ThemeProvider themeProvider,
+    required Color primaryColor,
+    required bool isDark,
+  }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final currentLayout = themeProvider.dishCardLayout;
+
+    return Column(
+      key: key,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2.0, vertical: 4.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Layout Schede Piatto',
+                style: TextStyle(
+                  fontSize: 15.0,
+                  fontWeight: FontWeight.w700,
+                  color: colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(height: 2.0),
+              Text(
+                'Scegli come visualizzare i piatti nel menù per i tuoi clienti.',
+                style: TextStyle(
+                  fontSize: 12.0,
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10.0),
+        ...DishCardLayout.values.map((layout) {
+          final isSelected = currentLayout == layout;
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 10.0),
+            child: Card(
+              elevation: isSelected ? 2.0 : 0.5,
+              shadowColor: isSelected
+                  ? primaryColor.withValues(alpha: isDark ? 0.35 : 0.15)
+                  : Colors.transparent,
+              color: isSelected
+                  ? primaryColor.withValues(alpha: isDark ? 0.15 : 0.06)
+                  : colorScheme.surface,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14.0),
+                side: BorderSide(
+                  color: isSelected
+                      ? primaryColor
+                      : colorScheme.outlineVariant.withValues(alpha: 0.35),
+                  width: isSelected ? 1.8 : 1.0,
+                ),
+              ),
+              child: InkWell(
+                onTap: () {
+                  themeProvider.setDishCardLayout(layout);
+                },
+                borderRadius: BorderRadius.circular(14.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(14.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 44.0,
+                        height: 44.0,
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? primaryColor
+                              : primaryColor.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                        alignment: Alignment.center,
+                        child: Icon(
+                          layout.icon,
+                          color: isSelected ? Colors.white : primaryColor,
+                          size: 22.0,
+                        ),
+                      ),
+                      const SizedBox(width: 12.0),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    layout.displayName,
+                                    style: TextStyle(
+                                      fontSize: 14.5,
+                                      fontWeight: FontWeight.bold,
+                                      color: colorScheme.onSurface,
+                                    ),
+                                  ),
+                                ),
+                                if (isSelected)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8.0, vertical: 2.0),
+                                    decoration: BoxDecoration(
+                                      color: primaryColor,
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
+                                    child: const Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.check_rounded,
+                                            size: 13.0, color: Colors.white),
+                                        SizedBox(width: 3.0),
+                                        Text(
+                                          'ATTIVO',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 10.0,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(height: 4.0),
+                            Text(
+                              layout.description,
+                              style: TextStyle(
+                                fontSize: 12.0,
+                                height: 1.35,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        }),
+        const SizedBox(height: 8.0),
+      ],
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 4D. TAB 3: BANNER DI COPERTINA & TEXTURE DI SFONDO
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  Widget _buildBannerTextureCustomizationView({
+    Key? key,
+    required BuildContext context,
+    required ThemeProvider themeProvider,
+    required Color primaryColor,
+    required bool isDark,
+  }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final currentBanner = themeProvider.coverBanner;
+    final currentTexture = themeProvider.backgroundTexture;
+
+    return Column(
+      key: key,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // ─── SEZIONE 1: BANNER DI COPERTINA ───
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2.0, vertical: 4.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Banner di Copertina',
+                    style: TextStyle(
+                      fontSize: 15.0,
+                      fontWeight: FontWeight.w700,
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 2.0),
+                  Text(
+                    'Hero header mostrato in cima al menù digitale.',
+                    style: TextStyle(
+                      fontSize: 12.0,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+              if (currentBanner.isNotEmpty)
+                TextButton.icon(
+                  onPressed: () {
+                    themeProvider.setCoverBanner('');
+                    _bannerUrlController.clear();
+                  },
+                  icon: const Icon(Icons.close_rounded, size: 14.0),
+                  label: const Text('Rimuovi', style: TextStyle(fontSize: 11.5)),
+                  style: TextButton.styleFrom(
+                    foregroundColor: colorScheme.error,
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8.0),
+
+        // Opzione: Nessun banner
+        Card(
+          elevation: currentBanner.isEmpty ? 2.0 : 0.5,
+          color: currentBanner.isEmpty
+              ? primaryColor.withValues(alpha: isDark ? 0.15 : 0.06)
+              : colorScheme.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+            side: BorderSide(
+              color: currentBanner.isEmpty
+                  ? primaryColor
+                  : colorScheme.outlineVariant.withValues(alpha: 0.35),
+              width: currentBanner.isEmpty ? 1.8 : 1.0,
+            ),
+          ),
+          child: InkWell(
+            onTap: () {
+              themeProvider.setCoverBanner('');
+              _bannerUrlController.clear();
+            },
+            borderRadius: BorderRadius.circular(12.0),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 11.0),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.hide_image_outlined,
+                    color: currentBanner.isEmpty ? primaryColor : colorScheme.onSurfaceVariant,
+                    size: 20.0,
+                  ),
+                  const SizedBox(width: 10.0),
+                  Expanded(
+                    child: Text(
+                      'Nessun Banner (Header pulito)',
+                      style: TextStyle(
+                        fontSize: 13.5,
+                        fontWeight: currentBanner.isEmpty ? FontWeight.bold : FontWeight.w500,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                  ),
+                  if (currentBanner.isEmpty)
+                    Icon(Icons.check_circle_rounded, color: primaryColor, size: 18.0),
+                ],
+              ),
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 10.0),
+
+        // Preset HD Banner Gastronomici
+        Text(
+          'Preset Fotografici HD Selezionati',
+          style: TextStyle(
+            fontSize: 12.5,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.3,
+            color: colorScheme.onSurface,
+          ),
+        ),
+        const SizedBox(height: 8.0),
+
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: PersonalizzazionePresets.banners.length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 1.35,
+            crossAxisSpacing: 10.0,
+            mainAxisSpacing: 10.0,
+          ),
+          itemBuilder: (context, index) {
+            final b = PersonalizzazionePresets.banners[index];
+            final isSelected = currentBanner == b.id || currentBanner == b.imageUrl;
+
+            return ClipRRect(
+              borderRadius: BorderRadius.circular(12.0),
+              child: InkWell(
+                onTap: () {
+                  themeProvider.setCoverBanner(b.id);
+                  _bannerUrlController.text = b.id;
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12.0),
+                    border: Border.all(
+                      color: isSelected ? primaryColor : Colors.transparent,
+                      width: isSelected ? 2.5 : 0.0,
+                    ),
+                    image: DecorationImage(
+                      image: NetworkImage(b.imageUrl),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withValues(alpha: 0.75),
+                        ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                    ),
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Align(
+                          alignment: Alignment.topRight,
+                          child: isSelected
+                              ? Container(
+                                  padding: const EdgeInsets.all(3.0),
+                                  decoration: BoxDecoration(
+                                    color: primaryColor,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(Icons.check_rounded, color: Colors.white, size: 14.0),
+                                )
+                              : const SizedBox.shrink(),
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              b.title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 11.5,
+                              ),
+                            ),
+                            Text(
+                              b.subtitle,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.8),
+                                fontSize: 9.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+
+        const SizedBox(height: 12.0),
+
+        // Campo inserimento URL Banner personalizzato
+        Container(
+          padding: const EdgeInsets.all(12.0),
+          decoration: BoxDecoration(
+            color: colorScheme.surface,
+            borderRadius: BorderRadius.circular(12.0),
+            border: Border.all(
+              color: colorScheme.outlineVariant.withValues(alpha: 0.4),
+              width: 1.0,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Oppure inserisci URL foto personalizzata:',
+                style: TextStyle(
+                  fontSize: 12.0,
+                  fontWeight: FontWeight.w600,
+                  color: colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(height: 8.0),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _bannerUrlController,
+                      style: TextStyle(fontSize: 12.5, color: colorScheme.onSurface),
+                      decoration: InputDecoration(
+                        hintText: 'https://images.unsplash.com/...',
+                        hintStyle: TextStyle(fontSize: 12.0, color: colorScheme.onSurfaceVariant),
+                        isDense: true,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: BorderSide(color: colorScheme.outlineVariant),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8.0),
+                  ElevatedButton(
+                    onPressed: () {
+                      final val = _bannerUrlController.text.trim();
+                      if (val.isNotEmpty) {
+                        themeProvider.setCoverBanner(val);
+                        FocusScope.of(context).unfocus();
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+                    ),
+                    child: const Text('Applica', style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 20.0),
+        Divider(color: colorScheme.outlineVariant.withValues(alpha: 0.3)),
+        const SizedBox(height: 12.0),
+
+        // ─── SEZIONE 2: TEXTURE DI SFONDO ───
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2.0, vertical: 4.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Texture & Sfondo Menù',
+                style: TextStyle(
+                  fontSize: 15.0,
+                  fontWeight: FontWeight.w700,
+                  color: colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(height: 2.0),
+              Text(
+                'Personalizza l\'atmosfera materica dello sfondo del tuo menù.',
+                style: TextStyle(
+                  fontSize: 12.0,
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10.0),
+
+        ...BackgroundTexture.values.map((texture) {
+          final isSelected = currentTexture == texture;
+          final texDeco = PersonalizzazionePresets.getTextureDecoration(
+            texture: texture,
+            isDark: isDark,
+            theme: theme,
+          );
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Card(
+              elevation: isSelected ? 2.0 : 0.5,
+              color: isSelected
+                  ? primaryColor.withValues(alpha: isDark ? 0.15 : 0.06)
+                  : colorScheme.surface,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
+                side: BorderSide(
+                  color: isSelected
+                      ? primaryColor
+                      : colorScheme.outlineVariant.withValues(alpha: 0.35),
+                  width: isSelected ? 1.8 : 1.0,
+                ),
+              ),
+              child: InkWell(
+                onTap: () {
+                  themeProvider.setBackgroundTexture(texture);
+                },
+                borderRadius: BorderRadius.circular(12.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Row(
+                    children: [
+                      // Miniature texture container
+                      Container(
+                        width: 44.0,
+                        height: 44.0,
+                        decoration: texDeco.copyWith(
+                          borderRadius: BorderRadius.circular(10.0),
+                          border: Border.all(
+                            color: isSelected
+                                ? primaryColor
+                                : colorScheme.outlineVariant.withValues(alpha: 0.5),
+                            width: 1.0,
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: Icon(
+                          texture.icon,
+                          size: 20.0,
+                          color: isSelected ? primaryColor : colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(width: 12.0),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              texture.displayName,
+                              style: TextStyle(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.bold,
+                                color: colorScheme.onSurface,
+                              ),
+                            ),
+                            const SizedBox(height: 2.0),
+                            Text(
+                              texture.description,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 11.0,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (isSelected)
+                        Icon(Icons.check_circle_rounded, color: primaryColor, size: 20.0),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        }),
+        const SizedBox(height: 10.0),
+      ],
     );
   }
 

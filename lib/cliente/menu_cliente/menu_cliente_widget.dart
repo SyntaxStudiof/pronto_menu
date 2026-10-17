@@ -25,6 +25,7 @@ import '/services/mutaforma_service.dart';
 import '/cliente/ingredienti_helper.dart';
 import '/app_themes.dart';
 import '/theme_provider.dart';
+import '/personalizzazione/personalizzazione_presets.dart';
 import 'menu_cliente_model.dart';
 export 'menu_cliente_model.dart';
 
@@ -1241,6 +1242,15 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
               : clientStyle.defaultBodyFont,
         );
 
+        final DishCardLayout clientLayout =
+            DishCardLayoutExtension.fromString(menuClienteUsersRecord.layoutPiatti);
+
+        final BackgroundTexture clientTexture =
+            BackgroundTextureExtension.fromString(menuClienteUsersRecord.textureSfondo);
+
+        final String clientBannerUrl =
+            PersonalizzazionePresets.resolveBannerUrl(menuClienteUsersRecord.bannerCopertina);
+
         return Theme(
           data: clientTheme,
           child: Builder(
@@ -1416,65 +1426,126 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
               child: SizedBox.expand(
                 child: mutaformaInPausa
                     ? _buildMutaformaPausaView(theme, prossimaFascia)
-                    : Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          Column(
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              if (widget.solaConsultazione && (widget.fasciaId != null || mutaformaInPausa))
-                                Container(
-                                  width: double.infinity,
-                                  margin: const EdgeInsets.fromLTRB(
-                                      16.0, 8.0, 16.0, 4.0),
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 14.0, vertical: 8.0),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF673AB7)
-                                        .withValues(alpha: 0.10),
-                                    borderRadius: BorderRadius.circular(12.0),
-                                    border: Border.all(
+                    : Container(
+                        decoration: PersonalizzazionePresets.getTextureDecoration(
+                          texture: clientTexture,
+                          isDark: theme.brightness == Brightness.dark,
+                          theme: theme,
+                        ),
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            Column(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                if (widget.solaConsultazione && (widget.fasciaId != null || mutaformaInPausa))
+                                  Container(
+                                    width: double.infinity,
+                                    margin: const EdgeInsets.fromLTRB(
+                                        16.0, 8.0, 16.0, 4.0),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 14.0, vertical: 8.0),
+                                    decoration: BoxDecoration(
                                       color: const Color(0xFF673AB7)
-                                          .withValues(alpha: 0.25),
-                                      width: 1.0,
-                                    ),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.visibility_rounded,
-                                        color: Color(0xFF673AB7),
-                                        size: 18.0,
+                                          .withValues(alpha: 0.10),
+                                      borderRadius: BorderRadius.circular(12.0),
+                                      border: Border.all(
+                                        color: const Color(0xFF673AB7)
+                                            .withValues(alpha: 0.25),
+                                        width: 1.0,
                                       ),
-                                      const SizedBox(width: 8.0),
-                                      Expanded(
-                                        child: Text(
-                                          fasciaTarget != null
-                                              ? 'Menù ${fasciaTarget.nome} • Sola consultazione'
-                                              : 'Menù fuori orario • Sola consultazione',
-                                          style: const TextStyle(
-                                            color: Color(0xFF673AB7),
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 12.5,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.visibility_rounded,
+                                          color: Color(0xFF673AB7),
+                                          size: 18.0,
+                                        ),
+                                        const SizedBox(width: 8.0),
+                                        Expanded(
+                                          child: Text(
+                                            fasciaTarget != null
+                                                ? 'Menù ${fasciaTarget.nome} • Sola consultazione'
+                                                : 'Menù fuori orario • Sola consultazione',
+                                            style: const TextStyle(
+                                              color: Color(0xFF673AB7),
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 12.5,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              Container(
-                                width: double.infinity,
-                                height: 52.0,
-                                decoration: BoxDecoration(
-                                  color: theme.scaffoldBackgroundColor,
-                                  border: Border(
-                                    bottom: BorderSide(
-                                      color: theme.dividerColor
-                                          .withValues(alpha: 0.08),
-                                      width: 1.0,
+                                      ],
                                     ),
                                   ),
-                                ),
+                                if (clientBannerUrl.isNotEmpty)
+                                  Container(
+                                    width: double.infinity,
+                                    height: 120.0,
+                                    margin: const EdgeInsets.fromLTRB(12.0, 6.0, 12.0, 6.0),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(16.0),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withValues(alpha: 0.15),
+                                          blurRadius: 10.0,
+                                          offset: const Offset(0, 3),
+                                        ),
+                                      ],
+                                      image: DecorationImage(
+                                        image: NetworkImage(clientBannerUrl),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(16.0),
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Colors.transparent,
+                                            Colors.black.withValues(alpha: 0.65),
+                                          ],
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                        ),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
+                                      alignment: Alignment.bottomLeft,
+                                      child: Text(
+                                        menuClienteUsersRecord.displayName.isNotEmpty
+                                            ? menuClienteUsersRecord.displayName
+                                            : 'Benvenuti',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16.5,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: -0.2,
+                                          shadows: [
+                                            Shadow(
+                                              color: Colors.black87,
+                                              blurRadius: 4.0,
+                                              offset: Offset(0, 1),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                Container(
+                                  width: double.infinity,
+                                  height: 52.0,
+                                  decoration: BoxDecoration(
+                                    color: clientTexture != BackgroundTexture.nessuna
+                                        ? Colors.transparent
+                                        : theme.scaffoldBackgroundColor,
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: theme.dividerColor
+                                            .withValues(alpha: 0.08),
+                                        width: 1.0,
+                                      ),
+                                    ),
+                                  ),
                                 child: StreamBuilder<List<CategoriesRecord>>(
                                   stream: _categoriesStream ??
                                       queryCategoriesRecord(
@@ -2103,349 +2174,13 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                                   );
                                 }
 
-                                return ListView.builder(
-                                  padding: EdgeInsets.zero,
-                                  shrinkWrap: true,
-                                  scrollDirection: Axis.vertical,
-                                  itemCount:
-                                      listViewNomePiattiRecordList.length,
-                                  itemBuilder: (context, listViewNomeIndex) {
-                                    final listViewNomePiattiRecord =
-                                        listViewNomePiattiRecordList[
-                                            listViewNomeIndex];
-                                    return Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                          10.0, 10.0, 10.0, 10.0),
-                                      child: InkWell(
-                                        splashColor: Colors.transparent,
-                                        focusColor: Colors.transparent,
-                                        hoverColor: Colors.transparent,
-                                        highlightColor: Colors.transparent,
-                                        onTap: () async {
-                                          await showModalBottomSheet(
-                                            isScrollControlled: true,
-                                            backgroundColor: Colors.transparent,
-                                            context: context,
-                                            builder: (context) {
-                                              return GestureDetector(
-                                                onTap: () {
-                                                  FocusScope.of(context)
-                                                      .unfocus();
-                                                  FocusManager
-                                                      .instance.primaryFocus
-                                                      ?.unfocus();
-                                                },
-                                                child: Padding(
-                                                  padding:
-                                                      MediaQuery.viewInsetsOf(
-                                                          context),
-                                                  child:
-                                                      DettagliPiattoPopupWidget(
-                                                    piattoSelezionato:
-                                                        listViewNomePiattiRecord,
-                                                    currentLang: _currentLang,
-                                                    ingredientiEsauriti:
-                                                        _ingredientiEsauriti,
-                                                    ristoranteRef:
-                                                        widget.ristoranteRef,
-                                                    dispensaAttiva:
-                                                        menuClienteUsersRecord.dispensaAttiva,
-                                                    modifichePiattiAttive:
-                                                        menuClienteUsersRecord.modifichePiattiAttive,
-                                                    prezzoAggiuntaManuale:
-                                                        menuClienteUsersRecord.prezzoAggiuntaManuale,
-                                                    ingredientiManualiAttivi:
-                                                        menuClienteUsersRecord.ingredientiManualiAttivi,
-                                                    solaConsultazione:
-                                                        isSolaConsultazione,
-                                                    mostraFoto:
-                                                        menuClienteUsersRecord
-                                                            .hasUltra,
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                          ).then(
-                                              (value) => safeSetState(() {}));
-                                        },
-                                        child: Material(
-                                          color: Colors.transparent,
-                                          elevation: 2.0,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(12.0),
-                                          ),
-                                          child: Container(
-                                            width: MediaQuery.sizeOf(context)
-                                                    .width *
-                                                1.0,
-                                            constraints: const BoxConstraints(
-                                                minHeight: 72.0),
-                                            decoration: BoxDecoration(
-                                              color: theme.cardColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(12.0),
-                                            ),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.max,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                if (menuClienteUsersRecord.hasUltra &&
-                                                    listViewNomePiattiRecord
-                                                            .foto !=
-                                                        null &&
-                                                    listViewNomePiattiRecord
-                                                            .foto !=
-                                                        '')
-                                                  Align(
-                                                    alignment:
-                                                        AlignmentDirectional(
-                                                            0.0, 0.0),
-                                                    child: Container(
-                                                      width: 60.0,
-                                                      height: 60.0,
-                                                      child: Stack(
-                                                        children: [
-                                                          Align(
-                                                            alignment:
-                                                                AlignmentDirectional(
-                                                                    0.0, 0.0),
-                                                            child:
-                                                                CircularPercentIndicator(
-                                                              percent: 1.0,
-                                                              radius: 25.0,
-                                                              lineWidth: 12.0,
-                                                              animation: true,
-                                                              animateFromLastPercent:
-                                                                  true,
-                                                              progressColor: theme.colorScheme.primary,
-                                                              backgroundColor: theme.colorScheme.secondary,
-                                                            ),
-                                                          ),
-                                                          ClipRRect(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        12.0),
-                                                            child:
-                                                                Image.network(
-                                                              valueOrDefault<
-                                                                  String>(
-                                                                listViewNomePiattiRecord
-                                                                    .foto,
-                                                                'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/pronto-menu-f0och1/assets/2n9hc9ugo68c/Immagine_standard.png',
-                                                              ),
-                                                              width: 60.0,
-                                                              height: 60.0,
-                                                              fit: BoxFit.cover,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                Expanded(
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                                    child: Column(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Padding(
-                                                          padding:
-                                                              EdgeInsetsDirectional
-                                                                  .fromSTEB(
-                                                                      10.0,
-                                                                      0.0,
-                                                                      0.0,
-                                                                      0.0),
-                                                          child: Text(
-                                                            listViewNomePiattiRecord.nome, maxLines: 1, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, fontSize: 18.0)),
-                                                        ),
-                                                        if (listViewNomePiattiRecord.ingredienti != '')
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsetsDirectional
-                                                                    .fromSTEB(
-                                                                        12.0,
-                                                                        2.0,
-                                                                        0.0,
-                                                                        0.0),
-                                                            child: IngredientiHelper.buildIngredientiWidget(
-                                                              ingredientiText: TranslationService.getDishIngredients(
-                                                                  listViewNomePiattiRecord,
-                                                                  _currentLang),
-                                                              ingredientiOriginali:
-                                                                  listViewNomePiattiRecord.ingredienti,
-                                                              ingredientiEsauriti: _ingredientiEsauriti,
-                                                              baseStyle: theme.textTheme.bodySmall?.copyWith(
-                                                                color: theme.hintColor,
-                                                                height: 1.35,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        if (listViewNomePiattiRecord.intolleranze.isNotEmpty ||
-                                                            listViewNomePiattiRecord.allergeni.isNotEmpty)
-                                                          Padding(
-                                                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                                                10.0, 4.0, 0.0, 0.0),
-                                                            child: Wrap(
-                                                              spacing: 4.0,
-                                                              runSpacing: 2.0,
-                                                              children: [
-                                                                ...listViewNomePiattiRecord.intolleranze.map((tag) {
-                                                                  final f = AllergeniData.getFiltroMagicoById(tag);
-                                                                  if (f == null) return const SizedBox.shrink();
-                                                                  return Container(
-                                                                    padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 1.5),
-                                                                    decoration: BoxDecoration(
-                                                                      color: f.badgeColor.withValues(alpha: 0.15),
-                                                                      borderRadius: BorderRadius.circular(6.0),
-                                                                    ),
-                                                                    child: Text(
-                                                                      '${f.emoji} ${TranslationService.getFiltroLabel(f.id, _currentLang)}',
-                                                                      style: TextStyle(
-                                                                        color: f.badgeColor,
-                                                                        fontSize: 10.0,
-                                                                        fontWeight: FontWeight.bold,
-                                                                      ),
-                                                                    ),
-                                                                  );
-                                                                }),
-                                                                if (listViewNomePiattiRecord.allergeni.isNotEmpty)
-                                                                  Container(
-                                                                    padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 1.5),
-                                                                    decoration: BoxDecoration(
-                                                                      color: Colors.orange.withValues(alpha: 0.15),
-                                                                      borderRadius: BorderRadius.circular(6.0),
-                                                                    ),
-                                                                    child: Text(
-                                                                      '⚠️ ${listViewNomePiattiRecord.allergeni.length} ${TranslationService.getUi('allergeni_badge', _currentLang)}',
-                                                                      style: TextStyle(
-                                                                        color: Colors.orange.shade800,
-                                                                        fontSize: 10.0,
-                                                                        fontWeight: FontWeight.w600,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                                Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  children: [
-                                                    SizedBox(
-                                                      height: 50.0,
-                                                      child: VerticalDivider(
-                                                        thickness: 1.0,
-                                                        color: FFAppState()
-                                                            .temaAlternate,
-                                                      ),
-                                                    ),
-                                                    Container(
-                                                      width: 70.0,
-                                                      decoration:
-                                                          BoxDecoration(),
-                                                      child: Padding(
-                                                        padding:
-                                                            EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                                    0.0,
-                                                                    0.0,
-                                                                    8.0,
-                                                                    0.0),
-                                                        child: Text(
-                                                          formatNumber(
-                                                            listViewNomePiattiRecord.prezzo, formatType: FormatType.decimal, decimalType: DecimalType.periodDecimal, currency: '€'), textAlign: TextAlign.end, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600, color: theme.hintColor)),
-                                                      ),
-                                                    ),
-                                                    if (!isSolaConsultazione) ...[
-                                                      if (menuClienteUsersRecord.dispensaAttiva &&
-                                                          menuClienteUsersRecord.modifichePiattiAttive &&
-                                                          widget.ristoranteRef != null)
-                                                        Padding(
-                                                          padding: const EdgeInsets.only(right: 6.0),
-                                                          child: FlutterFlowIconButton(
-                                                            borderRadius: 25.0,
-                                                            buttonSize: 38.0,
-                                                            fillColor: theme.colorScheme.primary.withValues(alpha: 0.12),
-                                                            icon: Icon(
-                                                              Icons.tune_rounded,
-                                                              color: theme.colorScheme.primary,
-                                                              size: 19.0,
-                                                            ),
-                                                            onPressed: () async {
-                                                              await ModalPersonalizzaPiattoWidget.show(
-                                                                context: context,
-                                                                piatto: listViewNomePiattiRecord,
-                                                                ristoranteRef: widget.ristoranteRef!,
-                                                                dispensaAttiva: menuClienteUsersRecord.dispensaAttiva,
-                                                                prezzoAggiuntaManuale: menuClienteUsersRecord.prezzoAggiuntaManuale,
-                                                                currentLang: _currentLang,
-                                                              );
-                                                              safeSetState(() {});
-                                                            },
-                                                          ),
-                                                        ),
-                                                      Padding(
-                                                        padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 5.0, 0.0),
-                                                        child: FlutterFlowIconButton(
-                                                          borderRadius: 25.0,
-                                                          buttonSize: 40.0,
-                                                          fillColor: theme.colorScheme.primary,
-                                                          icon: FaIcon(
-                                                            FontAwesomeIcons.plus,
-                                                            color: theme.colorScheme.onPrimary,
-                                                            size: 20.0,
-                                                          ),
-                                                          onPressed: () async {
-                                                            FFAppState().addToCarrello(
-                                                                listViewNomePiattiRecord.reference);
-                                                            safeSetState(() {});
-                                                            FFAppState().totaleCarrello =
-                                                                FFAppState().totaleCarrello +
-                                                                    listViewNomePiattiRecord.prezzo;
-                                                            safeSetState(() {});
-                                                            FFAppState().addToCarrelloNomi(
-                                                                listViewNomePiattiRecord.nome);
-                                                            safeSetState(() {});
-                                                            FFAppState().addToCarrelloPrezzi(
-                                                                listViewNomePiattiRecord.prezzo);
-                                                            safeSetState(() {});
-                                                          },
-                                                        ),
-                                                      ),
-                                                    ] else ...[
-                                                      Padding(
-                                                        padding: const EdgeInsets.only(right: 8.0),
-                                                        child: Icon(
-                                                          Icons.remove_red_eye_outlined,
-                                                          size: 18.0,
-                                                          color: theme.hintColor.withValues(alpha: 0.6),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  },
+                                return _buildDishesView(
+                                  context,
+                                  theme,
+                                  menuClienteUsersRecord,
+                                  listViewNomePiattiRecordList,
+                                  clientLayout,
+                                  isSolaConsultazione,
                                 );
                               },
                             ),
@@ -2560,365 +2295,13 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                                   );
                                 }
 
-                                return ListView.builder(
-                                  padding: EdgeInsets.zero,
-                                  shrinkWrap: true,
-                                  scrollDirection: Axis.vertical,
-                                  itemCount:
-                                      listViewPrezzoPiattiRecordList.length,
-                                  itemBuilder: (context, listViewPrezzoIndex) {
-                                    final listViewPrezzoPiattiRecord =
-                                        listViewPrezzoPiattiRecordList[
-                                            listViewPrezzoIndex];
-                                    return Padding(
-                                      padding: EdgeInsetsDirectional.fromSTEB(
-                                          10.0, 10.0, 10.0, 10.0),
-                                      child: InkWell(
-                                        splashColor: Colors.transparent,
-                                        focusColor: Colors.transparent,
-                                        hoverColor: Colors.transparent,
-                                        highlightColor: Colors.transparent,
-                                        onTap: () async {
-                                          await showModalBottomSheet(
-                                            isScrollControlled: true,
-                                            backgroundColor: Colors.transparent,
-                                            context: context,
-                                            builder: (context) {
-                                              return GestureDetector(
-                                                onTap: () {
-                                                  FocusScope.of(context)
-                                                      .unfocus();
-                                                  FocusManager
-                                                      .instance.primaryFocus
-                                                      ?.unfocus();
-                                                },
-                                                child: Padding(
-                                                  padding:
-                                                      MediaQuery.viewInsetsOf(
-                                                          context),
-                                                  child:
-                                                      DettagliPiattoPopupWidget(
-                                                    piattoSelezionato:
-                                                        listViewPrezzoPiattiRecord,
-                                                    currentLang: _currentLang,
-                                                    ingredientiEsauriti:
-                                                        _ingredientiEsauriti,
-                                                    ristoranteRef:
-                                                        widget.ristoranteRef,
-                                                    dispensaAttiva:
-                                                        menuClienteUsersRecord.dispensaAttiva,
-                                                    modifichePiattiAttive:
-                                                        menuClienteUsersRecord.modifichePiattiAttive,
-                                                    prezzoAggiuntaManuale:
-                                                        menuClienteUsersRecord.prezzoAggiuntaManuale,
-                                                    ingredientiManualiAttivi:
-                                                        menuClienteUsersRecord.ingredientiManualiAttivi,
-                                                    solaConsultazione:
-                                                        isSolaConsultazione,
-                                                    mostraFoto:
-                                                        menuClienteUsersRecord
-                                                            .hasUltra,
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                          ).then(
-                                              (value) => safeSetState(() {}));
-                                        },
-                                        child: Material(
-                                          color: Colors.transparent,
-                                          elevation: 2.0,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(12.0),
-                                          ),
-                                          child: Container(
-                                            width: MediaQuery.sizeOf(context)
-                                                    .width *
-                                                1.0,
-                                            constraints: const BoxConstraints(
-                                                minHeight: 72.0),
-                                            decoration: BoxDecoration(
-                                              color: theme.cardColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(12.0),
-                                            ),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.max,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                if (menuClienteUsersRecord.hasUltra &&
-                                                    listViewPrezzoPiattiRecord
-                                                            .foto !=
-                                                        null &&
-                                                    listViewPrezzoPiattiRecord
-                                                            .foto !=
-                                                        '')
-                                                  Align(
-                                                    alignment:
-                                                        AlignmentDirectional(
-                                                            0.0, 0.0),
-                                                    child: Container(
-                                                      width: 60.0,
-                                                      height: 60.0,
-                                                      child: Stack(
-                                                        children: [
-                                                          Align(
-                                                            alignment:
-                                                                AlignmentDirectional(
-                                                                    0.0, 0.0),
-                                                            child:
-                                                                CircularPercentIndicator(
-                                                              percent: 1.0,
-                                                              radius: 25.0,
-                                                              lineWidth: 12.0,
-                                                              animation: true,
-                                                              animateFromLastPercent:
-                                                                  true,
-                                                              progressColor: theme.colorScheme.primary,
-                                                              backgroundColor: theme.colorScheme.secondary,
-                                                            ),
-                                                          ),
-                                                          ClipRRect(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        12.0),
-                                                            child:
-                                                                Image.network(
-                                                              valueOrDefault<
-                                                                  String>(
-                                                                listViewPrezzoPiattiRecord
-                                                                    .foto,
-                                                                'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/pronto-menu-f0och1/assets/2n9hc9ugo68c/Immagine_standard.png',
-                                                              ),
-                                                              width: 60.0,
-                                                              height: 60.0,
-                                                              fit: BoxFit.cover,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                Expanded(
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                                    child: Column(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Padding(
-                                                          padding:
-                                                              EdgeInsetsDirectional
-                                                                  .fromSTEB(
-                                                                      10.0,
-                                                                      0.0,
-                                                                      0.0,
-                                                                      0.0),
-                                                          child: Text(
-                                                            listViewPrezzoPiattiRecord.nome, maxLines: 1, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, fontSize: 18.0)),
-                                                        ),
-                                                        if (listViewPrezzoPiattiRecord.ingredienti != '')
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsetsDirectional
-                                                                    .fromSTEB(
-                                                                        12.0,
-                                                                        2.0,
-                                                                        0.0,
-                                                                        0.0),
-                                                            child: IngredientiHelper.buildIngredientiWidget(
-                                                              ingredientiText: TranslationService.getDishIngredients(
-                                                                  listViewPrezzoPiattiRecord,
-                                                                  _currentLang),
-                                                              ingredientiOriginali:
-                                                                  listViewPrezzoPiattiRecord.ingredienti,
-                                                              ingredientiEsauriti: _ingredientiEsauriti,
-                                                              baseStyle: theme.textTheme.bodySmall?.copyWith(
-                                                                color: theme.hintColor,
-                                                                height: 1.35,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        if (listViewPrezzoPiattiRecord.intolleranze.isNotEmpty ||
-                                                            listViewPrezzoPiattiRecord.allergeni.isNotEmpty)
-                                                          Padding(
-                                                            padding: const EdgeInsetsDirectional.fromSTEB(
-                                                                10.0, 4.0, 0.0, 0.0),
-                                                            child: Wrap(
-                                                              spacing: 4.0,
-                                                              runSpacing: 2.0,
-                                                              children: [
-                                                                ...listViewPrezzoPiattiRecord.intolleranze.map((tag) {
-                                                                  final f = AllergeniData.getFiltroMagicoById(tag);
-                                                                  if (f == null) return const SizedBox.shrink();
-                                                                  return Container(
-                                                                    padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 1.5),
-                                                                    decoration: BoxDecoration(
-                                                                      color: f.badgeColor.withValues(alpha: 0.15),
-                                                                      borderRadius: BorderRadius.circular(6.0),
-                                                                    ),
-                                                                    child: Text(
-                                                                      '${f.emoji} ${TranslationService.getFiltroLabel(f.id, _currentLang)}',
-                                                                      style: TextStyle(
-                                                                        color: f.badgeColor,
-                                                                        fontSize: 10.0,
-                                                                        fontWeight: FontWeight.bold,
-                                                                      ),
-                                                                    ),
-                                                                  );
-                                                                }),
-                                                                if (listViewPrezzoPiattiRecord.allergeni.isNotEmpty)
-                                                                  Container(
-                                                                    padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 1.5),
-                                                                    decoration: BoxDecoration(
-                                                                      color: Colors.orange.withValues(alpha: 0.15),
-                                                                      borderRadius: BorderRadius.circular(6.0),
-                                                                    ),
-                                                                    child: Text(
-                                                                      '⚠️ ${listViewPrezzoPiattiRecord.allergeni.length} ${TranslationService.getUi('allergeni_badge', _currentLang)}',
-                                                                      style: TextStyle(
-                                                                        color: Colors.orange.shade800,
-                                                                        fontSize: 10.0,
-                                                                        fontWeight: FontWeight.w600,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                                Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  children: [
-                                                    SizedBox(
-                                                      height: 50.0,
-                                                      child: VerticalDivider(
-                                                        thickness: 1.0,
-                                                        color: FFAppState()
-                                                            .temaAlternate,
-                                                      ),
-                                                    ),
-                                                    Container(
-                                                      width: 70.0,
-                                                      decoration:
-                                                          BoxDecoration(),
-                                                      child: Padding(
-                                                        padding:
-                                                            EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                                    0.0,
-                                                                    0.0,
-                                                                    8.0,
-                                                                    0.0),
-                                                        child: Text(
-                                                          formatNumber(
-                                                            listViewPrezzoPiattiRecord.prezzo, formatType: FormatType.decimal, decimalType: DecimalType.periodDecimal, currency: '€'), textAlign: TextAlign.end, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600, color: theme.hintColor)),
-                                                      ),
-                                                    ),
-                                                    if (!isSolaConsultazione) ...[
-                                                      if (menuClienteUsersRecord.dispensaAttiva &&
-                                                          menuClienteUsersRecord.modifichePiattiAttive &&
-                                                          widget.ristoranteRef != null)
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets.only(right: 6.0),
-                                                          child: FlutterFlowIconButton(
-                                                            borderRadius: 25.0,
-                                                            buttonSize: 38.0,
-                                                            fillColor: theme.colorScheme.primary.withValues(alpha: 0.12),
-                                                            icon: Icon(
-                                                              Icons.tune_rounded,
-                                                              color: theme.colorScheme.primary,
-                                                              size: 19.0,
-                                                            ),
-                                                            onPressed: () async {
-                                                              await ModalPersonalizzaPiattoWidget.show(
-                                                                context: context,
-                                                                piatto: listViewPrezzoPiattiRecord,
-                                                                ristoranteRef: widget.ristoranteRef!,
-                                                                dispensaAttiva: menuClienteUsersRecord.dispensaAttiva,
-                                                                prezzoAggiuntaManuale: menuClienteUsersRecord.prezzoAggiuntaManuale,
-                                                                currentLang: _currentLang,
-                                                              );
-                                                              safeSetState(() {});
-                                                            },
-                                                          ),
-                                                        ),
-                                                      Padding(
-                                                        padding:
-                                                            EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                                    0.0,
-                                                                    0.0,
-                                                                    5.0,
-                                                                    0.0),
-                                                        child:
-                                                            FlutterFlowIconButton(
-                                                          borderRadius: 25.0,
-                                                          buttonSize: 40.0,
-                                                          fillColor: theme.colorScheme.primary,
-                                                          icon: FaIcon(
-                                                            FontAwesomeIcons.plus,
-                                                            color: theme.colorScheme.onPrimary,
-                                                            size: 20.0,
-                                                          ),
-                                                          onPressed: () async {
-                                                            FFAppState().addToCarrello(
-                                                                listViewPrezzoPiattiRecord
-                                                                    .reference);
-                                                            safeSetState(() {});
-                                                            FFAppState()
-                                                                    .totaleCarrello =
-                                                                FFAppState()
-                                                                        .totaleCarrello +
-                                                                    listViewPrezzoPiattiRecord
-                                                                        .prezzo;
-                                                            safeSetState(() {});
-                                                            FFAppState()
-                                                                .addToCarrelloNomi(
-                                                                    listViewPrezzoPiattiRecord
-                                                                        .nome);
-                                                            safeSetState(() {});
-                                                            FFAppState()
-                                                                .addToCarrelloPrezzi(
-                                                                    listViewPrezzoPiattiRecord
-                                                                        .prezzo);
-                                                            safeSetState(() {});
-                                                          },
-                                                        ),
-                                                      ),
-                                                    ] else ...[
-                                                      Padding(
-                                                        padding: const EdgeInsets.only(right: 8.0),
-                                                        child: Icon(
-                                                          Icons.remove_red_eye_outlined,
-                                                          size: 18.0,
-                                                          color: theme.hintColor.withValues(alpha: 0.6),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  },
+                                return _buildDishesView(
+                                  context,
+                                  theme,
+                                  menuClienteUsersRecord,
+                                  listViewPrezzoPiattiRecordList,
+                                  clientLayout,
+                                  isSolaConsultazione,
                                 );
                               },
                             ),
@@ -3146,11 +2529,854 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
         ),
       ),
     ),
-  );
+  ),
+);
             },
           ),
         );
       },
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // GESTIONE LAYOUT SCHEDE PIATTO PERSONALIZZATE
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  void _addDishToCart(PiattiRecord dish) {
+    FFAppState().addToCarrello(dish.reference);
+    FFAppState().totaleCarrello = FFAppState().totaleCarrello + dish.prezzo;
+    FFAppState().addToCarrelloNomi(dish.nome);
+    FFAppState().addToCarrelloPrezzi(dish.prezzo);
+    safeSetState(() {});
+  }
+
+  Future<void> _customizeDish(
+    BuildContext context,
+    PiattiRecord dish,
+    UsersRecord menuClienteUsersRecord,
+  ) async {
+    if (widget.ristoranteRef == null) return;
+    await ModalPersonalizzaPiattoWidget.show(
+      context: context,
+      piatto: dish,
+      ristoranteRef: widget.ristoranteRef!,
+      dispensaAttiva: menuClienteUsersRecord.dispensaAttiva,
+      prezzoAggiuntaManuale: menuClienteUsersRecord.prezzoAggiuntaManuale,
+      currentLang: _currentLang,
+    );
+    safeSetState(() {});
+  }
+
+  Future<void> _openDishDetails(
+    BuildContext context,
+    PiattiRecord dish,
+    UsersRecord menuClienteUsersRecord,
+    bool isSolaConsultazione,
+  ) async {
+    await showModalBottomSheet(
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      context: context,
+      builder: (context) {
+        return GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+            FocusManager.instance.primaryFocus?.unfocus();
+          },
+          child: Padding(
+            padding: MediaQuery.viewInsetsOf(context),
+            child: DettagliPiattoPopupWidget(
+              piattoSelezionato: dish,
+              currentLang: _currentLang,
+              ingredientiEsauriti: _ingredientiEsauriti,
+              ristoranteRef: widget.ristoranteRef,
+              dispensaAttiva: menuClienteUsersRecord.dispensaAttiva,
+              modifichePiattiAttive: menuClienteUsersRecord.modifichePiattiAttive,
+              prezzoAggiuntaManuale: menuClienteUsersRecord.prezzoAggiuntaManuale,
+              ingredientiManualiAttivi: menuClienteUsersRecord.ingredientiManualiAttivi,
+              solaConsultazione: isSolaConsultazione,
+              mostraFoto: menuClienteUsersRecord.hasUltra,
+            ),
+          ),
+        );
+      },
+    ).then((value) => safeSetState(() {}));
+  }
+
+  Widget _buildDishesView(
+    BuildContext context,
+    ThemeData theme,
+    UsersRecord menuClienteUsersRecord,
+    List<PiattiRecord> dishes,
+    DishCardLayout layout,
+    bool isSolaConsultazione,
+  ) {
+    switch (layout) {
+      case DishCardLayout.fotoGrande:
+        return ListView.builder(
+          padding: const EdgeInsets.only(bottom: 24.0),
+          shrinkWrap: true,
+          scrollDirection: Axis.vertical,
+          itemCount: dishes.length,
+          itemBuilder: (context, index) {
+            return _buildFotoGrandeDishCard(
+              context,
+              theme,
+              menuClienteUsersRecord,
+              dishes[index],
+              isSolaConsultazione,
+            );
+          },
+        );
+
+      case DishCardLayout.griglia:
+        return GridView.builder(
+          padding: const EdgeInsets.fromLTRB(10.0, 4.0, 10.0, 32.0),
+          shrinkWrap: true,
+          physics: const BouncingScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 0.65,
+            crossAxisSpacing: 10.0,
+            mainAxisSpacing: 10.0,
+          ),
+          itemCount: dishes.length,
+          itemBuilder: (context, index) {
+            return _buildGrigliaDishCard(
+              context,
+              theme,
+              menuClienteUsersRecord,
+              dishes[index],
+              isSolaConsultazione,
+            );
+          },
+        );
+
+      case DishCardLayout.minimale:
+        return ListView.separated(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
+          shrinkWrap: true,
+          scrollDirection: Axis.vertical,
+          itemCount: dishes.length,
+          separatorBuilder: (context, index) => Divider(
+            color: theme.dividerColor.withValues(alpha: 0.15),
+            height: 14.0,
+            indent: 8.0,
+            endIndent: 8.0,
+          ),
+          itemBuilder: (context, index) {
+            return _buildMinimaleDishCard(
+              context,
+              theme,
+              menuClienteUsersRecord,
+              dishes[index],
+              isSolaConsultazione,
+            );
+          },
+        );
+
+      case DishCardLayout.classico:
+        return ListView.builder(
+          padding: EdgeInsets.zero,
+          shrinkWrap: true,
+          scrollDirection: Axis.vertical,
+          itemCount: dishes.length,
+          itemBuilder: (context, index) {
+            return _buildClassicoDishCard(
+              context,
+              theme,
+              menuClienteUsersRecord,
+              dishes[index],
+              isSolaConsultazione,
+            );
+          },
+        );
+    }
+  }
+
+  // 1. CLASSICO ORIZZONTALE
+  Widget _buildClassicoDishCard(
+    BuildContext context,
+    ThemeData theme,
+    UsersRecord menuClienteUsersRecord,
+    PiattiRecord dish,
+    bool isSolaConsultazione,
+  ) {
+    return Padding(
+      padding: const EdgeInsetsDirectional.fromSTEB(10.0, 10.0, 10.0, 10.0),
+      child: InkWell(
+        splashColor: Colors.transparent,
+        focusColor: Colors.transparent,
+        hoverColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        onTap: () => _openDishDetails(context, dish, menuClienteUsersRecord, isSolaConsultazione),
+        child: Material(
+          color: Colors.transparent,
+          elevation: 2.0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          child: Container(
+            width: MediaQuery.sizeOf(context).width * 1.0,
+            constraints: const BoxConstraints(minHeight: 72.0),
+            decoration: BoxDecoration(
+              color: theme.cardColor,
+              borderRadius: BorderRadius.circular(12.0),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                if (menuClienteUsersRecord.hasUltra && dish.foto.isNotEmpty)
+                  Align(
+                    alignment: const AlignmentDirectional(0.0, 0.0),
+                    child: SizedBox(
+                      width: 60.0,
+                      height: 60.0,
+                      child: Stack(
+                        children: [
+                          Align(
+                            alignment: const AlignmentDirectional(0.0, 0.0),
+                            child: CircularPercentIndicator(
+                              percent: 1.0,
+                              radius: 25.0,
+                              lineWidth: 12.0,
+                              animation: true,
+                              animateFromLastPercent: true,
+                              progressColor: theme.colorScheme.primary,
+                              backgroundColor: theme.colorScheme.secondary,
+                            ),
+                          ),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12.0),
+                            child: Image.network(
+                              valueOrDefault<String>(
+                                dish.foto,
+                                'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/pronto-menu-f0och1/assets/2n9hc9ugo68c/Immagine_standard.png',
+                              ),
+                              width: 60.0,
+                              height: 60.0,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsetsDirectional.fromSTEB(10.0, 0.0, 0.0, 0.0),
+                          child: Text(
+                            dish.nome,
+                            maxLines: 1,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18.0,
+                            ),
+                          ),
+                        ),
+                        if (dish.ingredienti.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(12.0, 2.0, 0.0, 0.0),
+                            child: IngredientiHelper.buildIngredientiWidget(
+                              ingredientiText: TranslationService.getDishIngredients(dish, _currentLang),
+                              ingredientiOriginali: dish.ingredienti,
+                              ingredientiEsauriti: _ingredientiEsauriti,
+                              baseStyle: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.hintColor,
+                                height: 1.35,
+                              ),
+                            ),
+                          ),
+                        if (dish.intolleranze.isNotEmpty || dish.allergeni.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(10.0, 4.0, 0.0, 0.0),
+                            child: Wrap(
+                              spacing: 4.0,
+                              runSpacing: 2.0,
+                              children: [
+                                ...dish.intolleranze.map((tag) {
+                                  final f = AllergeniData.getFiltroMagicoById(tag);
+                                  if (f == null) return const SizedBox.shrink();
+                                  return Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 1.5),
+                                    decoration: BoxDecoration(
+                                      color: f.badgeColor.withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(6.0),
+                                    ),
+                                    child: Text(
+                                      '${f.emoji} ${TranslationService.getFiltroLabel(f.id, _currentLang)}',
+                                      style: TextStyle(
+                                        color: f.badgeColor,
+                                        fontSize: 10.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  );
+                                }),
+                                if (dish.allergeni.isNotEmpty)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 1.5),
+                                    decoration: BoxDecoration(
+                                      color: Colors.orange.withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(6.0),
+                                    ),
+                                    child: Text(
+                                      '⚠️ ${dish.allergeni.length} ${TranslationService.getUi('allergeni_badge', _currentLang)}',
+                                      style: TextStyle(
+                                        color: Colors.orange.shade800,
+                                        fontSize: 10.0,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    SizedBox(
+                      height: 50.0,
+                      child: VerticalDivider(
+                        thickness: 1.0,
+                        color: FFAppState().temaAlternate,
+                      ),
+                    ),
+                    Container(
+                      width: 70.0,
+                      decoration: const BoxDecoration(),
+                      child: Padding(
+                        padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 8.0, 0.0),
+                        child: Text(
+                          formatNumber(
+                            dish.prezzo,
+                            formatType: FormatType.decimal,
+                            decimalType: DecimalType.periodDecimal,
+                            currency: '€',
+                          ),
+                          textAlign: TextAlign.end,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: theme.hintColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                    if (!isSolaConsultazione) ...[
+                      if (menuClienteUsersRecord.dispensaAttiva &&
+                          menuClienteUsersRecord.modifichePiattiAttive &&
+                          widget.ristoranteRef != null)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 6.0),
+                          child: FlutterFlowIconButton(
+                            borderRadius: 25.0,
+                            buttonSize: 38.0,
+                            fillColor: theme.colorScheme.primary.withValues(alpha: 0.12),
+                            icon: Icon(
+                              Icons.tune_rounded,
+                              color: theme.colorScheme.primary,
+                              size: 19.0,
+                            ),
+                            onPressed: () => _customizeDish(context, dish, menuClienteUsersRecord),
+                          ),
+                        ),
+                      Padding(
+                        padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 5.0, 0.0),
+                        child: FlutterFlowIconButton(
+                          borderRadius: 25.0,
+                          buttonSize: 40.0,
+                          fillColor: theme.colorScheme.primary,
+                          icon: FaIcon(
+                            FontAwesomeIcons.plus,
+                            color: theme.colorScheme.onPrimary,
+                            size: 20.0,
+                          ),
+                          onPressed: () => _addDishToCart(dish),
+                        ),
+                      ),
+                    ] else ...[
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: Icon(
+                          Icons.remove_red_eye_outlined,
+                          size: 18.0,
+                          color: theme.hintColor.withValues(alpha: 0.6),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // 2. FOTO IN EVIDENZA (HERO CARD)
+  Widget _buildFotoGrandeDishCard(
+    BuildContext context,
+    ThemeData theme,
+    UsersRecord menuClienteUsersRecord,
+    PiattiRecord dish,
+    bool isSolaConsultazione,
+  ) {
+    final hasPhoto = menuClienteUsersRecord.hasUltra && dish.foto.isNotEmpty;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+      child: Material(
+        color: Colors.transparent,
+        elevation: 2.5,
+        borderRadius: BorderRadius.circular(16.0),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16.0),
+          onTap: () => _openDishDetails(context, dish, menuClienteUsersRecord, isSolaConsultazione),
+          child: Container(
+            decoration: BoxDecoration(
+              color: theme.cardColor,
+              borderRadius: BorderRadius.circular(16.0),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (hasPhoto)
+                  Stack(
+                    children: [
+                      Image.network(
+                        dish.foto,
+                        height: 155.0,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Container(
+                          height: 120.0,
+                          color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                          child: Icon(Icons.restaurant_rounded, color: theme.colorScheme.primary, size: 40.0),
+                        ),
+                      ),
+                      Positioned(
+                        top: 10.0,
+                        right: 10.0,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.5),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primary,
+                            borderRadius: BorderRadius.circular(10.0),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.3),
+                                blurRadius: 4.0,
+                                offset: const Offset(0, 1.5),
+                              ),
+                            ],
+                          ),
+                          child: Text(
+                            formatNumber(
+                              dish.prezzo,
+                              formatType: FormatType.decimal,
+                              decimalType: DecimalType.periodDecimal,
+                              currency: '€',
+                            ),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              dish.nome,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18.0,
+                              ),
+                            ),
+                          ),
+                          if (!hasPhoto)
+                            Text(
+                              formatNumber(
+                                dish.prezzo,
+                                formatType: FormatType.decimal,
+                                decimalType: DecimalType.periodDecimal,
+                                currency: '€',
+                              ),
+                              style: TextStyle(
+                                color: theme.colorScheme.primary,
+                                fontSize: 16.5,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                        ],
+                      ),
+                      if (dish.ingredienti.isNotEmpty) ...[
+                        const SizedBox(height: 4.0),
+                        IngredientiHelper.buildIngredientiWidget(
+                          ingredientiText: TranslationService.getDishIngredients(dish, _currentLang),
+                          ingredientiOriginali: dish.ingredienti,
+                          ingredientiEsauriti: _ingredientiEsauriti,
+                          baseStyle: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.hintColor,
+                            height: 1.35,
+                          ),
+                        ),
+                      ],
+                      if (dish.intolleranze.isNotEmpty || dish.allergeni.isNotEmpty) ...[
+                        const SizedBox(height: 6.0),
+                        Wrap(
+                          spacing: 4.0,
+                          runSpacing: 2.0,
+                          children: [
+                            ...dish.intolleranze.map((tag) {
+                              final f = AllergeniData.getFiltroMagicoById(tag);
+                              if (f == null) return const SizedBox.shrink();
+                              return Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
+                                decoration: BoxDecoration(
+                                  color: f.badgeColor.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(6.0),
+                                ),
+                                child: Text(
+                                  '${f.emoji} ${TranslationService.getFiltroLabel(f.id, _currentLang)}',
+                                  style: TextStyle(
+                                    color: f.badgeColor,
+                                    fontSize: 10.5,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              );
+                            }),
+                            if (dish.allergeni.isNotEmpty)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.orange.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(6.0),
+                                ),
+                                child: Text(
+                                  '⚠️ ${dish.allergeni.length} ${TranslationService.getUi('allergeni_badge', _currentLang)}',
+                                  style: TextStyle(
+                                    color: Colors.orange.shade800,
+                                    fontSize: 10.5,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ],
+                      if (!isSolaConsultazione) ...[
+                        const SizedBox(height: 10.0),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            if (menuClienteUsersRecord.dispensaAttiva &&
+                                menuClienteUsersRecord.modifichePiattiAttive &&
+                                widget.ristoranteRef != null)
+                              Padding(
+                                padding: const EdgeInsets.only(right: 8.0),
+                                child: OutlinedButton.icon(
+                                  onPressed: () => _customizeDish(context, dish, menuClienteUsersRecord),
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: theme.colorScheme.primary,
+                                    side: BorderSide(color: theme.colorScheme.primary.withValues(alpha: 0.4)),
+                                    padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                                  ),
+                                  icon: const Icon(Icons.tune_rounded, size: 16.0),
+                                  label: const Text('Personalizza', style: TextStyle(fontSize: 12.0)),
+                                ),
+                              ),
+                            ElevatedButton.icon(
+                              onPressed: () => _addDishToCart(dish),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: theme.colorScheme.primary,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8.0),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                              ),
+                              icon: const FaIcon(FontAwesomeIcons.plus, size: 14.0),
+                              label: const Text('Aggiungi', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold)),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // 3. GRIGLIA COMPATTA (2 COLONNE)
+  Widget _buildGrigliaDishCard(
+    BuildContext context,
+    ThemeData theme,
+    UsersRecord menuClienteUsersRecord,
+    PiattiRecord dish,
+    bool isSolaConsultazione,
+  ) {
+    final hasPhoto = menuClienteUsersRecord.hasUltra && dish.foto.isNotEmpty;
+
+    return Material(
+      color: Colors.transparent,
+      elevation: 2.0,
+      borderRadius: BorderRadius.circular(14.0),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14.0),
+        onTap: () => _openDishDetails(context, dish, menuClienteUsersRecord, isSolaConsultazione),
+        child: Container(
+          decoration: BoxDecoration(
+            color: theme.cardColor,
+            borderRadius: BorderRadius.circular(14.0),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (hasPhoto)
+                Image.network(
+                  dish.foto,
+                  height: 105.0,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Container(
+                    height: 80.0,
+                    color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                    child: Icon(Icons.restaurant_rounded, color: theme.colorScheme.primary, size: 28.0),
+                  ),
+                )
+              else
+                Container(
+                  height: 60.0,
+                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                  alignment: Alignment.center,
+                  child: Icon(Icons.restaurant_rounded, color: theme.colorScheme.primary, size: 26.0),
+                ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        dish.nome,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 2.0),
+                      if (dish.ingredienti.isNotEmpty)
+                        Expanded(
+                          child: Text(
+                            TranslationService.getDishIngredients(dish, _currentLang),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.hintColor,
+                              fontSize: 10.5,
+                            ),
+                          ),
+                        )
+                      else
+                        const Spacer(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            formatNumber(
+                              dish.prezzo,
+                              formatType: FormatType.decimal,
+                              decimalType: DecimalType.periodDecimal,
+                              currency: '€',
+                            ),
+                            style: TextStyle(
+                              color: theme.colorScheme.primary,
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          if (!isSolaConsultazione)
+                            FlutterFlowIconButton(
+                              borderRadius: 18.0,
+                              buttonSize: 32.0,
+                              fillColor: theme.colorScheme.primary,
+                              icon: FaIcon(
+                                FontAwesomeIcons.plus,
+                                color: theme.colorScheme.onPrimary,
+                                size: 14.0,
+                              ),
+                              onPressed: () => _addDishToCart(dish),
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // 4. LISTA TIPOGRAFICA MINIMALE
+  Widget _buildMinimaleDishCard(
+    BuildContext context,
+    ThemeData theme,
+    UsersRecord menuClienteUsersRecord,
+    PiattiRecord dish,
+    bool isSolaConsultazione,
+  ) {
+    return InkWell(
+      onTap: () => _openDishDetails(context, dish, menuClienteUsersRecord, isSolaConsultazione),
+      borderRadius: BorderRadius.circular(10.0),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
+        decoration: BoxDecoration(
+          color: theme.cardColor.withValues(alpha: 0.5),
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text(
+                    dish.nome,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16.0,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8.0),
+                Text(
+                  formatNumber(
+                    dish.prezzo,
+                    formatType: FormatType.decimal,
+                    decimalType: DecimalType.periodDecimal,
+                    currency: '€',
+                  ),
+                  style: TextStyle(
+                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15.5,
+                  ),
+                ),
+                if (!isSolaConsultazione) ...[
+                  const SizedBox(width: 6.0),
+                  FlutterFlowIconButton(
+                    borderRadius: 16.0,
+                    buttonSize: 30.0,
+                    fillColor: theme.colorScheme.primary.withValues(alpha: 0.12),
+                    icon: FaIcon(
+                      FontAwesomeIcons.plus,
+                      color: theme.colorScheme.primary,
+                      size: 13.0,
+                    ),
+                    onPressed: () => _addDishToCart(dish),
+                  ),
+                ],
+              ],
+            ),
+            if (dish.ingredienti.isNotEmpty) ...[
+              const SizedBox(height: 3.0),
+              IngredientiHelper.buildIngredientiWidget(
+                ingredientiText: TranslationService.getDishIngredients(dish, _currentLang),
+                ingredientiOriginali: dish.ingredienti,
+                ingredientiEsauriti: _ingredientiEsauriti,
+                baseStyle: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.hintColor,
+                  fontStyle: FontStyle.italic,
+                  fontSize: 11.5,
+                ),
+              ),
+            ],
+            if (dish.intolleranze.isNotEmpty || dish.allergeni.isNotEmpty) ...[
+              const SizedBox(height: 4.0),
+              Wrap(
+                spacing: 4.0,
+                runSpacing: 2.0,
+                children: [
+                  ...dish.intolleranze.map((tag) {
+                    final f = AllergeniData.getFiltroMagicoById(tag);
+                    if (f == null) return const SizedBox.shrink();
+                    return Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 1.0),
+                      decoration: BoxDecoration(
+                        color: f.badgeColor.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(4.0),
+                      ),
+                      child: Text(
+                        '${f.emoji} ${TranslationService.getFiltroLabel(f.id, _currentLang)}',
+                        style: TextStyle(
+                          color: f.badgeColor,
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    );
+                  }),
+                  if (dish.allergeni.isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 1.0),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(4.0),
+                      ),
+                      child: Text(
+                        '⚠️ ${dish.allergeni.length} ${TranslationService.getUi('allergeni_badge', _currentLang)}',
+                        style: TextStyle(
+                          color: Colors.orange.shade800,
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }

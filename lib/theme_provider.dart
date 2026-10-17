@@ -64,6 +64,116 @@ extension AppDesignStyleExtension on AppDesignStyle {
       };
 }
 
+/// Layout styles for dish cards in the menu.
+enum DishCardLayout {
+  classico,
+  fotoGrande,
+  griglia,
+  minimale,
+}
+
+extension DishCardLayoutExtension on DishCardLayout {
+  String get name => switch (this) {
+        DishCardLayout.classico => 'classico',
+        DishCardLayout.fotoGrande => 'foto_grande',
+        DishCardLayout.griglia => 'griglia',
+        DishCardLayout.minimale => 'minimale',
+      };
+
+  String get displayName => switch (this) {
+        DishCardLayout.classico => 'Classico Orizzontale',
+        DishCardLayout.fotoGrande => 'Foto in Evidenza',
+        DishCardLayout.griglia => 'Griglia Compatta (2 Col.)',
+        DishCardLayout.minimale => 'Lista Minimale',
+      };
+
+  String get description => switch (this) {
+        DishCardLayout.classico =>
+          'Foto a sinistra e dettagli a destra. Il layout più amato e versatile.',
+        DishCardLayout.fotoGrande =>
+          'Immagine grande in alto. Esalta al massimo l\'estetica dei piatti gourmet e burger.',
+        DishCardLayout.griglia =>
+          'Due colonne compatte con foto sopra. Ideale per consultare molti piatti a colpo d\'occhio.',
+        DishCardLayout.minimale =>
+          'Senza foto invasive, massima eleganza tipografica. Ideale per pizzerie ed enoteche.',
+      };
+
+  IconData get icon => switch (this) {
+        DishCardLayout.classico => Icons.view_stream_rounded,
+        DishCardLayout.fotoGrande => Icons.photo_size_select_actual_rounded,
+        DishCardLayout.griglia => Icons.grid_view_rounded,
+        DishCardLayout.minimale => Icons.view_headline_rounded,
+      };
+
+  static DishCardLayout fromString(String? val) {
+    return switch (val) {
+      'foto_grande' || 'fotoGrande' => DishCardLayout.fotoGrande,
+      'griglia' => DishCardLayout.griglia,
+      'minimale' => DishCardLayout.minimale,
+      _ => DishCardLayout.classico,
+    };
+  }
+}
+
+/// Supported background textures and patterns for the restaurant menu.
+enum BackgroundTexture {
+  nessuna,
+  pergamena,
+  legno,
+  ardesia,
+  tessuto,
+  geometrico,
+}
+
+extension BackgroundTextureExtension on BackgroundTexture {
+  String get name => switch (this) {
+        BackgroundTexture.nessuna => 'nessuna',
+        BackgroundTexture.pergamena => 'pergamena',
+        BackgroundTexture.legno => 'legno',
+        BackgroundTexture.ardesia => 'ardesia',
+        BackgroundTexture.tessuto => 'tessuto',
+        BackgroundTexture.geometrico => 'geometrico',
+      };
+
+  String get displayName => switch (this) {
+        BackgroundTexture.nessuna => 'Nessuna (Tinta unita)',
+        BackgroundTexture.pergamena => 'Carta Pergamena',
+        BackgroundTexture.legno => 'Legno Bistrot',
+        BackgroundTexture.ardesia => 'Ardesia Minerale',
+        BackgroundTexture.tessuto => 'Lino & Tovagliato',
+        BackgroundTexture.geometrico => 'Texture Geometrica',
+      };
+
+  String get description => switch (this) {
+        BackgroundTexture.nessuna => 'Sfondo moderno, pulito e minimale a tinta unita.',
+        BackgroundTexture.pergamena => 'Tonalità calda avorio con grana carta da forno artigianale.',
+        BackgroundTexture.legno => 'Essenza calda rustica tipo tavolo bistrot o bancone pub.',
+        BackgroundTexture.ardesia => 'Pietra scura zen ad alto contrasto per sushi e carne.',
+        BackgroundTexture.tessuto => 'Trama delicata di lino naturale per ristoranti eleganti.',
+        BackgroundTexture.geometrico => 'Pattern contemporaneo sottile e raffinato.',
+      };
+
+  IconData get icon => switch (this) {
+        BackgroundTexture.nessuna => Icons.circle_outlined,
+        BackgroundTexture.pergamena => Icons.description_outlined,
+        BackgroundTexture.legno => Icons.deck_rounded,
+        BackgroundTexture.ardesia => Icons.layers_rounded,
+        BackgroundTexture.tessuto => Icons.texture_rounded,
+        BackgroundTexture.geometrico => Icons.grain_rounded,
+      };
+
+  static BackgroundTexture fromString(String? val) {
+    return switch (val) {
+      'pergamena' => BackgroundTexture.pergamena,
+      'legno' => BackgroundTexture.legno,
+      'ardesia' => BackgroundTexture.ardesia,
+      'tessuto' => BackgroundTexture.tessuto,
+      'geometrico' => BackgroundTexture.geometrico,
+      _ => BackgroundTexture.nessuna,
+    };
+  }
+}
+
 /// Provider to manage application design preset, typography (title & body fonts),
 /// and theme mode (light/dark), with automatic persistence via [SharedPreferences].
 class ThemeProvider extends ChangeNotifier {
@@ -72,6 +182,9 @@ class ThemeProvider extends ChangeNotifier {
   static const String _keyTitleFont = 'app_title_font';
   static const String _keyBodyFont = 'app_body_font';
   static const String _keyPrimaryColor = 'app_primary_color';
+  static const String _keyDishCardLayout = 'app_dish_card_layout';
+  static const String _keyCoverBanner = 'app_cover_banner';
+  static const String _keyBackgroundTexture = 'app_background_texture';
   static const String _kFFThemeModeKey = '__theme_mode__';
 
   AppDesignStyle _designStyle = AppDesignStyle.premium;
@@ -79,6 +192,9 @@ class ThemeProvider extends ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.light;
   String _titleFont = AppDesignStyle.premium.defaultTitleFont;
   String _bodyFont = AppDesignStyle.premium.defaultBodyFont;
+  DishCardLayout _dishCardLayout = DishCardLayout.classico;
+  String _coverBanner = '';
+  BackgroundTexture _backgroundTexture = BackgroundTexture.nessuna;
   bool _isLoaded = false;
 
   AppDesignStyle get designStyle => _designStyle;
@@ -86,6 +202,9 @@ class ThemeProvider extends ChangeNotifier {
   ThemeMode get themeMode => _themeMode;
   String get titleFont => _titleFont;
   String get bodyFont => _bodyFont;
+  DishCardLayout get dishCardLayout => _dishCardLayout;
+  String get coverBanner => _coverBanner;
+  BackgroundTexture get backgroundTexture => _backgroundTexture;
   bool get isDarkMode => _themeMode == ThemeMode.dark;
   bool get isLoaded => _isLoaded;
 
@@ -136,6 +255,15 @@ class ThemeProvider extends ChangeNotifier {
 
     final savedBodyFont = prefs.getString(_keyBodyFont);
     _bodyFont = savedBodyFont ?? _designStyle.defaultBodyFont;
+
+    final savedLayout = prefs.getString(_keyDishCardLayout);
+    _dishCardLayout = DishCardLayoutExtension.fromString(savedLayout);
+
+    final savedBanner = prefs.getString(_keyCoverBanner);
+    _coverBanner = savedBanner ?? '';
+
+    final savedTexture = prefs.getString(_keyBackgroundTexture);
+    _backgroundTexture = BackgroundTextureExtension.fromString(savedTexture);
 
     // Load ThemeMode
     final savedMode = prefs.getString(_keyThemeMode);
@@ -220,12 +348,45 @@ class ThemeProvider extends ChangeNotifier {
     await prefs.setString(_keyPrimaryColor, hex);
   }
 
+  /// Sets the dish card layout style ('classico', 'foto_grande', 'griglia', 'minimale').
+  Future<void> setDishCardLayout(DishCardLayout layout) async {
+    if (_dishCardLayout == layout) return;
+    _dishCardLayout = layout;
+    notifyListeners();
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyDishCardLayout, layout.name);
+  }
+
+  /// Sets the restaurant cover banner (preset ID or image URL).
+  Future<void> setCoverBanner(String bannerUrl) async {
+    if (_coverBanner == bannerUrl) return;
+    _coverBanner = bannerUrl;
+    notifyListeners();
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyCoverBanner, bannerUrl);
+  }
+
+  /// Sets the background texture/pattern for the menu.
+  Future<void> setBackgroundTexture(BackgroundTexture texture) async {
+    if (_backgroundTexture == texture) return;
+    _backgroundTexture = texture;
+    notifyListeners();
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyBackgroundTexture, texture.name);
+  }
+
   /// Syncs all customization properties from a restaurant profile (e.g. from Firestore).
   void syncFromRestaurant({
     String? temaScelto,
     String? colorePrimarioHex,
     String? fontTitoli,
     String? fontTesti,
+    String? layoutPiatti,
+    String? bannerCopertina,
+    String? textureSfondo,
   }) {
     if (temaScelto != null && temaScelto.isNotEmpty) {
       for (final style in AppDesignStyle.values) {
@@ -256,6 +417,15 @@ class ThemeProvider extends ChangeNotifier {
       _bodyFont = fontTesti;
     } else {
       _bodyFont = _designStyle.defaultBodyFont;
+    }
+    if (layoutPiatti != null && layoutPiatti.isNotEmpty) {
+      _dishCardLayout = DishCardLayoutExtension.fromString(layoutPiatti);
+    }
+    if (bannerCopertina != null) {
+      _coverBanner = bannerCopertina;
+    }
+    if (textureSfondo != null && textureSfondo.isNotEmpty) {
+      _backgroundTexture = BackgroundTextureExtension.fromString(textureSfondo);
     }
     notifyListeners();
   }
