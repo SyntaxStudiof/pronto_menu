@@ -298,7 +298,7 @@ class _SupportoRistoratoreWidgetState extends State<SupportoRistoratoreWidget> {
               borderRadius: BorderRadius.circular(12.0),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(vertical: 11.0),
+                padding: const EdgeInsets.symmetric(vertical: 11.0, horizontal: 4.0),
                 decoration: BoxDecoration(
                   color: _model.selectedTabIndex == 0
                       ? colorScheme.primary
@@ -317,23 +317,28 @@ class _SupportoRistoratoreWidgetState extends State<SupportoRistoratoreWidget> {
                 alignment: Alignment.center,
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
                       Icons.add_circle_outline_rounded,
-                      size: 18.0,
+                      size: 16.0,
                       color: _model.selectedTabIndex == 0
                           ? colorScheme.onPrimary
                           : theme.hintColor,
                     ),
-                    const SizedBox(width: 8.0),
-                    Text(
-                      'Nuova Richiesta',
-                      style: TextStyle(
-                        fontSize: 14.0,
-                        fontWeight: FontWeight.bold,
-                        color: _model.selectedTabIndex == 0
-                          ? colorScheme.onPrimary
-                          : colorScheme.onSurface,
+                    const SizedBox(width: 6.0),
+                    Flexible(
+                      child: Text(
+                        'Nuova Richiesta',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 13.0,
+                          fontWeight: FontWeight.bold,
+                          color: _model.selectedTabIndex == 0
+                              ? colorScheme.onPrimary
+                              : colorScheme.onSurface,
+                        ),
                       ),
                     ),
                   ],
@@ -348,7 +353,7 @@ class _SupportoRistoratoreWidgetState extends State<SupportoRistoratoreWidget> {
               borderRadius: BorderRadius.circular(12.0),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(vertical: 11.0),
+                padding: const EdgeInsets.symmetric(vertical: 11.0, horizontal: 4.0),
                 decoration: BoxDecoration(
                   color: _model.selectedTabIndex == 1
                       ? colorScheme.primary
@@ -367,30 +372,35 @@ class _SupportoRistoratoreWidgetState extends State<SupportoRistoratoreWidget> {
                 alignment: Alignment.center,
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
                       Icons.inbox_rounded,
-                      size: 18.0,
+                      size: 16.0,
                       color: _model.selectedTabIndex == 1
                           ? colorScheme.onPrimary
                           : theme.hintColor,
                     ),
-                    const SizedBox(width: 8.0),
-                    Text(
-                      ticketCount > 0 ? 'I Miei Ticket ($ticketCount)' : 'I Miei Ticket',
-                      style: TextStyle(
-                        fontSize: 14.0,
-                        fontWeight: FontWeight.bold,
-                        color: _model.selectedTabIndex == 1
-                          ? colorScheme.onPrimary
-                          : colorScheme.onSurface,
+                    const SizedBox(width: 6.0),
+                    Flexible(
+                      child: Text(
+                        ticketCount > 0 ? 'I Miei Ticket ($ticketCount)' : 'I Miei Ticket',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 13.0,
+                          fontWeight: FontWeight.bold,
+                          color: _model.selectedTabIndex == 1
+                              ? colorScheme.onPrimary
+                              : colorScheme.onSurface,
+                        ),
                       ),
                     ),
                     if (hasUnreadReply) ...[
-                      const SizedBox(width: 6.0),
+                      const SizedBox(width: 4.0),
                       Container(
-                        width: 18.0,
-                        height: 18.0,
+                        width: 16.0,
+                        height: 16.0,
                         decoration: BoxDecoration(
                           color: const Color(0xFFEF4444),
                           shape: BoxShape.circle,
@@ -407,7 +417,7 @@ class _SupportoRistoratoreWidgetState extends State<SupportoRistoratoreWidget> {
                           '!',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 11.0,
+                            fontSize: 10.0,
                             fontWeight: FontWeight.w900,
                             height: 1.0,
                           ),
@@ -493,12 +503,14 @@ class _SupportoRistoratoreWidgetState extends State<SupportoRistoratoreWidget> {
                             size: 15.0,
                           ),
                           const SizedBox(width: 4.0),
-                          Text(
-                            'Risposta media garantita entro poche ore',
-                            style: TextStyle(
-                              fontSize: 11.5,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.orange.shade800,
+                          Expanded(
+                            child: Text(
+                              'Risposta media garantita entro poche ore',
+                              style: TextStyle(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.orange.shade800,
+                              ),
                             ),
                           ),
                         ],
@@ -767,31 +779,34 @@ class _SupportoRistoratoreWidgetState extends State<SupportoRistoratoreWidget> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         // Filtri Rapidi
-        Row(
-          children: [
-            _buildFiltroPill(
-              theme,
-              label: 'Tutti (${allTickets.length})',
-              isSelected: _model.filtroStato == 'Tutti',
-              onTap: () => safeSetState(() => _model.filtroStato = 'Tutti'),
-            ),
-            const SizedBox(width: 8.0),
-            _buildFiltroPill(
-              theme,
-              label: 'In Attesa ($apertiCount)',
-              isSelected: _model.filtroStato == 'Aperto',
-              color: Colors.orange.shade700,
-              onTap: () => safeSetState(() => _model.filtroStato = 'Aperto'),
-            ),
-            const SizedBox(width: 8.0),
-            _buildFiltroPill(
-              theme,
-              label: 'Risolti ($risoltiCount)',
-              isSelected: _model.filtroStato == 'Risolto',
-              color: const Color(0xFF10B981),
-              onTap: () => safeSetState(() => _model.filtroStato = 'Risolto'),
-            ),
-          ],
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              _buildFiltroPill(
+                theme,
+                label: 'Tutti (${allTickets.length})',
+                isSelected: _model.filtroStato == 'Tutti',
+                onTap: () => safeSetState(() => _model.filtroStato = 'Tutti'),
+              ),
+              const SizedBox(width: 8.0),
+              _buildFiltroPill(
+                theme,
+                label: 'In Attesa ($apertiCount)',
+                isSelected: _model.filtroStato == 'Aperto',
+                color: Colors.orange.shade700,
+                onTap: () => safeSetState(() => _model.filtroStato = 'Aperto'),
+              ),
+              const SizedBox(width: 8.0),
+              _buildFiltroPill(
+                theme,
+                label: 'Risolti ($risoltiCount)',
+                isSelected: _model.filtroStato == 'Risolto',
+                color: const Color(0xFF10B981),
+                onTap: () => safeSetState(() => _model.filtroStato = 'Risolto'),
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 16.0),
 
@@ -965,13 +980,17 @@ class _SupportoRistoratoreWidgetState extends State<SupportoRistoratoreWidget> {
                     color: Color(0xFFEF4444),
                   ),
                   SizedBox(width: 6.0),
-                  Text(
-                    'NUOVA RISPOSTA RICEVUTA DALL\'ADMIN!',
-                    style: TextStyle(
-                      color: Color(0xFFEF4444),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 11.0,
-                      letterSpacing: 0.3,
+                  Flexible(
+                    child: Text(
+                      'NUOVA RISPOSTA RICEVUTA DALL\'ADMIN!',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Color(0xFFEF4444),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 11.0,
+                        letterSpacing: 0.3,
+                      ),
                     ),
                   ),
                 ],
@@ -982,23 +1001,31 @@ class _SupportoRistoratoreWidgetState extends State<SupportoRistoratoreWidget> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Icon(
-                    Icons.access_time_rounded,
-                    size: 14.0,
-                    color: theme.hintColor,
-                  ),
-                  const SizedBox(width: 4.0),
-                  Text(
-                    dataStr,
-                    style: theme.textTheme.bodySmall?.copyWith(
+              Flexible(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.access_time_rounded,
+                      size: 14.0,
                       color: theme.hintColor,
-                      fontSize: 11.5,
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 4.0),
+                    Flexible(
+                      child: Text(
+                        dataStr,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.hintColor,
+                          fontSize: 11.5,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: 8.0),
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
@@ -1102,12 +1129,16 @@ class _SupportoRistoratoreWidgetState extends State<SupportoRistoratoreWidget> {
                         ),
                       ),
                       const SizedBox(width: 8.0),
-                      const Text(
-                        'Risposta dell\'Assistenza ProntoMenu',
-                        style: TextStyle(
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF047857),
+                      Expanded(
+                        child: Text(
+                          'Risposta dell\'Assistenza ProntoMenu',
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.bold,
+                            color: theme.brightness == Brightness.dark
+                                ? const Color(0xFF34D399)
+                                : const Color(0xFF047857),
+                          ),
                         ),
                       ),
                     ],
@@ -1116,7 +1147,9 @@ class _SupportoRistoratoreWidgetState extends State<SupportoRistoratoreWidget> {
                   Text(
                     ticket.rispostaAdmin,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: const Color(0xFF064E3B),
+                      color: theme.brightness == Brightness.dark
+                          ? const Color(0xFFD1FAE5)
+                          : const Color(0xFF064E3B),
                       fontSize: 14.0,
                       height: 1.4,
                     ),
