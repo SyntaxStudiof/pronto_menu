@@ -65,6 +65,8 @@ export '/admin/admin_cronologia_azioni/admin_cronologia_azioni_widget.dart'
     show AdminCronologiaAzioniWidget;
 export '/cliente/giochi/tris_game_widget.dart' show TrisGameWidget;
 export '/cliente/giochi/quiz_game_widget.dart' show QuizGameWidget;
+export '/components/responsive_dashboard.dart'
+    show ResponsiveDashboard, DashboardPlaceholderWidget;
 
 
 

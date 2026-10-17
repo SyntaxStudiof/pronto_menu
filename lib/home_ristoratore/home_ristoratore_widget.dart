@@ -110,7 +110,7 @@ class _HomeRistoratoreWidgetState extends State<HomeRistoratoreWidget> {
           });
         }
 
-        return GestureDetector(
+        final mobileUI = GestureDetector(
           onTap: () {
             FocusScope.of(context).unfocus();
             FocusManager.instance.primaryFocus?.unfocus();
@@ -980,6 +980,12 @@ class _HomeRistoratoreWidgetState extends State<HomeRistoratoreWidget> {
               ),
             ),
           ),
+        );
+
+        return ResponsiveDashboard(
+          ristoranteRef: widget.ristoranteRef,
+          userDoc: userDoc,
+          mobile: mobileUI,
         );
       },
     );
