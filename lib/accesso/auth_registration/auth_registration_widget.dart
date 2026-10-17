@@ -536,7 +536,7 @@ class _AuthRegistrationWidgetState extends State<AuthRegistrationWidget> {
                         color: theme.colorScheme.primary,
                         textStyle: theme.textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: theme.colorScheme.onPrimary,
+                          color: Colors.white,
                         ),
                         elevation: 0.0,
                         borderRadius: BorderRadius.circular(14.0),

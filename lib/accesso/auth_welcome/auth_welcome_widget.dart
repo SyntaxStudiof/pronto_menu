@@ -314,7 +314,7 @@ class _AuthWelcomeWidgetState extends State<AuthWelcomeWidget> {
                       color: theme.colorScheme.primary,
                       textStyle: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.onPrimary,
+                        color: Colors.white,
                       ),
                       elevation: 2.0,
                       borderRadius: BorderRadius.circular(12.0),

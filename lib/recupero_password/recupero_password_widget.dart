@@ -270,7 +270,7 @@ class _RecuperoPasswordWidgetState extends State<RecuperoPasswordWidget> {
                         textStyle: theme.textTheme.titleSmall?.copyWith(
                           fontSize: 15.0,
                           fontWeight: FontWeight.bold,
-                          color: theme.colorScheme.onPrimary,
+                          color: Colors.white,
                         ),
                         elevation: 0.0,
                         borderRadius: BorderRadius.circular(14.0),

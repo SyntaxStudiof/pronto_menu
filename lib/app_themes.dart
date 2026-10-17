@@ -189,6 +189,7 @@ class AppThemes {
       brightness: brightness,
     ).copyWith(
       primary: seedColor,
+      onPrimary: Colors.white,
     );
 
     // 2. Base text theme allineato alla luminosità
