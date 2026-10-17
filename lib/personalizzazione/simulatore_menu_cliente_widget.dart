@@ -5,6 +5,7 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/theme_provider.dart';
 import '/app_themes.dart';
 import '/services/translation_service.dart';
+import '/services/category_icon_helper.dart';
 import '/cliente/dettagli_piatto_popup/dettagli_piatto_popup_widget.dart';
 import 'personalizzazione_presets.dart';
 
@@ -554,7 +555,7 @@ class _SimulatoreMenuClienteWidgetState
                     padding: const EdgeInsets.only(right: 8.0),
                     child: _buildCategoryPill(
                       title: TranslationService.getCategoryName(cat.name, _currentLang),
-                      icon: Icons.local_dining_rounded,
+                      icon: CategoryIconHelper.getCategoryIcon(cat.name),
                       isSelected: isSel,
                       clientTheme: clientTheme,
                       onTap: () {

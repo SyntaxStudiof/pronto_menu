@@ -22,6 +22,7 @@ import '/cliente/modal_personalizza_piatto_widget.dart';
 import '/cliente/jukebox_modal/jukebox_modal_widget.dart';
 import '/services/translation_service.dart';
 import '/services/mutaforma_service.dart';
+import '/services/category_icon_helper.dart';
 import '/cliente/ingredienti_helper.dart';
 import '/app_themes.dart';
 import '/theme_provider.dart';
@@ -508,71 +509,7 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
   }
 
   IconData _getCategoryIcon(String categoryName) {
-    final lower = categoryName.toLowerCase();
-    if (lower.contains('pizz')) return Icons.local_pizza_rounded;
-    if (lower.contains('burg') ||
-        lower.contains('panin') ||
-        lower.contains('sandwich')) {
-      return Icons.lunch_dining_rounded;
-    }
-    if (lower.contains('prim') ||
-        lower.contains('past') ||
-        lower.contains('risott') ||
-        lower.contains('noodl') ||
-        lower.contains('zupp')) {
-      return Icons.ramen_dining_rounded;
-    }
-    if (lower.contains('second') ||
-        lower.contains('carn') ||
-        lower.contains('steak') ||
-        lower.contains('tagliat')) {
-      return Icons.kebab_dining_rounded;
-    }
-    if (lower.contains('pesc') ||
-        lower.contains('fish') ||
-        lower.contains('mare') ||
-        lower.contains('seafood')) {
-      return Icons.set_meal_rounded;
-    }
-    if (lower.contains('antipas') ||
-        lower.contains('starter') ||
-        lower.contains('appetiz') ||
-        lower.contains('tapas') ||
-        lower.contains('sfiz')) {
-      return Icons.tapas_rounded;
-    }
-    if (lower.contains('dolc') ||
-        lower.contains('dessert') ||
-        lower.contains('tort') ||
-        lower.contains('cake')) {
-      return Icons.cake_rounded;
-    }
-    if (lower.contains('gelat') || lower.contains('ice cream')) {
-      return Icons.icecream_rounded;
-    }
-    if (lower.contains('bevand') ||
-        lower.contains('drink') ||
-        lower.contains('bibit')) {
-      return Icons.local_bar_rounded;
-    }
-    if (lower.contains('vin') || lower.contains('wine')) {
-      return Icons.wine_bar_rounded;
-    }
-    if (lower.contains('birr') || lower.contains('beer')) {
-      return Icons.sports_bar_rounded;
-    }
-    if (lower.contains('caff') ||
-        lower.contains('coffee') ||
-        lower.contains('colazion')) {
-      return Icons.coffee_rounded;
-    }
-    if (lower.contains('contorn') ||
-        lower.contains('insalat') ||
-        lower.contains('salad') ||
-        lower.contains('verdur')) {
-      return Icons.eco_rounded;
-    }
-    return Icons.restaurant_rounded;
+    return CategoryIconHelper.getCategoryIcon(categoryName);
   }
 
   Widget _buildFilterSpeedDial(ThemeData theme) {

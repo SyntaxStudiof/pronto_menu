@@ -7,6 +7,7 @@ import '/custom_code/actions/index.dart' as actions;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
+import '/services/category_icon_helper.dart';
 import 'impostazioni_categorie_model.dart';
 export 'impostazioni_categorie_model.dart';
 
@@ -43,7 +44,8 @@ class _ImpostazioniCategorieWidgetState
             .orderBy('ordine_categoria'),
       );
       _model.listaCategorie =
-          _model.categorieTrovate!.toList().cast<CategoriesRecord>();
+          _model.categorieTrovate!.toList().cast<CategoriesRecord>()
+            ..sort((a, b) => a.ordineCategoria.compareTo(b.ordineCategoria));
       safeSetState(() {});
     });
 
@@ -181,13 +183,40 @@ class _ImpostazioniCategorieWidgetState
                                     color: theme.dividerColor.withValues(alpha: 0.1),
                                   ),
                                 ),
-                                alignment: AlignmentDirectional(0.0, 0.0),
-                                child: Text(
-                                  categoriaItemItem.name,
-                                  textAlign: TextAlign.center,
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                                padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 38.0,
+                                      height: 38.0,
+                                      decoration: BoxDecoration(
+                                        color: theme.colorScheme.primary
+                                            .withValues(alpha: 0.10),
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
+                                      ),
+                                      child: Icon(
+                                        CategoryIconHelper.getCategoryIcon(
+                                            categoriaItemItem.name),
+                                        color: theme.colorScheme.primary,
+                                        size: 20.0,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 14.0),
+                                    Expanded(
+                                      child: Text(
+                                        categoriaItemItem.name,
+                                        style: theme.textTheme.bodyMedium?.copyWith(
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                    Icon(
+                                      Icons.drag_handle_rounded,
+                                      color: theme.hintColor.withValues(alpha: 0.5),
+                                      size: 22.0,
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),

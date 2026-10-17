@@ -13,6 +13,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 import '/theme_provider.dart';
+import '/services/category_icon_helper.dart';
 import 'home_ristoratore_model.dart';
 export 'home_ristoratore_model.dart';
 
@@ -584,10 +585,12 @@ class _HomeRistoratoreWidgetState extends State<HomeRistoratoreWidget> {
                                   StreamBuilder<List<CategoriesRecord>>(
                                     stream: queryCategoriesRecord(
                                       queryBuilder: (categoriesRecord) =>
-                                          categoriesRecord.where(
-                                        'proprietario',
-                                        isEqualTo: widget.ristoranteRef,
-                                      ),
+                                          categoriesRecord
+                                              .where(
+                                                'proprietario',
+                                                isEqualTo: widget.ristoranteRef,
+                                              )
+                                              .orderBy('ordine_categoria'),
                                     ),
                                     builder: (context, snapshot) {
                                       if (!snapshot.hasData) {
@@ -607,7 +610,8 @@ class _HomeRistoratoreWidgetState extends State<HomeRistoratoreWidget> {
                                         );
                                       }
 
-                                      final categories = snapshot.data!;
+                                      final categories = snapshot.data!.toList()
+                                        ..sort((a, b) => a.ordineCategoria.compareTo(b.ordineCategoria));
 
                                       return Column(
                                         crossAxisAlignment:
@@ -815,10 +819,13 @@ class _HomeRistoratoreWidgetState extends State<HomeRistoratoreWidget> {
                                                                             10.0),
                                                               ),
                                                               child: Icon(
-                                                                Icons
-                                                                    .restaurant_rounded,
-                                                                color: theme.colorScheme.primary,
-                                                                size: 20.0,
+                                                                CategoryIconHelper
+                                                                    .getCategoryIcon(
+                                                                        cat.name),
+                                                                color: theme
+                                                                    .colorScheme
+                                                                    .primary,
+                                                                size: 22.0,
                                                               ),
                                                             ),
                                                             const SizedBox(
