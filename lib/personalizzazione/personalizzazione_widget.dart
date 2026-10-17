@@ -637,36 +637,43 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
           children: [
             // Header anteprima con tag preset e layout
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.remove_red_eye_rounded,
-                      size: 15.0,
-                      color: primaryColor,
-                    ),
-                    const SizedBox(width: 6.0),
-                    Text(
-                      'ANTEPRIMA IN TEMPO REALE',
-                      style: GoogleFonts.getFont(
-                        titleFont,
-                        textStyle: TextStyle(
-                          fontSize: 10.5,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.8,
-                          color: primaryColor,
+                Expanded(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.remove_red_eye_rounded,
+                        size: 14.0,
+                        color: primaryColor,
+                      ),
+                      const SizedBox(width: 5.0),
+                      Flexible(
+                        child: Text(
+                          'ANTEPRIMA',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.getFont(
+                            titleFont,
+                            textStyle: TextStyle(
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.8,
+                              color: primaryColor,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
+                const SizedBox(width: 6.0),
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 7.0, vertical: 2.5),
+                          horizontal: 6.0, vertical: 2.5),
                       decoration: BoxDecoration(
                         color: primaryColor.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(6.0),
@@ -680,18 +687,18 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                         style: GoogleFonts.getFont(
                           titleFont,
                           textStyle: TextStyle(
-                            fontSize: 9.0,
+                            fontSize: 8.5,
                             fontWeight: FontWeight.w700,
-                            letterSpacing: 0.5,
+                            letterSpacing: 0.4,
                             color: primaryColor,
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 6.0),
+                    const SizedBox(width: 5.0),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8.0, vertical: 3.0),
+                          horizontal: 7.0, vertical: 2.5),
                       decoration: BoxDecoration(
                         color: primaryColor,
                         borderRadius: BorderRadius.circular(6.0),
@@ -701,9 +708,9 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                         style: GoogleFonts.getFont(
                           titleFont,
                           textStyle: const TextStyle(
-                            fontSize: 9.5,
+                            fontSize: 9.0,
                             fontWeight: FontWeight.w700,
-                            letterSpacing: 0.6,
+                            letterSpacing: 0.5,
                             color: Colors.white,
                           ),
                         ),
@@ -2544,28 +2551,31 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Banner di Copertina',
-                    style: TextStyle(
-                      fontSize: 15.0,
-                      fontWeight: FontWeight.w700,
-                      color: colorScheme.onSurface,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Banner di Copertina',
+                      style: TextStyle(
+                        fontSize: 15.0,
+                        fontWeight: FontWeight.w700,
+                        color: colorScheme.onSurface,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 2.0),
-                  Text(
-                    'Hero header mostrato in cima al menù digitale.',
-                    style: TextStyle(
-                      fontSize: 12.0,
-                      color: colorScheme.onSurfaceVariant,
+                    const SizedBox(height: 2.0),
+                    Text(
+                      'Hero header mostrato in cima al menù digitale.',
+                      style: TextStyle(
+                        fontSize: 12.0,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-              if (currentBanner.isNotEmpty)
+              if (currentBanner.isNotEmpty) ...[
+                const SizedBox(width: 8.0),
                 TextButton.icon(
                   onPressed: () {
                     themeProvider.setCoverBanner('');
@@ -2580,6 +2590,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
                 ),
+              ],
             ],
           ),
         ),
