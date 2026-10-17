@@ -150,4 +150,94 @@ class PersonalizzazionePresets {
         );
     }
   }
+
+  /// Genera la decorazione visiva (BoxDecoration) per un badge in base allo stile scelto
+  static BoxDecoration getBadgeDecoration({
+    required BadgeStyle style,
+    required Color baseColor,
+    bool isDark = false,
+    bool isFilled = false,
+  }) {
+    switch (style) {
+      case BadgeStyle.pillola:
+        if (isFilled) {
+          return BoxDecoration(
+            color: baseColor,
+            borderRadius: BorderRadius.circular(20.0),
+            boxShadow: [
+              BoxShadow(
+                color: baseColor.withValues(alpha: isDark ? 0.35 : 0.25),
+                blurRadius: 4.0,
+                offset: const Offset(0.0, 1.5),
+              ),
+            ],
+          );
+        }
+        return BoxDecoration(
+          color: baseColor.withValues(alpha: isDark ? 0.20 : 0.12),
+          borderRadius: BorderRadius.circular(20.0),
+          border: Border.all(
+            color: baseColor.withValues(alpha: isDark ? 0.40 : 0.25),
+            width: 1.0,
+          ),
+        );
+
+      case BadgeStyle.modernoSoft:
+        if (isFilled) {
+          return BoxDecoration(
+            color: baseColor,
+            borderRadius: BorderRadius.circular(7.0),
+          );
+        }
+        return BoxDecoration(
+          color: baseColor.withValues(alpha: isDark ? 0.18 : 0.10),
+          borderRadius: BorderRadius.circular(7.0),
+          border: Border.all(
+            color: baseColor.withValues(alpha: isDark ? 0.35 : 0.22),
+            width: 1.0,
+          ),
+        );
+
+      case BadgeStyle.minimalOutline:
+        return BoxDecoration(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(8.0),
+          border: Border.all(
+            color: baseColor.withValues(alpha: isDark ? 0.85 : 0.75),
+            width: 1.2,
+          ),
+        );
+
+      case BadgeStyle.boldTag:
+        return BoxDecoration(
+          color: baseColor,
+          borderRadius: BorderRadius.circular(4.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.15),
+              blurRadius: 3.0,
+              offset: const Offset(0.0, 1.0),
+            ),
+          ],
+        );
+    }
+  }
+
+  /// Restituisce il colore del testo adatto allo stile del badge
+  static Color getBadgeTextColor({
+    required BadgeStyle style,
+    required Color baseColor,
+    bool isDark = false,
+    bool isFilled = false,
+  }) {
+    switch (style) {
+      case BadgeStyle.pillola:
+      case BadgeStyle.modernoSoft:
+        return isFilled ? Colors.white : baseColor;
+      case BadgeStyle.minimalOutline:
+        return baseColor;
+      case BadgeStyle.boldTag:
+        return Colors.white;
+    }
+  }
 }

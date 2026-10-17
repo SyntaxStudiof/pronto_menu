@@ -174,6 +174,53 @@ extension BackgroundTextureExtension on BackgroundTexture {
   }
 }
 
+/// Stili di visualizzazione dei badge (prezzo, allergeni, tags) nel menù cliente
+enum BadgeStyle {
+  pillola,
+  modernoSoft,
+  minimalOutline,
+  boldTag,
+}
+
+extension BadgeStyleExtension on BadgeStyle {
+  String get value => switch (this) {
+        BadgeStyle.pillola => 'pillola',
+        BadgeStyle.modernoSoft => 'moderno_soft',
+        BadgeStyle.minimalOutline => 'minimal_outline',
+        BadgeStyle.boldTag => 'bold_tag',
+      };
+
+  String get displayName => switch (this) {
+        BadgeStyle.pillola => 'Capsula / Pillola',
+        BadgeStyle.modernoSoft => 'Moderno Soft',
+        BadgeStyle.minimalOutline => 'Minimal Outline',
+        BadgeStyle.boldTag => 'Bold Tag Solido',
+      };
+
+  String get description => switch (this) {
+        BadgeStyle.pillola => 'Bordi arrotondati classici, morbidi e universali.',
+        BadgeStyle.modernoSoft => 'Angoli smussati (r6) con sfondo tenue e bordo sottile, raffinato.',
+        BadgeStyle.minimalOutline => 'Solo contorno fine a contrasto senza riempimento, sobrio.',
+        BadgeStyle.boldTag => 'Sfondo pieno ad alto contrasto con angoli decisi e icona.',
+      };
+
+  IconData get icon => switch (this) {
+        BadgeStyle.pillola => Icons.label_rounded,
+        BadgeStyle.modernoSoft => Icons.crop_square_rounded,
+        BadgeStyle.minimalOutline => Icons.check_box_outline_blank_rounded,
+        BadgeStyle.boldTag => Icons.local_offer_rounded,
+      };
+
+  static BadgeStyle fromString(String? val) {
+    return switch (val) {
+      'moderno_soft' => BadgeStyle.modernoSoft,
+      'minimal_outline' => BadgeStyle.minimalOutline,
+      'bold_tag' => BadgeStyle.boldTag,
+      _ => BadgeStyle.pillola,
+    };
+  }
+}
+
 /// Provider to manage application design preset, typography (title & body fonts),
 /// and theme mode (light/dark), with automatic persistence via [SharedPreferences].
 class ThemeProvider extends ChangeNotifier {
@@ -185,6 +232,7 @@ class ThemeProvider extends ChangeNotifier {
   static const String _keyDishCardLayout = 'app_dish_card_layout';
   static const String _keyCoverBanner = 'app_cover_banner';
   static const String _keyBackgroundTexture = 'app_background_texture';
+  static const String _keyBadgeStyle = 'app_badge_style';
   static const String _kFFThemeModeKey = '__theme_mode__';
 
   AppDesignStyle _designStyle = AppDesignStyle.premium;
@@ -195,6 +243,7 @@ class ThemeProvider extends ChangeNotifier {
   DishCardLayout _dishCardLayout = DishCardLayout.classico;
   String _coverBanner = '';
   BackgroundTexture _backgroundTexture = BackgroundTexture.nessuna;
+  BadgeStyle _badgeStyle = BadgeStyle.pillola;
   bool _isLoaded = false;
 
   AppDesignStyle get designStyle => _designStyle;
@@ -205,6 +254,7 @@ class ThemeProvider extends ChangeNotifier {
   DishCardLayout get dishCardLayout => _dishCardLayout;
   String get coverBanner => _coverBanner;
   BackgroundTexture get backgroundTexture => _backgroundTexture;
+  BadgeStyle get badgeStyle => _badgeStyle;
   bool get isDarkMode => _themeMode == ThemeMode.dark;
   bool get isLoaded => _isLoaded;
 
@@ -264,6 +314,9 @@ class ThemeProvider extends ChangeNotifier {
 
     final savedTexture = prefs.getString(_keyBackgroundTexture);
     _backgroundTexture = BackgroundTextureExtension.fromString(savedTexture);
+
+    final savedBadge = prefs.getString(_keyBadgeStyle);
+    _badgeStyle = BadgeStyleExtension.fromString(savedBadge);
 
     // Load ThemeMode
     final savedMode = prefs.getString(_keyThemeMode);
@@ -378,6 +431,16 @@ class ThemeProvider extends ChangeNotifier {
     await prefs.setString(_keyBackgroundTexture, texture.name);
   }
 
+  /// Sets the badge style for prices, allergens, and tags ('pillola', 'moderno_soft', 'minimal_outline', 'bold_tag').
+  Future<void> setBadgeStyle(BadgeStyle style) async {
+    if (_badgeStyle == style) return;
+    _badgeStyle = style;
+    notifyListeners();
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyBadgeStyle, style.value);
+  }
+
   /// Syncs all customization properties from a restaurant profile (e.g. from Firestore).
   void syncFromRestaurant({
     String? temaScelto,
@@ -387,6 +450,7 @@ class ThemeProvider extends ChangeNotifier {
     String? layoutPiatti,
     String? bannerCopertina,
     String? textureSfondo,
+    String? stileBadge,
   }) {
     if (temaScelto != null && temaScelto.isNotEmpty) {
       for (final style in AppDesignStyle.values) {
@@ -426,6 +490,9 @@ class ThemeProvider extends ChangeNotifier {
     }
     if (textureSfondo != null && textureSfondo.isNotEmpty) {
       _backgroundTexture = BackgroundTextureExtension.fromString(textureSfondo);
+    }
+    if (stileBadge != null && stileBadge.isNotEmpty) {
+      _badgeStyle = BadgeStyleExtension.fromString(stileBadge);
     }
     notifyListeners();
   }

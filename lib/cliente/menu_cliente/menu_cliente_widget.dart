@@ -1251,6 +1251,9 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
         final String clientBannerUrl =
             PersonalizzazionePresets.resolveBannerUrl(menuClienteUsersRecord.bannerCopertina);
 
+        final BadgeStyle clientBadgeStyle =
+            BadgeStyleExtension.fromString(menuClienteUsersRecord.stileBadge);
+
         return Theme(
           data: clientTheme,
           child: Builder(
@@ -2180,6 +2183,7 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                                   menuClienteUsersRecord,
                                   listViewNomePiattiRecordList,
                                   clientLayout,
+                                  clientBadgeStyle,
                                   isSolaConsultazione,
                                 );
                               },
@@ -2301,6 +2305,7 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                                   menuClienteUsersRecord,
                                   listViewPrezzoPiattiRecordList,
                                   clientLayout,
+                                  clientBadgeStyle,
                                   isSolaConsultazione,
                                 );
                               },
@@ -2609,6 +2614,7 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
     UsersRecord menuClienteUsersRecord,
     List<PiattiRecord> dishes,
     DishCardLayout layout,
+    BadgeStyle badgeStyle,
     bool isSolaConsultazione,
   ) {
     switch (layout) {
@@ -2624,6 +2630,7 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
               theme,
               menuClienteUsersRecord,
               dishes[index],
+              badgeStyle,
               isSolaConsultazione,
             );
           },
@@ -2647,6 +2654,7 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
               theme,
               menuClienteUsersRecord,
               dishes[index],
+              badgeStyle,
               isSolaConsultazione,
             );
           },
@@ -2670,6 +2678,7 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
               theme,
               menuClienteUsersRecord,
               dishes[index],
+              badgeStyle,
               isSolaConsultazione,
             );
           },
@@ -2687,6 +2696,7 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
               theme,
               menuClienteUsersRecord,
               dishes[index],
+              badgeStyle,
               isSolaConsultazione,
             );
           },
@@ -2700,6 +2710,7 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
     ThemeData theme,
     UsersRecord menuClienteUsersRecord,
     PiattiRecord dish,
+    BadgeStyle badgeStyle,
     bool isSolaConsultazione,
   ) {
     return Padding(
@@ -2806,15 +2817,22 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                                   final f = AllergeniData.getFiltroMagicoById(tag);
                                   if (f == null) return const SizedBox.shrink();
                                   return Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 1.5),
-                                    decoration: BoxDecoration(
-                                      color: f.badgeColor.withValues(alpha: 0.15),
-                                      borderRadius: BorderRadius.circular(6.0),
+                                    padding: const EdgeInsets.symmetric(horizontal: 5.5, vertical: 2.0),
+                                    decoration: PersonalizzazionePresets.getBadgeDecoration(
+                                      style: badgeStyle,
+                                      baseColor: f.badgeColor,
+                                      isDark: theme.brightness == Brightness.dark,
+                                      isFilled: false,
                                     ),
                                     child: Text(
                                       '${f.emoji} ${TranslationService.getFiltroLabel(f.id, _currentLang)}',
                                       style: TextStyle(
-                                        color: f.badgeColor,
+                                        color: PersonalizzazionePresets.getBadgeTextColor(
+                                          style: badgeStyle,
+                                          baseColor: f.badgeColor,
+                                          isDark: theme.brightness == Brightness.dark,
+                                          isFilled: false,
+                                        ),
                                         fontSize: 10.0,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -2823,15 +2841,22 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                                 }),
                                 if (dish.allergeni.isNotEmpty)
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 1.5),
-                                    decoration: BoxDecoration(
-                                      color: Colors.orange.withValues(alpha: 0.15),
-                                      borderRadius: BorderRadius.circular(6.0),
+                                    padding: const EdgeInsets.symmetric(horizontal: 5.5, vertical: 2.0),
+                                    decoration: PersonalizzazionePresets.getBadgeDecoration(
+                                      style: badgeStyle,
+                                      baseColor: Colors.orange,
+                                      isDark: theme.brightness == Brightness.dark,
+                                      isFilled: false,
                                     ),
                                     child: Text(
                                       '⚠️ ${dish.allergeni.length} ${TranslationService.getUi('allergeni_badge', _currentLang)}',
                                       style: TextStyle(
-                                        color: Colors.orange.shade800,
+                                        color: PersonalizzazionePresets.getBadgeTextColor(
+                                          style: badgeStyle,
+                                          baseColor: Colors.orange.shade800,
+                                          isDark: theme.brightness == Brightness.dark,
+                                          isFilled: false,
+                                        ),
                                         fontSize: 10.0,
                                         fontWeight: FontWeight.w600,
                                       ),
@@ -2854,11 +2879,16 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                         color: FFAppState().temaAlternate,
                       ),
                     ),
-                    Container(
-                      width: 70.0,
-                      decoration: const BoxDecoration(),
-                      child: Padding(
-                        padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 8.0, 0.0),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 7.0, vertical: 3.5),
+                        decoration: PersonalizzazionePresets.getBadgeDecoration(
+                          style: badgeStyle,
+                          baseColor: theme.colorScheme.primary,
+                          isDark: theme.brightness == Brightness.dark,
+                          isFilled: true,
+                        ),
                         child: Text(
                           formatNumber(
                             dish.prezzo,
@@ -2866,10 +2896,16 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                             decimalType: DecimalType.periodDecimal,
                             currency: '€',
                           ),
-                          textAlign: TextAlign.end,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: theme.hintColor,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.bold,
+                            color: PersonalizzazionePresets.getBadgeTextColor(
+                              style: badgeStyle,
+                              baseColor: theme.colorScheme.primary,
+                              isDark: theme.brightness == Brightness.dark,
+                              isFilled: true,
+                            ),
                           ),
                         ),
                       ),
@@ -2932,6 +2968,7 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
     ThemeData theme,
     UsersRecord menuClienteUsersRecord,
     PiattiRecord dish,
+    BadgeStyle badgeStyle,
     bool isSolaConsultazione,
   ) {
     final hasPhoto = menuClienteUsersRecord.hasUltra && dish.foto.isNotEmpty;
@@ -2973,16 +3010,11 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                         right: 10.0,
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.5),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.primary,
-                            borderRadius: BorderRadius.circular(10.0),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.3),
-                                blurRadius: 4.0,
-                                offset: const Offset(0, 1.5),
-                              ),
-                            ],
+                          decoration: PersonalizzazionePresets.getBadgeDecoration(
+                            style: badgeStyle,
+                            baseColor: theme.colorScheme.primary,
+                            isDark: theme.brightness == Brightness.dark,
+                            isFilled: true,
                           ),
                           child: Text(
                             formatNumber(
@@ -2991,8 +3023,13 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                               decimalType: DecimalType.periodDecimal,
                               currency: '€',
                             ),
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: PersonalizzazionePresets.getBadgeTextColor(
+                                style: badgeStyle,
+                                baseColor: theme.colorScheme.primary,
+                                isDark: theme.brightness == Brightness.dark,
+                                isFilled: true,
+                              ),
                               fontSize: 13.5,
                               fontWeight: FontWeight.bold,
                             ),
@@ -3019,17 +3056,31 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                             ),
                           ),
                           if (!hasPhoto)
-                            Text(
-                              formatNumber(
-                                dish.prezzo,
-                                formatType: FormatType.decimal,
-                                decimalType: DecimalType.periodDecimal,
-                                currency: '€',
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 3.5),
+                              decoration: PersonalizzazionePresets.getBadgeDecoration(
+                                style: badgeStyle,
+                                baseColor: theme.colorScheme.primary,
+                                isDark: theme.brightness == Brightness.dark,
+                                isFilled: true,
                               ),
-                              style: TextStyle(
-                                color: theme.colorScheme.primary,
-                                fontSize: 16.5,
-                                fontWeight: FontWeight.bold,
+                              child: Text(
+                                formatNumber(
+                                  dish.prezzo,
+                                  formatType: FormatType.decimal,
+                                  decimalType: DecimalType.periodDecimal,
+                                  currency: '€',
+                                ),
+                                style: TextStyle(
+                                  color: PersonalizzazionePresets.getBadgeTextColor(
+                                    style: badgeStyle,
+                                    baseColor: theme.colorScheme.primary,
+                                    isDark: theme.brightness == Brightness.dark,
+                                    isFilled: true,
+                                  ),
+                                  fontSize: 14.5,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                         ],
@@ -3057,14 +3108,21 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                               if (f == null) return const SizedBox.shrink();
                               return Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
-                                decoration: BoxDecoration(
-                                  color: f.badgeColor.withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(6.0),
+                                decoration: PersonalizzazionePresets.getBadgeDecoration(
+                                  style: badgeStyle,
+                                  baseColor: f.badgeColor,
+                                  isDark: theme.brightness == Brightness.dark,
+                                  isFilled: false,
                                 ),
                                 child: Text(
                                   '${f.emoji} ${TranslationService.getFiltroLabel(f.id, _currentLang)}',
                                   style: TextStyle(
-                                    color: f.badgeColor,
+                                    color: PersonalizzazionePresets.getBadgeTextColor(
+                                      style: badgeStyle,
+                                      baseColor: f.badgeColor,
+                                      isDark: theme.brightness == Brightness.dark,
+                                      isFilled: false,
+                                    ),
                                     fontSize: 10.5,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -3074,14 +3132,21 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                             if (dish.allergeni.isNotEmpty)
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
-                                decoration: BoxDecoration(
-                                  color: Colors.orange.withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(6.0),
+                                decoration: PersonalizzazionePresets.getBadgeDecoration(
+                                  style: badgeStyle,
+                                  baseColor: Colors.orange,
+                                  isDark: theme.brightness == Brightness.dark,
+                                  isFilled: false,
                                 ),
                                 child: Text(
                                   '⚠️ ${dish.allergeni.length} ${TranslationService.getUi('allergeni_badge', _currentLang)}',
                                   style: TextStyle(
-                                    color: Colors.orange.shade800,
+                                    color: PersonalizzazionePresets.getBadgeTextColor(
+                                      style: badgeStyle,
+                                      baseColor: Colors.orange.shade800,
+                                      isDark: theme.brightness == Brightness.dark,
+                                      isFilled: false,
+                                    ),
                                     fontSize: 10.5,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -3143,6 +3208,7 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
     ThemeData theme,
     UsersRecord menuClienteUsersRecord,
     PiattiRecord dish,
+    BadgeStyle badgeStyle,
     bool isSolaConsultazione,
   ) {
     final hasPhoto = menuClienteUsersRecord.hasUltra && dish.foto.isNotEmpty;
@@ -3216,17 +3282,31 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            formatNumber(
-                              dish.prezzo,
-                              formatType: FormatType.decimal,
-                              decimalType: DecimalType.periodDecimal,
-                              currency: '€',
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.5),
+                            decoration: PersonalizzazionePresets.getBadgeDecoration(
+                              style: badgeStyle,
+                              baseColor: theme.colorScheme.primary,
+                              isDark: theme.brightness == Brightness.dark,
+                              isFilled: true,
                             ),
-                            style: TextStyle(
-                              color: theme.colorScheme.primary,
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.bold,
+                            child: Text(
+                              formatNumber(
+                                dish.prezzo,
+                                formatType: FormatType.decimal,
+                                decimalType: DecimalType.periodDecimal,
+                                currency: '€',
+                              ),
+                              style: TextStyle(
+                                color: PersonalizzazionePresets.getBadgeTextColor(
+                                  style: badgeStyle,
+                                  baseColor: theme.colorScheme.primary,
+                                  isDark: theme.brightness == Brightness.dark,
+                                  isFilled: true,
+                                ),
+                                fontSize: 12.0,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                           if (!isSolaConsultazione)
@@ -3260,6 +3340,7 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
     ThemeData theme,
     UsersRecord menuClienteUsersRecord,
     PiattiRecord dish,
+    BadgeStyle badgeStyle,
     bool isSolaConsultazione,
   ) {
     return InkWell(
@@ -3288,17 +3369,31 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                   ),
                 ),
                 const SizedBox(width: 8.0),
-                Text(
-                  formatNumber(
-                    dish.prezzo,
-                    formatType: FormatType.decimal,
-                    decimalType: DecimalType.periodDecimal,
-                    currency: '€',
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 7.0, vertical: 2.5),
+                  decoration: PersonalizzazionePresets.getBadgeDecoration(
+                    style: badgeStyle,
+                    baseColor: theme.colorScheme.primary,
+                    isDark: theme.brightness == Brightness.dark,
+                    isFilled: true,
                   ),
-                  style: TextStyle(
-                    color: theme.colorScheme.primary,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15.5,
+                  child: Text(
+                    formatNumber(
+                      dish.prezzo,
+                      formatType: FormatType.decimal,
+                      decimalType: DecimalType.periodDecimal,
+                      currency: '€',
+                    ),
+                    style: TextStyle(
+                      color: PersonalizzazionePresets.getBadgeTextColor(
+                        style: badgeStyle,
+                        baseColor: theme.colorScheme.primary,
+                        isDark: theme.brightness == Brightness.dark,
+                        isFilled: true,
+                      ),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13.0,
+                    ),
                   ),
                 ),
                 if (!isSolaConsultazione) ...[
@@ -3340,15 +3435,22 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                     final f = AllergeniData.getFiltroMagicoById(tag);
                     if (f == null) return const SizedBox.shrink();
                     return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 1.0),
-                      decoration: BoxDecoration(
-                        color: f.badgeColor.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(4.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 1.5),
+                      decoration: PersonalizzazionePresets.getBadgeDecoration(
+                        style: badgeStyle,
+                        baseColor: f.badgeColor,
+                        isDark: theme.brightness == Brightness.dark,
+                        isFilled: false,
                       ),
                       child: Text(
                         '${f.emoji} ${TranslationService.getFiltroLabel(f.id, _currentLang)}',
                         style: TextStyle(
-                          color: f.badgeColor,
+                          color: PersonalizzazionePresets.getBadgeTextColor(
+                            style: badgeStyle,
+                            baseColor: f.badgeColor,
+                            isDark: theme.brightness == Brightness.dark,
+                            isFilled: false,
+                          ),
                           fontSize: 9.5,
                           fontWeight: FontWeight.bold,
                         ),
@@ -3357,15 +3459,22 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                   }),
                   if (dish.allergeni.isNotEmpty)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 1.0),
-                      decoration: BoxDecoration(
-                        color: Colors.orange.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(4.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 1.5),
+                      decoration: PersonalizzazionePresets.getBadgeDecoration(
+                        style: badgeStyle,
+                        baseColor: Colors.orange,
+                        isDark: theme.brightness == Brightness.dark,
+                        isFilled: false,
                       ),
                       child: Text(
                         '⚠️ ${dish.allergeni.length} ${TranslationService.getUi('allergeni_badge', _currentLang)}',
                         style: TextStyle(
-                          color: Colors.orange.shade800,
+                          color: PersonalizzazionePresets.getBadgeTextColor(
+                            style: badgeStyle,
+                            baseColor: Colors.orange.shade800,
+                            isDark: theme.brightness == Brightness.dark,
+                            isFilled: false,
+                          ),
                           fontSize: 9.5,
                           fontWeight: FontWeight.w600,
                         ),

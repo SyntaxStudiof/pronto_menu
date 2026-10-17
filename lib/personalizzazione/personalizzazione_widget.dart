@@ -8,6 +8,7 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/theme_provider.dart';
 import '/app_themes.dart';
 import 'personalizzazione_presets.dart';
+import 'simulatore_menu_cliente_widget.dart';
 import 'personalizzazione_model.dart';
 
 export 'personalizzazione_model.dart';
@@ -142,6 +143,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
           final layoutPiatti = data['layout_piatti'] as String?;
           final bannerCopertina = data['banner_copertina'] as String?;
           final textureSfondo = data['texture_sfondo'] as String?;
+          final stileBadge = data['stile_badge'] as String?;
 
           if (tema != null ||
               colore != null ||
@@ -149,7 +151,8 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
               fontTesti != null ||
               layoutPiatti != null ||
               bannerCopertina != null ||
-              textureSfondo != null) {
+              textureSfondo != null ||
+              stileBadge != null) {
             themeProvider.syncFromRestaurant(
               temaScelto: tema,
               colorePrimarioHex: colore,
@@ -158,6 +161,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
               layoutPiatti: layoutPiatti,
               bannerCopertina: bannerCopertina,
               textureSfondo: textureSfondo,
+              stileBadge: stileBadge,
             );
             if (mounted) {
               _hexController.text = themeProvider.primaryColor
@@ -201,6 +205,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
         'layout_piatti': themeProvider.dishCardLayout.name,
         'banner_copertina': themeProvider.coverBanner,
         'texture_sfondo': themeProvider.backgroundTexture.name,
+        'stile_badge': themeProvider.badgeStyle.value,
       });
 
       if (!mounted) return;
@@ -273,6 +278,32 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
         .toUpperCase();
   }
 
+  void _openSimulator(BuildContext context, ThemeProvider themeProvider) {
+    final docRef = widget.ristoranteRef ?? currentUserReference;
+    if (docRef == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Ristorante non trovato.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    SimulatoreMenuClienteWidget.open(
+      context,
+      ristoranteRef: docRef,
+      initialDesignStyle: themeProvider.designStyle,
+      initialPrimaryColor: themeProvider.primaryColor,
+      initialTitleFont: themeProvider.titleFont,
+      initialBodyFont: themeProvider.bodyFont,
+      initialDishLayout: themeProvider.dishCardLayout,
+      initialCoverBanner: themeProvider.coverBanner,
+      initialBackgroundTexture: themeProvider.backgroundTexture,
+      initialBadgeStyle: themeProvider.badgeStyle,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = context.watch<ThemeProvider>();
@@ -341,8 +372,28 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
             ],
           ),
           centerTitle: true,
-          actions: const [
-            SizedBox(width: 48.0),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 4.0),
+              child: IconButton(
+                tooltip: 'Simulatore Menù dal Vivo',
+                icon: Container(
+                  width: 36.0,
+                  height: 36.0,
+                  decoration: BoxDecoration(
+                    color: colorScheme.primary.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  alignment: Alignment.center,
+                  child: Icon(
+                    Icons.smartphone_rounded,
+                    color: colorScheme.primary,
+                    size: 20.0,
+                  ),
+                ),
+                onPressed: () => _openSimulator(context, themeProvider),
+              ),
+            ),
           ],
         ),
         body: SafeArea(
@@ -432,6 +483,13 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                             ),
                           3 => _buildBannerTextureCustomizationView(
                               key: const ValueKey('banner_texture_tab'),
+                              context: context,
+                              themeProvider: themeProvider,
+                              primaryColor: primaryColor,
+                              isDark: isDark,
+                            ),
+                          4 => _buildBadgeCustomizationView(
+                              key: const ValueKey('badges_tab'),
                               context: context,
                               themeProvider: themeProvider,
                               primaryColor: primaryColor,
@@ -769,22 +827,63 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
 
             const SizedBox(height: 10.0),
 
-            // Dettagli piatto (Pizza Margherita) animato in base al DishCardLayout
+            // Dettagli piatto (Pizza Margherita) animato in base al DishCardLayout e BadgeStyle
             _buildDishCardPreviewBody(
               context: context,
               style: style,
               dishLayout: dishLayout,
+              badgeStyle: themeProvider.badgeStyle,
               primaryColor: primaryColor,
               dishIcon: dishIcon,
               titleFont: titleFont,
               bodyFont: bodyFont,
               colorScheme: colorScheme,
+              isDark: isDark,
             ),
 
             const SizedBox(height: 10.0),
 
             // Pulsante interattivo compatto con titleFont
             _buildInteractiveFakeButton(style, primaryColor, titleFont),
+
+            const SizedBox(height: 8.0),
+
+            // Pulsante per aprire il Simulatore a schermo intero
+            InkWell(
+              onTap: () => _openSimulator(context, themeProvider),
+              borderRadius: BorderRadius.circular(8.0),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 10.0),
+                decoration: BoxDecoration(
+                  color: primaryColor.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(8.0),
+                  border: Border.all(
+                    color: primaryColor.withValues(alpha: 0.22),
+                    width: 1.0,
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.fullscreen_rounded, color: primaryColor, size: 16.0),
+                    const SizedBox(width: 6.0),
+                    Text(
+                      'Prova Menù dal Vivo a Schermo Intero',
+                      style: GoogleFonts.getFont(
+                        titleFont,
+                        textStyle: TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.bold,
+                          color: primaryColor,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 4.0),
+                    Icon(Icons.arrow_forward_ios_rounded, color: primaryColor, size: 10.0),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -795,11 +894,13 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     required BuildContext context,
     required AppDesignStyle style,
     required DishCardLayout dishLayout,
+    required BadgeStyle badgeStyle,
     required Color primaryColor,
     required IconData dishIcon,
     required String titleFont,
     required String bodyFont,
     required ColorScheme colorScheme,
+    required bool isDark,
   }) {
     final BorderRadius radius = switch (style) {
       AppDesignStyle.premium => BorderRadius.circular(6.0),
@@ -807,6 +908,31 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
       AppDesignStyle.minimal => BorderRadius.zero,
       AppDesignStyle.tradizionale => BorderRadius.circular(10.0),
     };
+
+    final badgeDeco = PersonalizzazionePresets.getBadgeDecoration(
+      style: badgeStyle,
+      baseColor: primaryColor,
+      isDark: isDark,
+      isFilled: true,
+    );
+    final badgeTextColor = PersonalizzazionePresets.getBadgeTextColor(
+      style: badgeStyle,
+      baseColor: primaryColor,
+      isDark: isDark,
+      isFilled: true,
+    );
+    final allergenDeco = PersonalizzazionePresets.getBadgeDecoration(
+      style: badgeStyle,
+      baseColor: Colors.deepOrange,
+      isDark: isDark,
+      isFilled: false,
+    );
+    final allergenTextColor = PersonalizzazionePresets.getBadgeTextColor(
+      style: badgeStyle,
+      baseColor: Colors.deepOrange,
+      isDark: isDark,
+      isFilled: false,
+    );
 
     switch (dishLayout) {
       case DishCardLayout.fotoGrande:
@@ -830,18 +956,15 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                     right: 8.0,
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 7.0, vertical: 3.0),
-                      decoration: BoxDecoration(
-                        color: primaryColor,
-                        borderRadius: BorderRadius.circular(6.0),
-                      ),
+                      decoration: badgeDeco,
                       child: Text(
                         '€ 9,50',
                         style: GoogleFonts.getFont(
                           titleFont,
-                          textStyle: const TextStyle(
-                            fontSize: 12.0,
+                          textStyle: TextStyle(
+                            fontSize: 11.5,
                             fontWeight: FontWeight.w700,
-                            color: Colors.white,
+                            color: badgeTextColor,
                           ),
                         ),
                       ),
@@ -883,6 +1006,23 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                 ),
               ),
             ),
+            const SizedBox(height: 4.0),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
+                  decoration: allergenDeco,
+                  child: Text(
+                    '🌾 Glutine  🥛 Lattosio',
+                    style: TextStyle(
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w600,
+                      color: allergenTextColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ],
         );
 
@@ -921,15 +1061,19 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                         ),
                       ),
                     ),
-                    const SizedBox(height: 2.0),
-                    Text(
-                      '€ 9,50',
-                      style: GoogleFonts.getFont(
-                        titleFont,
-                        textStyle: TextStyle(
-                          fontSize: 12.0,
-                          fontWeight: FontWeight.bold,
-                          color: primaryColor,
+                    const SizedBox(height: 4.0),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
+                      decoration: badgeDeco,
+                      child: Text(
+                        '€ 9,50',
+                        style: GoogleFonts.getFont(
+                          titleFont,
+                          textStyle: TextStyle(
+                            fontSize: 11.0,
+                            fontWeight: FontWeight.bold,
+                            color: badgeTextColor,
+                          ),
                         ),
                       ),
                     ),
@@ -970,15 +1114,19 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                         ),
                       ),
                     ),
-                    const SizedBox(height: 2.0),
-                    Text(
-                      '€ 8,00',
-                      style: GoogleFonts.getFont(
-                        titleFont,
-                        textStyle: TextStyle(
-                          fontSize: 12.0,
-                          fontWeight: FontWeight.bold,
-                          color: primaryColor,
+                    const SizedBox(height: 4.0),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
+                      decoration: badgeDeco,
+                      child: Text(
+                        '€ 8,00',
+                        style: GoogleFonts.getFont(
+                          titleFont,
+                          textStyle: TextStyle(
+                            fontSize: 11.0,
+                            fontWeight: FontWeight.bold,
+                            color: badgeTextColor,
+                          ),
                         ),
                       ),
                     ),
@@ -1013,15 +1161,19 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                     ),
                   ),
                 ),
-                const SizedBox(width: 10.0),
-                Text(
-                  '€ 9,50',
-                  style: GoogleFonts.getFont(
-                    titleFont,
-                    textStyle: TextStyle(
-                      fontSize: 15.5,
-                      fontWeight: FontWeight.w700,
-                      color: primaryColor,
+                const SizedBox(width: 8.0),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 3.0),
+                  decoration: badgeDeco,
+                  child: Text(
+                    '€ 9,50',
+                    style: GoogleFonts.getFont(
+                      titleFont,
+                      textStyle: TextStyle(
+                        fontSize: 13.0,
+                        fontWeight: FontWeight.w700,
+                        color: badgeTextColor,
+                      ),
                     ),
                   ),
                 ),
@@ -1041,6 +1193,23 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                   height: 1.3,
                 ),
               ),
+            ),
+            const SizedBox(height: 4.0),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
+                  decoration: allergenDeco,
+                  child: Text(
+                    '🌾 Glutine  🥛 Lattosio',
+                    style: TextStyle(
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w600,
+                      color: allergenTextColor,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         );
@@ -1121,18 +1290,35 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                       ),
                     ),
                   ),
+                  const SizedBox(height: 4.0),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
+                    decoration: allergenDeco,
+                    child: Text(
+                      '🌾 Glutine  🥛 Lattosio',
+                      style: TextStyle(
+                        fontSize: 9.0,
+                        fontWeight: FontWeight.w600,
+                        color: allergenTextColor,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
             const SizedBox(width: 8.0),
-            Text(
-              '€ 9,50',
-              style: GoogleFonts.getFont(
-                titleFont,
-                textStyle: TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.w700,
-                  color: primaryColor,
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+              decoration: badgeDeco,
+              child: Text(
+                '€ 9,50',
+                style: GoogleFonts.getFont(
+                  titleFont,
+                  textStyle: TextStyle(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w700,
+                    color: badgeTextColor,
+                  ),
                 ),
               ),
             ),
@@ -1295,14 +1481,26 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
             ),
             const SizedBox(width: 4.0),
             _buildMainTabPill(
-              title: 'Caratteri',
-              icon: Icons.font_download_rounded,
+              title: 'Badge & Dettagli',
+              icon: Icons.label_rounded,
               isSelected: _mainTab == 4,
               primaryColor: primaryColor,
               activeBg: cardBg,
               isDark: isDark,
               onTap: () {
                 if (_mainTab != 4) setState(() => _mainTab = 4);
+              },
+            ),
+            const SizedBox(width: 4.0),
+            _buildMainTabPill(
+              title: 'Caratteri',
+              icon: Icons.font_download_rounded,
+              isSelected: _mainTab == 5,
+              primaryColor: primaryColor,
+              activeBg: cardBg,
+              isDark: isDark,
+              onTap: () {
+                if (_mainTab != 5) setState(() => _mainTab = 5);
               },
             ),
           ],
@@ -1558,6 +1756,354 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
           ),
         ),
       ),
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 4E. TAB 4: STILE DEI BADGE & DETTAGLI PIATTO
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  Widget _buildBadgeCustomizationView({
+    Key? key,
+    required BuildContext context,
+    required ThemeProvider themeProvider,
+    required Color primaryColor,
+    required bool isDark,
+  }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final currentBadgeStyle = themeProvider.badgeStyle;
+
+    return Column(
+      key: key,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2.0, vertical: 4.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Stile dei Badge & Tag',
+                style: TextStyle(
+                  fontSize: 15.0,
+                  fontWeight: FontWeight.w700,
+                  color: colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(height: 2.0),
+              Text(
+                'Personalizza la forma e lo stile di prezzi, allergeni e tag nel menù cliente.',
+                style: TextStyle(
+                  fontSize: 12.0,
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10.0),
+
+        ...BadgeStyle.values.map((bStyle) {
+          final isSelected = currentBadgeStyle == bStyle;
+          final priceDeco = PersonalizzazionePresets.getBadgeDecoration(
+            style: bStyle,
+            baseColor: primaryColor,
+            isDark: isDark,
+            isFilled: true,
+          );
+          final priceTextColor = PersonalizzazionePresets.getBadgeTextColor(
+            style: bStyle,
+            baseColor: primaryColor,
+            isDark: isDark,
+            isFilled: true,
+          );
+
+          final allergenDeco = PersonalizzazionePresets.getBadgeDecoration(
+            style: bStyle,
+            baseColor: Colors.deepOrange,
+            isDark: isDark,
+            isFilled: false,
+          );
+          final allergenTextColor = PersonalizzazionePresets.getBadgeTextColor(
+            style: bStyle,
+            baseColor: Colors.deepOrange,
+            isDark: isDark,
+            isFilled: false,
+          );
+
+          final chefDeco = PersonalizzazionePresets.getBadgeDecoration(
+            style: bStyle,
+            baseColor: const Color(0xFFD97706),
+            isDark: isDark,
+            isFilled: true,
+          );
+          final chefTextColor = PersonalizzazionePresets.getBadgeTextColor(
+            style: bStyle,
+            baseColor: const Color(0xFFD97706),
+            isDark: isDark,
+            isFilled: true,
+          );
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 10.0),
+            child: Card(
+              elevation: isSelected ? 2.0 : 0.5,
+              shadowColor: isSelected
+                  ? primaryColor.withValues(alpha: isDark ? 0.35 : 0.15)
+                  : Colors.transparent,
+              color: isSelected
+                  ? primaryColor.withValues(alpha: isDark ? 0.15 : 0.06)
+                  : colorScheme.surface,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14.0),
+                side: BorderSide(
+                  color: isSelected
+                      ? primaryColor
+                      : colorScheme.outlineVariant.withValues(alpha: 0.35),
+                  width: isSelected ? 1.8 : 1.0,
+                ),
+              ),
+              child: InkWell(
+                onTap: () {
+                  themeProvider.setBadgeStyle(bStyle);
+                },
+                borderRadius: BorderRadius.circular(14.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(14.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 38.0,
+                            height: 38.0,
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? primaryColor
+                                  : primaryColor.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            alignment: Alignment.center,
+                            child: Icon(
+                              bStyle.icon,
+                              color: isSelected ? Colors.white : primaryColor,
+                              size: 19.0,
+                            ),
+                          ),
+                          const SizedBox(width: 10.0),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        bStyle.displayName,
+                                        style: TextStyle(
+                                          fontSize: 14.5,
+                                          fontWeight: FontWeight.bold,
+                                          color: colorScheme.onSurface,
+                                        ),
+                                      ),
+                                    ),
+                                    if (isSelected)
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 7.0, vertical: 2.0),
+                                        decoration: BoxDecoration(
+                                          color: primaryColor,
+                                          borderRadius:
+                                              BorderRadius.circular(8.0),
+                                        ),
+                                        child: const Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(Icons.check_rounded,
+                                                size: 12.0,
+                                                color: Colors.white),
+                                            SizedBox(width: 3.0),
+                                            Text(
+                                              'ATTIVO',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 9.5,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                const SizedBox(height: 2.0),
+                                Text(
+                                  bStyle.description,
+                                  style: TextStyle(
+                                    fontSize: 11.5,
+                                    color: colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12.0),
+                      // Anteprima dal vivo dei 3 badge per questo stile
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10.0, vertical: 8.0),
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? Colors.black.withValues(alpha: 0.25)
+                              : Colors.grey.shade100.withValues(alpha: 0.7),
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        child: Row(
+                          children: [
+                            const Text(
+                              'Esempi:',
+                              style: TextStyle(
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            const SizedBox(width: 8.0),
+                            // Badge Prezzo
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8.0, vertical: 3.0),
+                              decoration: priceDeco,
+                              child: Text(
+                                '€ 9,50',
+                                style: TextStyle(
+                                  color: priceTextColor,
+                                  fontSize: 11.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 6.0),
+                            // Badge Allergeni
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 7.0, vertical: 2.5),
+                              decoration: allergenDeco,
+                              child: Text(
+                                '🌾 Glutine',
+                                style: TextStyle(
+                                  color: allergenTextColor,
+                                  fontSize: 10.5,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 6.0),
+                            // Badge Chef
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 7.0, vertical: 2.5),
+                              decoration: chefDeco,
+                              child: Text(
+                                '★ Chef',
+                                style: TextStyle(
+                                  color: chefTextColor,
+                                  fontSize: 10.5,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        }),
+
+        const SizedBox(height: 12.0),
+
+        // Box promozionale per aprire il simulatore a schermo intero
+        Card(
+          elevation: 1.0,
+          color: primaryColor.withValues(alpha: isDark ? 0.12 : 0.05),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14.0),
+            side: BorderSide(
+              color: primaryColor.withValues(alpha: 0.3),
+              width: 1.0,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(14.0),
+            child: Row(
+              children: [
+                Container(
+                  width: 44.0,
+                  height: 44.0,
+                  decoration: BoxDecoration(
+                    color: primaryColor,
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                  alignment: Alignment.center,
+                  child: const Icon(
+                    Icons.smartphone_rounded,
+                    color: Colors.white,
+                    size: 24.0,
+                  ),
+                ),
+                const SizedBox(width: 12.0),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Vuoi testare tutto dal vivo?',
+                        style: TextStyle(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 2.0),
+                      Text(
+                        'Apri il simulatore per provare la navigazione del cliente a schermo intero.',
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8.0),
+                ElevatedButton(
+                  onPressed: () => _openSimulator(context, themeProvider),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12.0, vertical: 8.0),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0)),
+                  ),
+                  child: const Text('Simula',
+                      style: TextStyle(
+                          fontSize: 12.0, fontWeight: FontWeight.bold)),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 20.0),
+      ],
     );
   }
 

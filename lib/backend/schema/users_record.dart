@@ -105,6 +105,11 @@ class UsersRecord extends FirestoreRecord {
   String get textureSfondo => _textureSfondo ?? 'nessuna';
   bool hasTextureSfondo() => _textureSfondo != null;
 
+  // "stile_badge" field. ('pillola', 'moderno_soft', 'outline', 'bold_tag')
+  String? _stileBadge;
+  String get stileBadge => _stileBadge ?? 'pillola';
+  bool hasStileBadge() => _stileBadge != null;
+
   // "ordine_preferito" field.
   String? _ordinePreferito;
   String get ordinePreferito => _ordinePreferito ?? '';
@@ -244,6 +249,7 @@ class UsersRecord extends FirestoreRecord {
     _layoutPiatti = snapshotData['layout_piatti'] as String?;
     _bannerCopertina = snapshotData['banner_copertina'] as String?;
     _textureSfondo = snapshotData['texture_sfondo'] as String?;
+    _stileBadge = snapshotData['stile_badge'] as String?;
     _ordinePreferito = snapshotData['ordine_preferito'] as String?;
     _isAdmin = snapshotData['isAdmin'] as bool?;
     _isPremium = snapshotData['isPremium'] as bool?;
@@ -427,6 +433,7 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
         e1?.layoutPiatti == e2?.layoutPiatti &&
         e1?.bannerCopertina == e2?.bannerCopertina &&
         e1?.textureSfondo == e2?.textureSfondo &&
+        e1?.stileBadge == e2?.stileBadge &&
         e1?.ordinePreferito == e2?.ordinePreferito &&
         e1?.isAdmin == e2?.isAdmin &&
         e1?.isPremium == e2?.isPremium &&
@@ -457,6 +464,7 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
         e?.layoutPiatti,
         e?.bannerCopertina,
         e?.textureSfondo,
+        e?.stileBadge,
         e?.ordinePreferito,
         e?.isAdmin,
         e?.isPremium,
