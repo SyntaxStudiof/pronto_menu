@@ -869,7 +869,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
           const SizedBox(width: 4.0),
           Expanded(
             child: _buildMainTabPill(
-              title: 'Colori Brand',
+              title: 'Colori',
               icon: Icons.palette_rounded,
               isSelected: _mainTab == 1,
               primaryColor: primaryColor,
@@ -931,21 +931,26 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               icon,
-              size: 16.0,
+              size: 15.0,
               color: isSelected ? primaryColor : (isDark ? const Color(0xFF9E9E9E) : const Color(0xFF6B7280)),
             ),
-            const SizedBox(width: 6.0),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 13.0,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                color: isSelected
-                    ? (isDark ? Colors.white : Colors.black87)
-                    : (isDark ? const Color(0xFF9E9E9E) : const Color(0xFF6B7280)),
+            const SizedBox(width: 4.0),
+            Flexible(
+              child: Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 12.0,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  color: isSelected
+                      ? (isDark ? Colors.white : Colors.black87)
+                      : (isDark ? const Color(0xFF9E9E9E) : const Color(0xFF6B7280)),
+                ),
               ),
             ),
           ],
@@ -1691,12 +1696,16 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                         children: [
                           Row(
                             children: [
-                              Text(
-                                opt.name,
-                                style: TextStyle(
-                                  fontSize: 14.0,
-                                  fontWeight: FontWeight.w700,
-                                  color: colorScheme.onSurface,
+                              Flexible(
+                                child: Text(
+                                  opt.name,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.w700,
+                                    color: colorScheme.onSurface,
+                                  ),
                                 ),
                               ),
                               const SizedBox(width: 8.0),
@@ -1784,20 +1793,27 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Icon(Icons.colorize_rounded, size: 18.0, color: primaryColor),
-                  const SizedBox(width: 8.0),
-                  Text(
-                    'Colore Personalizzato (HEX)',
-                    style: TextStyle(
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w700,
-                      color: colorScheme.onSurface,
+              Expanded(
+                child: Row(
+                  children: [
+                    Icon(Icons.colorize_rounded, size: 17.0, color: primaryColor),
+                    const SizedBox(width: 6.0),
+                    Flexible(
+                      child: Text(
+                        'Codice Colore (HEX)',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 13.0,
+                          fontWeight: FontWeight.w700,
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
+              const SizedBox(width: 4.0),
               TextButton.icon(
                 onPressed: () {
                   final defaultColor = currentStyle.defaultPrimaryColor;
@@ -1812,12 +1828,12 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                 style: TextButton.styleFrom(
                   visualDensity: VisualDensity.compact,
                   foregroundColor: primaryColor,
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 6.0),
                 ),
-                icon: const Icon(Icons.restart_alt_rounded, size: 15.0),
+                icon: const Icon(Icons.restart_alt_rounded, size: 14.0),
                 label: const Text(
                   'Colore Tema',
-                  style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 11.0, fontWeight: FontWeight.w600),
                 ),
               ),
             ],
@@ -2022,11 +2038,16 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                   color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
                 ),
                 const SizedBox(width: 5.0),
-                Text(
-                  'Visibile in tempo reale a chiunque scansioni il QR Code del menù',
-                  style: TextStyle(
-                    fontSize: 11.0,
-                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+                Flexible(
+                  child: Text(
+                    'Sincronizzato in tempo reale con il QR Code del menù',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 11.0,
+                      color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+                    ),
                   ),
                 ),
               ],
