@@ -2876,7 +2876,7 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                       height: 50.0,
                       child: VerticalDivider(
                         thickness: 1.0,
-                        color: FFAppState().temaAlternate,
+                        color: theme.dividerColor,
                       ),
                     ),
                     Padding(

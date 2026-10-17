@@ -223,21 +223,36 @@ class PersonalizzazionePresets {
     }
   }
 
-  /// Restituisce il colore del testo adatto allo stile del badge
+  /// Restituisce il colore del testo adatto allo stile del badge con rilevamento del contrasto
   static Color getBadgeTextColor({
     required BadgeStyle style,
     required Color baseColor,
     bool isDark = false,
     bool isFilled = false,
   }) {
-    switch (style) {
-      case BadgeStyle.pillola:
-      case BadgeStyle.modernoSoft:
-        return isFilled ? Colors.white : baseColor;
-      case BadgeStyle.minimalOutline:
-        return baseColor;
-      case BadgeStyle.boldTag:
-        return Colors.white;
+    if (isFilled || style == BadgeStyle.boldTag) {
+      // Quando il badge è pieno, lo sfondo è baseColor:
+      // Se baseColor è chiaro, testo scuro; se baseColor è scuro, testo bianco!
+      return baseColor.computeLuminance() > 0.48 ? const Color(0xFF1A1A1A) : Colors.white;
     }
+
+    // Se il badge è outline o soft:
+    // Su sfondo scuro, se baseColor ha tonalità troppo scura (luminanza < 0.45),
+    // lo schiariamo armonicamente affinché sia nitido e perfettamente leggibile!
+    if (isDark) {
+      if (baseColor.computeLuminance() < 0.45) {
+        final hsl = HSLColor.fromColor(baseColor);
+        return hsl.withLightness((hsl.lightness + 0.35).clamp(0.55, 0.88)).toColor();
+      }
+      return baseColor;
+    }
+
+    // Su sfondo chiaro, se baseColor è troppo chiaro (luminanza > 0.65),
+    // lo scuriamo per garantire il contrasto:
+    if (baseColor.computeLuminance() > 0.65) {
+      final hsl = HSLColor.fromColor(baseColor);
+      return hsl.withLightness((hsl.lightness - 0.28).clamp(0.22, 0.50)).toColor();
+    }
+    return baseColor;
   }
 }

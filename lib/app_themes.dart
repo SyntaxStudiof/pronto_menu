@@ -172,6 +172,37 @@ class AppThemes {
     }
   }
 
+  /// Rileva se il colore di un testo è troppo simile a quello dello sfondo
+  /// e garantisce un contrasto perfetto invertendo automaticamente tra bianco e nero/scuro.
+  static Color getContrastingTextColor({
+    required Color background,
+    Color? foreground,
+    double minContrastThreshold = 0.35,
+  }) {
+    final bgLum = background.computeLuminance();
+    if (foreground != null) {
+      final fgLum = foreground.computeLuminance();
+      if ((bgLum - fgLum).abs() >= minContrastThreshold) {
+        return foreground;
+      }
+    }
+    return bgLum < 0.45 ? Colors.white : const Color(0xFF1A1A1A);
+  }
+
+  /// Schiarisce armonicamente un colore se usato in Dark Mode per garantire visibilità e contrasto WCAG
+  static Color ensureContrastOnDark(Color color, {double minLuminance = 0.42}) {
+    if (color.computeLuminance() >= minLuminance) return color;
+    final hsl = HSLColor.fromColor(color);
+    return hsl.withLightness((hsl.lightness + 0.32).clamp(0.48, 0.78)).toColor();
+  }
+
+  /// Scurisce armonicamente un colore se usato in Light Mode per garantire visibilità e contrasto WCAG
+  static Color ensureContrastOnLight(Color color, {double maxLuminance = 0.65}) {
+    if (color.computeLuminance() <= maxLuminance) return color;
+    final hsl = HSLColor.fromColor(color);
+    return hsl.withLightness((hsl.lightness - 0.25).clamp(0.25, 0.52)).toColor();
+  }
+
   static ThemeData _buildPresetTheme({
     required Color seedColor,
     required Brightness brightness,
@@ -183,21 +214,39 @@ class AppThemes {
     required Duration animationSpeed,
     required String styleTag,
   }) {
-    // 1. ColorScheme dinamico basato sul seed e la luminosità
-    final colorScheme = ColorScheme.fromSeed(
-      seedColor: seedColor,
+    final isDark = brightness == Brightness.dark;
+
+    // 1. Calcolo adattivo del colore primario per contrasto impeccabile
+    final effectivePrimary = isDark
+        ? ensureContrastOnDark(seedColor)
+        : ensureContrastOnLight(seedColor);
+
+    final rawColorScheme = ColorScheme.fromSeed(
+      seedColor: effectivePrimary,
       brightness: brightness,
-    ).copyWith(
-      primary: seedColor,
-      onPrimary: Colors.white,
+    );
+
+    final colorScheme = rawColorScheme.copyWith(
+      primary: effectivePrimary,
+      onPrimary: getContrastingTextColor(background: effectivePrimary),
+      surface: isDark ? const Color(0xFF1E1E24) : Colors.white,
+      surfaceContainerLowest: isDark ? const Color(0xFF121215) : const Color(0xFFF8F9FA),
+      surfaceContainerLow: isDark ? const Color(0xFF18181D) : const Color(0xFFF1F3F5),
+      surfaceContainer: isDark ? const Color(0xFF1E1E24) : Colors.white,
+      surfaceContainerHigh: isDark ? const Color(0xFF26262F) : const Color(0xFFE9ECEF),
+      surfaceContainerHighest: isDark ? const Color(0xFF2E2E39) : const Color(0xFFDEE2E6),
+      onSurface: isDark ? const Color(0xFFF5F5F7) : const Color(0xFF1F2937),
+      onSurfaceVariant: isDark ? const Color(0xFFCACAD5) : const Color(0xFF4B5563),
+      outline: isDark ? const Color(0xFF484856) : const Color(0xFFD1D5DB),
+      outlineVariant: isDark ? const Color(0xFF32323E) : const Color(0xFFE5E7EB),
     );
 
     // 2. Base text theme allineato alla luminosità
-    final baseTextTheme = brightness == Brightness.dark
+    final baseTextTheme = isDark
         ? ThemeData.dark().textTheme
         : ThemeData.light().textTheme;
 
-    // 3. Tipografia dinamica differenziata per Titoli (piatti e prezzi) e Body (descrizioni)
+    // 3. Tipografia dinamica differenziata per Titoli e Body ad alto contrasto
     final titleTextTheme = GoogleFonts.getTextTheme(titleFont, baseTextTheme);
     final bodyTextTheme = GoogleFonts.getTextTheme(bodyFont, baseTextTheme);
 
@@ -219,19 +268,20 @@ class AppThemes {
       titleMedium: titleTextTheme.titleMedium?.copyWith(
           color: colorScheme.onSurface, fontWeight: FontWeight.w600),
       titleSmall: titleTextTheme.titleSmall?.copyWith(
-          color: colorScheme.onSurfaceVariant, fontWeight: FontWeight.w500),
-      bodyLarge: bodyTextTheme.bodyLarge
-          ?.copyWith(color: colorScheme.onSurface, height: 1.5),
-      bodyMedium: bodyTextTheme.bodyMedium
-          ?.copyWith(color: colorScheme.onSurfaceVariant, height: 1.45),
-      bodySmall: bodyTextTheme.bodySmall
-          ?.copyWith(color: colorScheme.onSurfaceVariant),
+          color: colorScheme.onSurface, fontWeight: FontWeight.w600),
+      bodyLarge: bodyTextTheme.bodyLarge?.copyWith(
+          color: colorScheme.onSurface, height: 1.5),
+      bodyMedium: bodyTextTheme.bodyMedium?.copyWith(
+          color: isDark ? const Color(0xFFE3E3EC) : const Color(0xFF374151),
+          height: 1.45),
+      bodySmall: bodyTextTheme.bodySmall?.copyWith(
+          color: isDark ? const Color(0xFFB8B8C7) : const Color(0xFF6B7280)),
       labelLarge: titleTextTheme.labelLarge?.copyWith(
-          color: colorScheme.primary, fontWeight: FontWeight.w700),
-      labelMedium: bodyTextTheme.labelMedium
-          ?.copyWith(color: colorScheme.onSurfaceVariant),
-      labelSmall: bodyTextTheme.labelSmall
-          ?.copyWith(color: colorScheme.onSurfaceVariant),
+          color: effectivePrimary, fontWeight: FontWeight.w700),
+      labelMedium: bodyTextTheme.labelMedium?.copyWith(
+          color: isDark ? const Color(0xFFB8B8C7) : const Color(0xFF6B7280)),
+      labelSmall: bodyTextTheme.labelSmall?.copyWith(
+          color: isDark ? const Color(0xFFA2A2B2) : const Color(0xFF9CA3AF)),
     );
 
     // 4. Estensione custom per il tema
@@ -262,7 +312,10 @@ class AppThemes {
       scaffoldBackgroundColor: colorScheme.surfaceContainerLowest,
       canvasColor: colorScheme.surfaceContainerLowest,
       cardColor: colorScheme.surface,
-      dividerColor: colorScheme.outlineVariant.withValues(alpha: 0.5),
+      hintColor: isDark ? const Color(0xFFA8A8B6) : const Color(0xFF6B7280),
+      dividerColor: isDark
+          ? Colors.white.withValues(alpha: 0.12)
+          : Colors.black.withValues(alpha: 0.08),
       textTheme: textTheme,
       extensions: [customTheme],
       appBarTheme: AppBarTheme(
@@ -285,13 +338,45 @@ class AppThemes {
         shadowColor: isFlat
             ? Colors.transparent
             : colorScheme.shadow.withValues(
-                alpha: brightness == Brightness.dark ? 0.35 : 0.08,
+                alpha: isDark ? 0.35 : 0.08,
               ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadius),
-          side: BorderSide.none,
+          side: isDark
+              ? BorderSide(
+                  color: Colors.white.withValues(alpha: 0.08),
+                  width: 1.0,
+                )
+              : BorderSide.none,
         ),
         margin: EdgeInsets.zero,
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: colorScheme.surface,
+        hintStyle: TextStyle(
+          color: isDark ? const Color(0xFFA8A8B6) : const Color(0xFF6B7280),
+          fontSize: 14.0,
+        ),
+        labelStyle: TextStyle(
+          color: isDark ? const Color(0xFFD4D4DE) : const Color(0xFF4B5563),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(borderRadius > 0 ? borderRadius : 12.0),
+          borderSide: BorderSide(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.14)
+                : const Color(0xFFE5E7EB),
+            width: 1.0,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(borderRadius > 0 ? borderRadius : 12.0),
+          borderSide: BorderSide(
+            color: colorScheme.primary,
+            width: 1.5,
+          ),
+        ),
       ),
       listTileTheme: ListTileThemeData(
         textColor: colorScheme.onSurface,

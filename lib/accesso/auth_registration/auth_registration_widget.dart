@@ -175,7 +175,7 @@ class _AuthRegistrationWidgetState extends State<AuthRegistrationWidget> {
                         ),
                         hintText: 'Es. Pizzeria Da Mario',
                         hintStyle: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.hintColor.withValues(alpha: 0.6),
+                          color: theme.hintColor,
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(
@@ -242,7 +242,7 @@ class _AuthRegistrationWidgetState extends State<AuthRegistrationWidget> {
                         ),
                         hintText: 'nome@ristorante.it',
                         hintStyle: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.hintColor.withValues(alpha: 0.6),
+                          color: theme.hintColor,
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(
@@ -323,7 +323,7 @@ class _AuthRegistrationWidgetState extends State<AuthRegistrationWidget> {
                         ),
                         hintText: 'Crea una password sicura',
                         hintStyle: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.hintColor.withValues(alpha: 0.6),
+                          color: theme.hintColor,
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(
@@ -403,7 +403,7 @@ class _AuthRegistrationWidgetState extends State<AuthRegistrationWidget> {
                         ),
                         hintText: 'Ripeti la password',
                         hintStyle: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.hintColor.withValues(alpha: 0.6),
+                          color: theme.hintColor,
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(
