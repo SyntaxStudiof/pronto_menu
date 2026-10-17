@@ -75,6 +75,21 @@ class UsersRecord extends FirestoreRecord {
   String get temaScelto => _temaScelto ?? '';
   bool hasTemaScelto() => _temaScelto != null;
 
+  // "colore_primario" field.
+  String? _colorePrimario;
+  String get colorePrimario => _colorePrimario ?? '';
+  bool hasColorePrimario() => _colorePrimario != null;
+
+  // "font_titoli" field.
+  String? _fontTitoli;
+  String get fontTitoli => _fontTitoli ?? '';
+  bool hasFontTitoli() => _fontTitoli != null;
+
+  // "font_testi" field.
+  String? _fontTesti;
+  String get fontTesti => _fontTesti ?? '';
+  bool hasFontTesti() => _fontTesti != null;
+
   // "ordine_preferito" field.
   String? _ordinePreferito;
   String get ordinePreferito => _ordinePreferito ?? '';
@@ -208,6 +223,9 @@ class UsersRecord extends FirestoreRecord {
     _notificheOrdini = snapshotData['notifiche_ordini'] as bool?;
     _notifichePromo = snapshotData['notifiche_promo'] as bool?;
     _temaScelto = snapshotData['temaScelto'] as String?;
+    _colorePrimario = snapshotData['colore_primario'] as String?;
+    _fontTitoli = snapshotData['font_titoli'] as String?;
+    _fontTesti = snapshotData['font_testi'] as String?;
     _ordinePreferito = snapshotData['ordine_preferito'] as String?;
     _isAdmin = snapshotData['isAdmin'] as bool?;
     _isPremium = snapshotData['isPremium'] as bool?;
@@ -283,6 +301,9 @@ Map<String, dynamic> createUsersRecordData({
   bool? notificheOrdini,
   bool? notifichePromo,
   String? temaScelto,
+  String? colorePrimario,
+  String? fontTitoli,
+  String? fontTesti,
   String? ordinePreferito,
   bool? isAdmin,
   bool? isPremium,
@@ -324,6 +345,9 @@ Map<String, dynamic> createUsersRecordData({
       'notifiche_ordini': notificheOrdini,
       'notifiche_promo': notifichePromo,
       'temaScelto': temaScelto,
+      'colore_primario': colorePrimario,
+      'font_titoli': fontTitoli,
+      'font_testi': fontTesti,
       'ordine_preferito': ordinePreferito,
       'isAdmin': isAdmin,
       'isPremium': isPremium,
@@ -373,6 +397,9 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
         e1?.notificheOrdini == e2?.notificheOrdini &&
         e1?.notifichePromo == e2?.notifichePromo &&
         e1?.temaScelto == e2?.temaScelto &&
+        e1?.colorePrimario == e2?.colorePrimario &&
+        e1?.fontTitoli == e2?.fontTitoli &&
+        e1?.fontTesti == e2?.fontTesti &&
         e1?.ordinePreferito == e2?.ordinePreferito &&
         e1?.isAdmin == e2?.isAdmin &&
         e1?.isPremium == e2?.isPremium &&
@@ -397,6 +424,9 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
         e?.notificheOrdini,
         e?.notifichePromo,
         e?.temaScelto,
+        e?.colorePrimario,
+        e?.fontTitoli,
+        e?.fontTesti,
         e?.ordinePreferito,
         e?.isAdmin,
         e?.isPremium,

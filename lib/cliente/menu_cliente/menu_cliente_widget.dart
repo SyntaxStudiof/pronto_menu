@@ -23,6 +23,8 @@ import '/cliente/jukebox_modal/jukebox_modal_widget.dart';
 import '/services/translation_service.dart';
 import '/services/mutaforma_service.dart';
 import '/cliente/ingredienti_helper.dart';
+import '/app_themes.dart';
+import '/theme_provider.dart';
 import 'menu_cliente_model.dart';
 export 'menu_cliente_model.dart';
 
@@ -1208,14 +1210,50 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
           });
         }
 
-        return GestureDetector(
-          onTap: () {
-            FocusScope.of(context).unfocus();
-            FocusManager.instance.primaryFocus?.unfocus();
-          },
-          child: Scaffold(
-            key: scaffoldKey,
-            backgroundColor: theme.scaffoldBackgroundColor,
+        final AppDesignStyle clientStyle = switch (menuClienteUsersRecord.temaScelto) {
+          'pub' => AppDesignStyle.pub,
+          'minimal' => AppDesignStyle.minimal,
+          'tradizionale' => AppDesignStyle.tradizionale,
+          _ => AppDesignStyle.premium,
+        };
+
+        Color? clientColor;
+        if (menuClienteUsersRecord.colorePrimario.isNotEmpty) {
+          try {
+            final clean = menuClienteUsersRecord.colorePrimario.replaceAll('#', '');
+            if (clean.length == 6) {
+              clientColor = Color(int.parse('FF$clean', radix: 16));
+            } else if (clean.length == 8) {
+              clientColor = Color(int.parse(clean, radix: 16));
+            }
+          } catch (_) {}
+        }
+
+        final ThemeData clientTheme = AppThemes.buildTheme(
+          designStyle: clientStyle,
+          primaryColor: clientColor ?? clientStyle.defaultPrimaryColor,
+          brightness: theme.brightness,
+          titleFont: menuClienteUsersRecord.fontTitoli.isNotEmpty
+              ? menuClienteUsersRecord.fontTitoli
+              : clientStyle.defaultTitleFont,
+          bodyFont: menuClienteUsersRecord.fontTesti.isNotEmpty
+              ? menuClienteUsersRecord.fontTesti
+              : clientStyle.defaultBodyFont,
+        );
+
+        return Theme(
+          data: clientTheme,
+          child: Builder(
+            builder: (context) {
+              final theme = Theme.of(context);
+              return GestureDetector(
+                onTap: () {
+                  FocusScope.of(context).unfocus();
+                  FocusManager.instance.primaryFocus?.unfocus();
+                },
+                child: Scaffold(
+                  key: scaffoldKey,
+                  backgroundColor: theme.scaffoldBackgroundColor,
             appBar: AppBar(
               backgroundColor: theme.appBarTheme.backgroundColor ?? theme.cardColor,
               automaticallyImplyLeading: false,
@@ -3109,6 +3147,9 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
       ),
     ),
   );
+            },
+          ),
+        );
       },
     );
   }

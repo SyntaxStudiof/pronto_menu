@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '/auth/firebase_auth/auth_util.dart';
+import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/theme_provider.dart';
@@ -76,17 +78,151 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     FontOption('DM Sans', 'Compatto ad alto contrasto', 'Minimalista'),
   ];
 
+  // Palette Colori Gourmet Selezionate
+  final List<GourmetColorOption> _gourmetColors = const [
+    GourmetColorOption('Oro Imperiale', 'Fine dining, champagne & wine bar', Color(0xFFC5A059), 'Lusso'),
+    GourmetColorOption('Rosso Pizzeria', 'Pizzerie, trattorie tipiche e primi piatti', Color(0xFFB71C1C), 'Tradizione'),
+    GourmetColorOption('Ambra & Birra', 'Pub, birrerie artigianali & burger house', Color(0xFFD97706), 'Rustico'),
+    GourmetColorOption('Verde Salvia', 'Cucina biologica, agriturismi & poke green', Color(0xFF10B981), 'Fresco'),
+    GourmetColorOption('Blu Mediterraneo', 'Specialità marinare & pesce fresco', Color(0xFF0284C7), 'Marino'),
+    GourmetColorOption('Bordeaux Nobile', 'Enoteche, carni selezionate e cantine', Color(0xFF881337), 'Classico'),
+    GourmetColorOption('Ardesia Zen', 'Sushi bar & cucina fusion contemporanea', Color(0xFF334155), 'Minimal'),
+    GourmetColorOption('Terracotta Rustico', 'Osterie, forni a legna & bracerie', Color(0xFFEA580C), 'Autentico'),
+    GourmetColorOption('Viola Lounge', 'Cocktail bar & locali serali d\'avanguardia', Color(0xFF7C3AED), 'Glamour'),
+    GourmetColorOption('Lampone Vivace', 'Pasticcerie, dolci, pokè & fast casual', Color(0xFFE11D48), 'Vivace'),
+    GourmetColorOption('Indaco Notte', 'Ristopub, lounge bar & bistrot moderni', Color(0xFF4F46E5), 'Moderno'),
+    GourmetColorOption('Smeraldo Etnico', 'Tapas bar, ristoranti asiatici & messicani', Color(0xFF0D9488), 'Esotico'),
+  ];
+
+  late TextEditingController _hexController;
+  bool _isSavingCloud = false;
+
   @override
   void initState() {
     super.initState();
     _model = createModel(context, () => PersonalizzazioneModel());
-    _mainTab = widget.initialTab.clamp(0, 1);
+    _mainTab = widget.initialTab.clamp(0, 2);
+    _hexController = TextEditingController();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+      _hexController.text = themeProvider.primaryColor
+          .toARGB32()
+          .toRadixString(16)
+          .padLeft(8, '0')
+          .substring(2)
+          .toUpperCase();
+      _loadRestaurantTheme(themeProvider);
+    });
   }
 
   @override
   void dispose() {
+    _hexController.dispose();
     _model.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadRestaurantTheme(ThemeProvider themeProvider) async {
+    try {
+      final docRef = widget.ristoranteRef ?? currentUserReference;
+      if (docRef != null) {
+        final doc = await docRef.get();
+        if (doc.exists) {
+          final data = doc.data() as Map<String, dynamic>? ?? {};
+          final tema = data['temaScelto'] as String?;
+          final colore = data['colore_primario'] as String?;
+          final fontTitoli = data['font_titoli'] as String?;
+          final fontTesti = data['font_testi'] as String?;
+
+          if (tema != null || colore != null || fontTitoli != null || fontTesti != null) {
+            themeProvider.syncFromRestaurant(
+              temaScelto: tema,
+              colorePrimarioHex: colore,
+              fontTitoli: fontTitoli,
+              fontTesti: fontTesti,
+            );
+            if (mounted) {
+              _hexController.text = themeProvider.primaryColor
+                  .toARGB32()
+                  .toRadixString(16)
+                  .padLeft(8, '0')
+                  .substring(2)
+                  .toUpperCase();
+            }
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Errore caricamento tema ristorante: $e');
+    }
+  }
+
+  Future<void> _publishThemeToCloud(ThemeProvider themeProvider) async {
+    final docRef = widget.ristoranteRef ?? currentUserReference;
+    if (docRef == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Profilo ristorante non trovato per la sincronizzazione.'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isSavingCloud = true);
+
+    try {
+      final hexColor = '#${themeProvider.primaryColor.toARGB32().toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}';
+      await docRef.update({
+        'temaScelto': themeProvider.designStyle.name,
+        'colore_primario': hexColor,
+        'font_titoli': themeProvider.titleFont,
+        'font_testi': themeProvider.bodyFont,
+      });
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: const [
+              Icon(Icons.check_circle_rounded, color: Colors.white, size: 22.0),
+              SizedBox(width: 12.0),
+              Expanded(
+                child: Text(
+                  'Stile pubblicato! Tutti i clienti vedranno subito la nuova grafica del menù.',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13.5,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: const Color(0xFF10B981),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+          margin: const EdgeInsets.all(16.0),
+          duration: const Duration(seconds: 4),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Errore durante la pubblicazione: $e'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isSavingCloud = false);
+      }
+    }
   }
 
   void _onFakeButtonTap() {
@@ -108,6 +244,12 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
       _dishWiggleTrigger++;
     });
     themeProvider.setDesignStyle(preset);
+    _hexController.text = preset.defaultPrimaryColor
+        .toARGB32()
+        .toRadixString(16)
+        .padLeft(8, '0')
+        .substring(2)
+        .toUpperCase();
   }
 
   @override
@@ -252,15 +394,33 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                                 currentStyle: currentStyle,
                                 isDark: isDark,
                               )
-                            : _buildFontCustomizationView(
-                                key: const ValueKey('fonts_tab'),
-                                context: context,
-                                themeProvider: themeProvider,
-                                primaryColor: primaryColor,
-                                isDark: isDark,
-                              ),
+                            : (_mainTab == 1
+                                ? _buildColorCustomizationView(
+                                    key: const ValueKey('colors_tab'),
+                                    context: context,
+                                    themeProvider: themeProvider,
+                                    primaryColor: primaryColor,
+                                    isDark: isDark,
+                                  )
+                                : _buildFontCustomizationView(
+                                    key: const ValueKey('fonts_tab'),
+                                    context: context,
+                                    themeProvider: themeProvider,
+                                    primaryColor: primaryColor,
+                                    isDark: isDark,
+                                  )),
                       ),
                     ),
+                  ),
+
+                  // ═════════════════════════════════════════════════════════════
+                  // 🚀 BOTTONE SALVA & PUBBLICA NEL MENÙ (STICKY BOTTOM BAR)
+                  // ═════════════════════════════════════════════════════════════
+                  _buildPublishBottomBar(
+                    context: context,
+                    themeProvider: themeProvider,
+                    primaryColor: primaryColor,
+                    isDark: isDark,
                   ),
                 ],
               ),
@@ -695,7 +855,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
         children: [
           Expanded(
             child: _buildMainTabPill(
-              title: 'Stile & Preset',
+              title: 'Stile',
               icon: Icons.auto_awesome_rounded,
               isSelected: _mainTab == 0,
               primaryColor: primaryColor,
@@ -709,14 +869,28 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
           const SizedBox(width: 4.0),
           Expanded(
             child: _buildMainTabPill(
-              title: 'Tipografia & Font',
-              icon: Icons.font_download_rounded,
+              title: 'Colori Brand',
+              icon: Icons.palette_rounded,
               isSelected: _mainTab == 1,
               primaryColor: primaryColor,
               activeBg: cardBg,
               isDark: isDark,
               onTap: () {
                 if (_mainTab != 1) setState(() => _mainTab = 1);
+              },
+            ),
+          ),
+          const SizedBox(width: 4.0),
+          Expanded(
+            child: _buildMainTabPill(
+              title: 'Caratteri',
+              icon: Icons.font_download_rounded,
+              isSelected: _mainTab == 2,
+              primaryColor: primaryColor,
+              activeBg: cardBg,
+              isDark: isDark,
+              onTap: () {
+                if (_mainTab != 2) setState(() => _mainTab = 2);
               },
             ),
           ),
@@ -1330,6 +1504,538 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
       ),
     );
   }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 4C. TAB 1: PERSONALIZZAZIONE COLORI BRAND & PALETTE GOURMET
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  Widget _buildColorCustomizationView({
+    Key? key,
+    required BuildContext context,
+    required ThemeProvider themeProvider,
+    required Color primaryColor,
+    required bool isDark,
+  }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final currentStyle = themeProvider.designStyle;
+
+    return Column(
+      key: key,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Guida introduttiva semplice per principianti
+        Container(
+          padding: const EdgeInsets.all(14.0),
+          decoration: BoxDecoration(
+            color: primaryColor.withValues(alpha: isDark ? 0.18 : 0.08),
+            borderRadius: BorderRadius.circular(14.0),
+            border: Border.all(
+              color: primaryColor.withValues(alpha: 0.25),
+              width: 1.0,
+            ),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  color: primaryColor.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: Icon(
+                  Icons.palette_rounded,
+                  color: primaryColor,
+                  size: 20.0,
+                ),
+              ),
+              const SizedBox(width: 12.0),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Colore Identitario del Menù',
+                      style: TextStyle(
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w700,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 3.0),
+                    Text(
+                      'Definisce la tinta di pulsanti, prezzi, badge e dettagli del menù per i tuoi clienti. Scegli una tonalità gourmet abbinata al tuo locale oppure inserisci il codice esatto del tuo logo.',
+                      style: TextStyle(
+                        fontSize: 12.0,
+                        height: 1.35,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 14.0),
+
+        // Selettore Colore HEX personalizzato
+        _buildHexColorCard(
+          context: context,
+          themeProvider: themeProvider,
+          primaryColor: primaryColor,
+          currentStyle: currentStyle,
+          isDark: isDark,
+        ),
+
+        const SizedBox(height: 18.0),
+
+        // Titolo sezione palette gourmet
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Palette Gourmet Consigliate',
+              style: TextStyle(
+                fontSize: 14.0,
+                fontWeight: FontWeight.w700,
+                color: colorScheme.onSurface,
+              ),
+            ),
+            Text(
+              '12 tonalità studiate',
+              style: TextStyle(
+                fontSize: 11.5,
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10.0),
+
+        // Griglia / Lista delle 12 palette
+        ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: _gourmetColors.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 8.0),
+          itemBuilder: (context, index) {
+            final opt = _gourmetColors[index];
+            final isSelected = primaryColor.toARGB32() == opt.color.toARGB32();
+
+            return InkWell(
+              onTap: () {
+                themeProvider.setPrimaryColor(opt.color);
+                _hexController.text = opt.color
+                    .toARGB32()
+                    .toRadixString(16)
+                    .padLeft(8, '0')
+                    .substring(2)
+                    .toUpperCase();
+              },
+              borderRadius: BorderRadius.circular(14.0),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 12.0),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? opt.color.withValues(alpha: isDark ? 0.22 : 0.08)
+                      : colorScheme.surface,
+                  borderRadius: BorderRadius.circular(14.0),
+                  border: Border.all(
+                    color: isSelected
+                        ? opt.color
+                        : colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    width: isSelected ? 2.0 : 1.0,
+                  ),
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: opt.color.withValues(alpha: 0.18),
+                            blurRadius: 8.0,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                      : null,
+                ),
+                child: Row(
+                  children: [
+                    // Campione colore tondo grande
+                    Container(
+                      width: 42.0,
+                      height: 42.0,
+                      decoration: BoxDecoration(
+                        color: opt.color,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: opt.color.withValues(alpha: 0.35),
+                            blurRadius: 6.0,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: isSelected
+                          ? const Center(
+                              child: Icon(Icons.check_rounded, color: Colors.white, size: 22.0),
+                            )
+                          : null,
+                    ),
+                    const SizedBox(width: 14.0),
+                    // Nome e categoria suggerita
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                opt.name,
+                                style: TextStyle(
+                                  fontSize: 14.0,
+                                  fontWeight: FontWeight.w700,
+                                  color: colorScheme.onSurface,
+                                ),
+                              ),
+                              const SizedBox(width: 8.0),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
+                                decoration: BoxDecoration(
+                                  color: opt.color.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(6.0),
+                                ),
+                                child: Text(
+                                  opt.tag,
+                                  style: TextStyle(
+                                    fontSize: 10.0,
+                                    fontWeight: FontWeight.w700,
+                                    color: opt.color,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 3.0),
+                          Text(
+                            opt.recommendedFor,
+                            style: TextStyle(
+                              fontSize: 12.0,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8.0),
+                    // Badge codice HEX
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surfaceContainerHigh,
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: Text(
+                        '#${opt.color.toARGB32().toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}',
+                        style: TextStyle(
+                          fontSize: 11.0,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'monospace',
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+
+        const SizedBox(height: 16.0),
+      ],
+    );
+  }
+
+  Widget _buildHexColorCard({
+    required BuildContext context,
+    required ThemeProvider themeProvider,
+    required Color primaryColor,
+    required AppDesignStyle currentStyle,
+    required bool isDark,
+  }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(14.0),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(14.0),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.6),
+          width: 1.0,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.colorize_rounded, size: 18.0, color: primaryColor),
+                  const SizedBox(width: 8.0),
+                  Text(
+                    'Colore Personalizzato (HEX)',
+                    style: TextStyle(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w700,
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                ],
+              ),
+              TextButton.icon(
+                onPressed: () {
+                  final defaultColor = currentStyle.defaultPrimaryColor;
+                  themeProvider.setPrimaryColor(defaultColor);
+                  _hexController.text = defaultColor
+                      .toARGB32()
+                      .toRadixString(16)
+                      .padLeft(8, '0')
+                      .substring(2)
+                      .toUpperCase();
+                },
+                style: TextButton.styleFrom(
+                  visualDensity: VisualDensity.compact,
+                  foregroundColor: primaryColor,
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                ),
+                icon: const Icon(Icons.restart_alt_rounded, size: 15.0),
+                label: const Text(
+                  'Colore Tema',
+                  style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10.0),
+          Row(
+            children: [
+              // Anteprima colore corrente
+              Container(
+                width: 44.0,
+                height: 44.0,
+                decoration: BoxDecoration(
+                  color: primaryColor,
+                  borderRadius: BorderRadius.circular(10.0),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.8),
+                    width: 2.0,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: primaryColor.withValues(alpha: 0.35),
+                      blurRadius: 6.0,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12.0),
+              // Campo input codice HEX
+              Expanded(
+                child: SizedBox(
+                  height: 44.0,
+                  child: TextField(
+                    controller: _hexController,
+                    textCapitalization: TextCapitalization.characters,
+                    maxLength: 6,
+                    style: TextStyle(
+                      fontFamily: 'monospace',
+                      fontWeight: FontWeight.w700,
+                      fontSize: 15.0,
+                      letterSpacing: 2.0,
+                      color: colorScheme.onSurface,
+                    ),
+                    decoration: InputDecoration(
+                      prefixText: '# ',
+                      prefixStyle: TextStyle(
+                        fontFamily: 'monospace',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15.0,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      counterText: '',
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide(
+                          color: colorScheme.outlineVariant,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide(
+                          color: primaryColor,
+                          width: 2.0,
+                        ),
+                      ),
+                      hintText: 'E63946',
+                      hintStyle: TextStyle(
+                        fontFamily: 'monospace',
+                        color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                      ),
+                    ),
+                    onSubmitted: (val) => _applyHexColor(val, themeProvider),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10.0),
+              // Bottone Applica
+              ElevatedButton(
+                onPressed: () => _applyHexColor(_hexController.text, themeProvider),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  minimumSize: const Size(0, 44.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                ),
+                child: const Text(
+                  'Applica',
+                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13.0),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _applyHexColor(String hexText, ThemeProvider themeProvider) {
+    String cleanHex = hexText.replaceAll('#', '').trim();
+    if (cleanHex.length == 3) {
+      cleanHex = cleanHex.split('').map((c) => '$c$c').join();
+    }
+    if (cleanHex.length == 6) {
+      final intVal = int.tryParse('FF$cleanHex', radix: 16);
+      if (intVal != null) {
+        final newColor = Color(intVal);
+        themeProvider.setPrimaryColor(newColor);
+        _hexController.text = cleanHex.toUpperCase();
+        return;
+      }
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Codice HEX non valido. Inserisci 6 caratteri es. E63946'),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 5. STICKY BOTTOM BAR: SALVATAGGIO & PUBBLICAZIONE NEL CLOUD (QR MENU)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  Widget _buildPublishBottomBar({
+    required BuildContext context,
+    required ThemeProvider themeProvider,
+    required Color primaryColor,
+    required bool isDark,
+  }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        border: Border(
+          top: BorderSide(
+            color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+            width: 1.0,
+          ),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.06),
+            blurRadius: 10.0,
+            offset: const Offset(0, -3),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: double.infinity,
+              height: 48.0,
+              child: ElevatedButton.icon(
+                onPressed: _isSavingCloud ? null : () => _publishThemeToCloud(themeProvider),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  foregroundColor: Colors.white,
+                  disabledBackgroundColor: primaryColor.withValues(alpha: 0.6),
+                  elevation: 2.0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                ),
+                icon: _isSavingCloud
+                    ? const SizedBox(
+                        width: 20.0,
+                        height: 20.0,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    : const Icon(Icons.cloud_done_rounded, size: 22.0),
+                label: Text(
+                  _isSavingCloud ? 'Pubblicazione in corso...' : 'Pubblica Modifiche nel Menù',
+                  style: const TextStyle(
+                    fontSize: 15.0,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 6.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.sync_rounded,
+                  size: 13.0,
+                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+                ),
+                const SizedBox(width: 5.0),
+                Text(
+                  'Visibile in tempo reale a chiunque scansioni il QR Code del menù',
+                  style: TextStyle(
+                    fontSize: 11.0,
+                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1342,6 +2048,19 @@ class FontOption {
   final String description;
 
   const FontOption(this.family, this.genre, this.description);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MODELLO GOURMET COLOR OPTION
+// ═══════════════════════════════════════════════════════════════════════════
+
+class GourmetColorOption {
+  final String name;
+  final String recommendedFor;
+  final Color color;
+  final String tag;
+
+  const GourmetColorOption(this.name, this.recommendedFor, this.color, this.tag);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

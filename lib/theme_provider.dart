@@ -71,6 +71,7 @@ class ThemeProvider extends ChangeNotifier {
   static const String _keyThemeMode = 'app_theme_mode';
   static const String _keyTitleFont = 'app_title_font';
   static const String _keyBodyFont = 'app_body_font';
+  static const String _keyPrimaryColor = 'app_primary_color';
   static const String _kFFThemeModeKey = '__theme_mode__';
 
   AppDesignStyle _designStyle = AppDesignStyle.premium;
@@ -113,7 +114,21 @@ class ThemeProvider extends ChangeNotifier {
       }
     }
 
-    _primaryColor = _designStyle.defaultPrimaryColor;
+    final savedPrimaryColorHex = prefs.getString(_keyPrimaryColor);
+    if (savedPrimaryColorHex != null && savedPrimaryColorHex.isNotEmpty) {
+      try {
+        final clean = savedPrimaryColorHex.replaceAll('#', '');
+        if (clean.length == 6) {
+          _primaryColor = Color(int.parse('FF$clean', radix: 16));
+        } else if (clean.length == 8) {
+          _primaryColor = Color(int.parse(clean, radix: 16));
+        }
+      } catch (_) {
+        _primaryColor = _designStyle.defaultPrimaryColor;
+      }
+    } else {
+      _primaryColor = _designStyle.defaultPrimaryColor;
+    }
 
     // Load fonts
     final savedTitleFont = prefs.getString(_keyTitleFont);
@@ -195,9 +210,53 @@ class ThemeProvider extends ChangeNotifier {
     await prefs.setString(_keyBodyFont, _bodyFont);
   }
 
-  /// Legacy helper for color changes: preserves preset integrity.
+  /// Updates the primary accent color and persists it.
   Future<void> setPrimaryColor(Color color) async {
     _primaryColor = color;
+    notifyListeners();
+
+    final prefs = await SharedPreferences.getInstance();
+    final hex = '#${color.toARGB32().toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}';
+    await prefs.setString(_keyPrimaryColor, hex);
+  }
+
+  /// Syncs all customization properties from a restaurant profile (e.g. from Firestore).
+  void syncFromRestaurant({
+    String? temaScelto,
+    String? colorePrimarioHex,
+    String? fontTitoli,
+    String? fontTesti,
+  }) {
+    if (temaScelto != null && temaScelto.isNotEmpty) {
+      for (final style in AppDesignStyle.values) {
+        if (style.name == temaScelto) {
+          _designStyle = style;
+          break;
+        }
+      }
+    }
+    if (colorePrimarioHex != null && colorePrimarioHex.isNotEmpty) {
+      try {
+        final clean = colorePrimarioHex.replaceAll('#', '');
+        if (clean.length == 6) {
+          _primaryColor = Color(int.parse('FF$clean', radix: 16));
+        } else if (clean.length == 8) {
+          _primaryColor = Color(int.parse(clean, radix: 16));
+        }
+      } catch (_) {}
+    } else {
+      _primaryColor = _designStyle.defaultPrimaryColor;
+    }
+    if (fontTitoli != null && fontTitoli.isNotEmpty) {
+      _titleFont = fontTitoli;
+    } else {
+      _titleFont = _designStyle.defaultTitleFont;
+    }
+    if (fontTesti != null && fontTesti.isNotEmpty) {
+      _bodyFont = fontTesti;
+    } else {
+      _bodyFont = _designStyle.defaultBodyFont;
+    }
     notifyListeners();
   }
 
