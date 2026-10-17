@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
+import '/dashboard_ristorante/desktop_orders_table_view.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/theme_provider.dart';
 import '/index.dart';
@@ -17,6 +18,7 @@ class ResponsiveDashboard extends StatelessWidget {
     this.breakpoint = 800.0,
     this.ristoranteRef,
     this.userDoc,
+    this.initialNavIndex = 0,
   });
 
   /// Widget mostrato su smartphone e schermi stretti (< breakpoint)
@@ -34,6 +36,9 @@ class ResponsiveDashboard extends StatelessWidget {
 
   /// Dati utente/ristorante caricati da Firestore
   final UsersRecord? userDoc;
+
+  /// Indice della sezione inizialmente attiva (0: Menù, 1: Ordini, 2: Storico)
+  final int initialNavIndex;
 
   /// Metodo statico per verificare se lo schermo è Desktop
   static bool isDesktop(BuildContext context, [double breakpoint = 800.0]) {
@@ -55,6 +60,7 @@ class ResponsiveDashboard extends StatelessWidget {
                 ristoranteRef: ristoranteRef,
                 userDoc: userDoc,
                 mobileFallback: mobile,
+                initialNavIndex: initialNavIndex,
               );
         }
         return mobile;
@@ -70,19 +76,27 @@ class DashboardDesktopShell extends StatefulWidget {
     this.ristoranteRef,
     this.userDoc,
     this.mobileFallback,
+    this.initialNavIndex = 0,
   });
 
   final DocumentReference? ristoranteRef;
   final UsersRecord? userDoc;
   final Widget? mobileFallback;
+  final int initialNavIndex;
 
   @override
   State<DashboardDesktopShell> createState() => _DashboardDesktopShellState();
 }
 
 class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
-  int _activeNavIndex = 0;
+  late int _activeNavIndex;
   bool _forceMobilePreview = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _activeNavIndex = widget.initialNavIndex;
+  }
 
   final List<_SidebarSection> _navSections = const [
     _SidebarSection(
@@ -737,124 +751,134 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
 
                 // Canvas Centrale
                 Expanded(
-                  child: Center(
-                    child: Container(
-                      constraints: const BoxConstraints(maxWidth: 620.0),
-                      padding: const EdgeInsets.all(40.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 88.0,
-                            height: 88.0,
-                            decoration: BoxDecoration(
-                              color: colorScheme.primary.withValues(alpha: 0.08),
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: colorScheme.primary.withValues(alpha: 0.2),
-                                width: 2.0,
-                              ),
-                            ),
-                            alignment: Alignment.center,
-                            child: Icon(
-                              activeSection.icon,
-                              size: 42.0,
-                              color: colorScheme.primary,
-                            ),
-                          ),
-                          const SizedBox(height: 24.0),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 5.0),
-                            decoration: BoxDecoration(
-                              color: colorScheme.primary.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(16.0),
-                            ),
-                            child: Text(
-                              'SEZIONE: ${activeSection.title.toUpperCase()}',
-                              style: TextStyle(
-                                fontSize: 11.5,
-                                fontWeight: FontWeight.bold,
-                                color: colorScheme.primary,
-                                letterSpacing: 0.8,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 16.0),
-                          Text(
-                            'Dashboard in costruzione',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 28.0,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: -0.5,
-                              color: isDark ? Colors.white : const Color(0xFF0F172A),
-                            ),
-                          ),
-                          const SizedBox(height: 12.0),
-                          Text(
-                            'Stiamo sviluppando la vista desktop per la gestione di "${activeSection.title}" su schermi grandi. Dal menu laterale a sinistra puoi accedere direttamente a tutti gli strumenti del tuo ristorante.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 14.5,
-                              height: 1.5,
-                              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                            ),
-                          ),
-                          const SizedBox(height: 28.0),
-                          // Bottone per aprire vista mobile corrispondente
-                          ElevatedButton.icon(
-                            onPressed: () {
-                              if (_activeNavIndex == 1) {
-                                context.pushNamed(
-                                  DashboardRistoranteWidget.routeName,
-                                  queryParameters: {
-                                    'ristoranteRef': serializeParam(
-                                      docRef,
-                                      ParamType.DocumentReference,
-                                    ),
-                                  }.withoutNulls,
-                                );
-                              } else if (_activeNavIndex == 2) {
-                                context.pushNamed(
-                                  StoricoOrdiniWidget.routeName,
-                                  queryParameters: {
-                                    'ristoranteRef': serializeParam(
-                                      docRef,
-                                      ParamType.DocumentReference,
-                                    ),
-                                  }.withoutNulls,
-                                );
-                              } else {
-                                setState(() => _forceMobilePreview = true);
-                              }
-                            },
-                            icon: const Icon(Icons.open_in_new_rounded, size: 16.0),
-                            label: Text(
-                              _activeNavIndex == 0
-                                  ? 'Apri Gestione Menù (Versione Mobile)'
-                                  : (_activeNavIndex == 1
-                                      ? 'Apri Schermata Cucina Live'
-                                      : 'Apri Storico Ordini'),
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.0),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: colorScheme.primary,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  child: _activeNavIndex == 1
+                      ? DesktopOrdersTableView(
+                          ristoranteRef: docRef,
+                          initialStatusFilter: 'all',
+                        )
+                      : (_activeNavIndex == 2
+                          ? DesktopOrdersTableView(
+                              ristoranteRef: docRef,
+                              initialStatusFilter: 'Completato',
+                            )
+                          : _buildMenuConstructionView(activeSection, docRef, isDark, colorScheme)),
                 ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildMenuConstructionView(
+    _SidebarSection activeSection,
+    DocumentReference? docRef,
+    bool isDark,
+    ColorScheme colorScheme,
+  ) {
+    return Center(
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 620.0),
+        padding: const EdgeInsets.all(40.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 88.0,
+              height: 88.0,
+              decoration: BoxDecoration(
+                color: colorScheme.primary.withValues(alpha: 0.08),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: colorScheme.primary.withValues(alpha: 0.2),
+                  width: 2.0,
+                ),
+              ),
+              alignment: Alignment.center,
+              child: Icon(
+                activeSection.icon,
+                size: 42.0,
+                color: colorScheme.primary,
+              ),
+            ),
+            const SizedBox(height: 24.0),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 5.0),
+              decoration: BoxDecoration(
+                color: colorScheme.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(16.0),
+              ),
+              child: Text(
+                'SEZIONE: ${activeSection.title.toUpperCase()}',
+                style: TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.primary,
+                  letterSpacing: 0.8,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16.0),
+            Text(
+              'Dashboard in costruzione',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 28.0,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.5,
+                color: isDark ? Colors.white : const Color(0xFF0F172A),
+              ),
+            ),
+            const SizedBox(height: 12.0),
+            Text(
+              'Stiamo sviluppando la vista desktop per la gestione di "${activeSection.title}" su schermi grandi. Dal menu laterale puoi passare alla tabella Ordini Live in tempo reale o aprire la gestione menù.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14.5,
+                height: 1.5,
+                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+              ),
+            ),
+            const SizedBox(height: 28.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () => setState(() => _activeNavIndex = 1),
+                  icon: const Icon(Icons.table_restaurant_rounded, size: 16.0),
+                  label: const Text(
+                    'Vai alla Tabella Ordini Live',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.0),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12.0),
+                OutlinedButton.icon(
+                  onPressed: () => setState(() => _forceMobilePreview = true),
+                  icon: const Icon(Icons.open_in_new_rounded, size: 16.0),
+                  label: const Text(
+                    'Apri Menù Mobile',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.0),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

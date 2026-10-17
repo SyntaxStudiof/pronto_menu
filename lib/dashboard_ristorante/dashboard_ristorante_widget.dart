@@ -2,6 +2,7 @@ import '/backend/backend.dart';
 import '/components/nav_bar_dinamica_widget.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/custom_functions.dart' as functions;
+import '/index.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -52,7 +53,7 @@ class _DashboardRistoranteWidgetState extends State<DashboardRistoranteWidget> {
     context.watch<FFAppState>();
     final theme = Theme.of(context);
 
-    return GestureDetector(
+    final mobileUI = GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
         FocusManager.instance.primaryFocus?.unfocus();
@@ -823,6 +824,12 @@ class _DashboardRistoranteWidgetState extends State<DashboardRistoranteWidget> {
           ),
         ),
       ),
+    );
+
+    return ResponsiveDashboard(
+      ristoranteRef: widget.ristoranteRef,
+      initialNavIndex: 1,
+      mobile: mobileUI,
     );
   }
 }
