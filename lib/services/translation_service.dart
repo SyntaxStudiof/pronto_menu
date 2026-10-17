@@ -1014,6 +1014,20 @@ class TranslationService {
       'de': 'Bestellung erfolgreich gesendet! Wir bereiten sie für Sie zu.',
       'es': '¡Pedido enviado con éxito! Lo estamos preparando para ti.',
     },
+    'panoramica': {
+      'it': 'Panoramica',
+      'en': 'Overview',
+      'fr': 'Aperçu',
+      'de': 'Übersicht',
+      'es': 'Resumen',
+    },
+    'tutte': {
+      'it': 'Tutte',
+      'en': 'All',
+      'fr': 'Toutes',
+      'de': 'Alle',
+      'es': 'Todas',
+    },
   };
 
   /// Restituisce una stringa di interfaccia nella lingua corrente

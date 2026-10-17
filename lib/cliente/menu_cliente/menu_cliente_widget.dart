@@ -504,6 +504,74 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
     );
   }
 
+  IconData _getCategoryIcon(String categoryName) {
+    final lower = categoryName.toLowerCase();
+    if (lower.contains('pizz')) return Icons.local_pizza_rounded;
+    if (lower.contains('burg') ||
+        lower.contains('panin') ||
+        lower.contains('sandwich')) {
+      return Icons.lunch_dining_rounded;
+    }
+    if (lower.contains('prim') ||
+        lower.contains('past') ||
+        lower.contains('risott') ||
+        lower.contains('noodl') ||
+        lower.contains('zupp')) {
+      return Icons.ramen_dining_rounded;
+    }
+    if (lower.contains('second') ||
+        lower.contains('carn') ||
+        lower.contains('steak') ||
+        lower.contains('tagliat')) {
+      return Icons.kebab_dining_rounded;
+    }
+    if (lower.contains('pesc') ||
+        lower.contains('fish') ||
+        lower.contains('mare') ||
+        lower.contains('seafood')) {
+      return Icons.set_meal_rounded;
+    }
+    if (lower.contains('antipas') ||
+        lower.contains('starter') ||
+        lower.contains('appetiz') ||
+        lower.contains('tapas') ||
+        lower.contains('sfiz')) {
+      return Icons.tapas_rounded;
+    }
+    if (lower.contains('dolc') ||
+        lower.contains('dessert') ||
+        lower.contains('tort') ||
+        lower.contains('cake')) {
+      return Icons.cake_rounded;
+    }
+    if (lower.contains('gelat') || lower.contains('ice cream')) {
+      return Icons.icecream_rounded;
+    }
+    if (lower.contains('bevand') ||
+        lower.contains('drink') ||
+        lower.contains('bibit')) {
+      return Icons.local_bar_rounded;
+    }
+    if (lower.contains('vin') || lower.contains('wine')) {
+      return Icons.wine_bar_rounded;
+    }
+    if (lower.contains('birr') || lower.contains('beer')) {
+      return Icons.sports_bar_rounded;
+    }
+    if (lower.contains('caff') ||
+        lower.contains('coffee') ||
+        lower.contains('colazion')) {
+      return Icons.coffee_rounded;
+    }
+    if (lower.contains('contorn') ||
+        lower.contains('insalat') ||
+        lower.contains('salad') ||
+        lower.contains('verdur')) {
+      return Icons.eco_rounded;
+    }
+    return Icons.restaurant_rounded;
+  }
+
   Widget _buildFilterSpeedDial(ThemeData theme) {
     return StreamBuilder<List<PiattiRecord>>(
       stream: _allPiattiFilterStream ??
@@ -1358,9 +1426,16 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                                 ),
                               Container(
                                 width: double.infinity,
-                                height: 60.0,
+                                height: 52.0,
                                 decoration: BoxDecoration(
                                   color: theme.scaffoldBackgroundColor,
+                                  border: Border(
+                                    bottom: BorderSide(
+                                      color: theme.dividerColor
+                                          .withValues(alpha: 0.08),
+                                      width: 1.0,
+                                    ),
+                                  ),
                                 ),
                                 child: StreamBuilder<List<CategoriesRecord>>(
                                   stream: _categoriesStream ??
@@ -1375,22 +1450,28 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                                                 .orderBy('ordine_categoria'),
                                       ),
                                   builder: (context, snapshot) {
-                                    // Skeleton compatto per le categorie mentre caricano
+                                    // Skeleton moderno per le categorie mentre caricano
                                     if (!snapshot.hasData) {
-                                      return ListView.builder(
+                                      return ListView.separated(
                                         padding: const EdgeInsets.symmetric(
-                                            horizontal: 16.0, vertical: 10.0),
+                                            horizontal: 16.0, vertical: 7.0),
                                         scrollDirection: Axis.horizontal,
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
                                         itemCount: 4,
+                                        separatorBuilder: (context, i) =>
+                                            const SizedBox(width: 8.0),
                                         itemBuilder: (context, i) => Container(
-                                          width: 100.0,
-                                          margin: const EdgeInsets.only(
-                                              right: 12.0),
+                                          width: 105.0,
                                           decoration: BoxDecoration(
                                             color: theme.cardColor
-                                                .withValues(alpha: 0.7),
+                                                .withValues(alpha: 0.6),
                                             borderRadius:
-                                                BorderRadius.circular(12.0),
+                                                BorderRadius.circular(24.0),
+                                            border: Border.all(
+                                              color: theme.dividerColor
+                                                  .withValues(alpha: 0.1),
+                                            ),
                                           ),
                                         ),
                                       );
@@ -1425,234 +1506,458 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                                       );
                                     }
 
-                            return ListView.builder(
-                              padding: EdgeInsets.zero,
-                              shrinkWrap: true,
-                              scrollDirection: Axis.horizontal,
-                              itemCount: listViewCategoriesRecordList.length,
-                              itemBuilder: (context, listViewIndex) {
-                                final listViewCategoriesRecord =
-                                    listViewCategoriesRecordList[listViewIndex];
-                                return Padding(
-                                  padding: EdgeInsetsDirectional.fromSTEB(
-                                      16.0, 10.0, 16.0, 10.0),
-                                  child: InkWell(
-                                    splashColor: Colors.transparent,
-                                    focusColor: Colors.transparent,
-                                    hoverColor: Colors.transparent,
-                                    highlightColor: Colors.transparent,
-                                    onTap: () async {
-                                      _model.sottocategoriaSelezionata = null;
-                                      safeSetState(() {});
-                                      if (_model.categoriaSelezionataRef ==
-                                          listViewCategoriesRecord.reference) {
-                                        _model.categoriaSelezionataRef = null;
-                                        _model.categoriaSelezionata = null;
-                                        safeSetState(() {});
-                                      } else {
-                                        _model.categoriaSelezionataRef =
-                                            listViewCategoriesRecord.reference;
-                                        _model.categoriaSelezionata =
-                                            listViewCategoriesRecord
-                                                .reference.id;
-                                        safeSetState(() {});
-                                      }
-                                    },
-                                    child: Material(
-                                      color: Colors.transparent,
-                                      elevation: 2.0,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                      ),
-                                      child: Container(
-                                        height: 50.0,
-                                        constraints: BoxConstraints(
-                                          minWidth: 100.0,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: _model.categoriaSelezionata ==
-                                                  listViewCategoriesRecord
-                                                      .reference.id
-                                              ? theme.colorScheme.primary
-                                              : theme.cardColor,
-                                          borderRadius:
-                                              BorderRadius.circular(12.0),
-                                        ),
-                                        alignment:
-                                            AlignmentDirectional(0.0, 0.0),
-                                        child: Text(
-                                          TranslationService.getCategoryName(
-                                              listViewCategoriesRecord.name,
-                                              _currentLang),
-                                          maxLines: 1,
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                font: GoogleFonts.openSans(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontStyle:
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .bodyMedium
-                                                          .fontStyle,
-                                                ),
-                                                color: _model
-                                                            .categoriaSelezionata ==
-                                                        listViewCategoriesRecord
-                                                            .reference.id
-                                                    ? FFAppState()
-                                                        .temaPrimaryBackground
-                                                    : FFAppState()
-                                                        .temaSecondaryText,
-                                                letterSpacing: 0.0,
-                                                fontWeight: FontWeight.bold,
-                                                fontStyle:
-                                                    FlutterFlowTheme.of(context)
-                                                        .bodyMedium
-                                                        .fontStyle,
+                                    final isPanoramicaSelected =
+                                        _model.categoriaSelezionata == null ||
+                                            _model.categoriaSelezionata == '';
+
+                                    return ListView.separated(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16.0, vertical: 7.0),
+                                      scrollDirection: Axis.horizontal,
+                                      physics: const BouncingScrollPhysics(),
+                                      separatorBuilder: (context, i) =>
+                                          const SizedBox(width: 8.0),
+                                      itemCount: 1 +
+                                          listViewCategoriesRecordList.length,
+                                      itemBuilder: (context, index) {
+                                        if (index == 0) {
+                                          return AnimatedContainer(
+                                            duration: const Duration(
+                                                milliseconds: 200),
+                                            curve: Curves.easeOutCubic,
+                                            decoration: BoxDecoration(
+                                              color: isPanoramicaSelected
+                                                  ? theme.colorScheme.primary
+                                                  : theme.cardColor,
+                                              borderRadius:
+                                                  BorderRadius.circular(24.0),
+                                              border: Border.all(
+                                                color: isPanoramicaSelected
+                                                    ? theme.colorScheme.primary
+                                                    : theme.dividerColor
+                                                        .withValues(
+                                                            alpha: 0.20),
+                                                width: 1.0,
                                               ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                        ),
-                      ),
-                      StreamBuilder<List<SottocategorieRecord>>(
-                        stream: _subcategoriesStream ??
-                            querySottocategorieRecord(
-                              queryBuilder: (sottocategorieRecord) =>
-                                  sottocategorieRecord.where(
-                                'proprietario',
-                                isEqualTo: widget!.ristoranteRef,
-                              ),
-                            ),
-                        builder: (context, snapshot) {
-                          final allSubcategories = snapshot.data ?? [];
-                          final currentSubcategories =
-                              _model.categoriaSelezionataRef == null
-                                  ? <SottocategorieRecord>[]
-                                  : allSubcategories
-                                      .where((s) =>
-                                          s.categoriaPadreRef ==
-                                          _model.categoriaSelezionataRef)
-                                      .toList();
-
-                          if (_model.categoriaSelezionataRef == null ||
-                              currentSubcategories.isEmpty) {
-                            return const SizedBox.shrink();
-                          }
-
-                          return Container(
-                            width: double.infinity,
-                            height: 60.0,
-                            decoration: BoxDecoration(
-                              color: theme.cardColor,
-                            ),
-                            child: ListView.builder(
-                              padding: EdgeInsets.zero,
-                              shrinkWrap: true,
-                              scrollDirection: Axis.horizontal,
-                              itemCount: currentSubcategories.length,
-                              itemBuilder: (context, listViewIndex) {
-                                final listViewSottocategorieRecord =
-                                    currentSubcategories[listViewIndex];
-                                return Padding(
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      16.0, 10.0, 16.0, 10.0),
-                                  child: InkWell(
-                                    splashColor: Colors.transparent,
-                                    focusColor: Colors.transparent,
-                                    hoverColor: Colors.transparent,
-                                    highlightColor: Colors.transparent,
-                                    onTap: () async {
-                                      if (_model.sottocategoriaSelezionata ==
-                                          listViewSottocategorieRecord
-                                              .reference) {
-                                        _model.sottocategoriaSelezionata =
-                                            null;
-                                      } else {
-                                        _model.sottocategoriaSelezionata =
-                                            listViewSottocategorieRecord
-                                                .reference;
-                                      }
-                                      safeSetState(() {});
-                                    },
-                                    child: Material(
-                                      color: Colors.transparent,
-                                      elevation: 2.0,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                      ),
-                                      child: Container(
-                                        height: 50.0,
-                                        constraints: const BoxConstraints(
-                                          minWidth: 100.0,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: _model
-                                                      .sottocategoriaSelezionata ==
-                                                  listViewSottocategorieRecord
-                                                      .reference
-                                              ? theme.colorScheme.primary
-                                              : theme.scaffoldBackgroundColor,
-                                          borderRadius:
-                                              BorderRadius.circular(12.0),
-                                        ),
-                                        alignment:
-                                            const AlignmentDirectional(0.0, 0.0),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 14.0),
-                                          child: Text(
-                                            TranslationService.getCategoryName(
-                                                listViewSottocategorieRecord
-                                                    .nome,
-                                                _currentLang),
-                                            maxLines: 1,
-                                            style: FlutterFlowTheme.of(context)
-                                                .bodyMedium
-                                                .override(
-                                                  font: GoogleFonts.openSans(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontStyle:
-                                                        FlutterFlowTheme.of(
-                                                                context)
-                                                            .bodyMedium
-                                                            .fontStyle,
-                                                  ),
-                                                  color: _model
-                                                              .sottocategoriaSelezionata ==
-                                                          listViewSottocategorieRecord
-                                                              .reference
-                                                      ? FFAppState()
-                                                          .temaPrimaryBackground
-                                                      : FFAppState()
-                                                          .temaSecondaryText,
-                                                  letterSpacing: 0.0,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontStyle:
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .bodyMedium
-                                                          .fontStyle,
+                                              boxShadow: isPanoramicaSelected
+                                                  ? [
+                                                      BoxShadow(
+                                                        color: theme
+                                                            .colorScheme.primary
+                                                            .withValues(
+                                                                alpha: 0.35),
+                                                        blurRadius: 8.0,
+                                                        offset: const Offset(
+                                                            0.0, 3.0),
+                                                      ),
+                                                    ]
+                                                  : [
+                                                      BoxShadow(
+                                                        color: Colors.black
+                                                            .withValues(
+                                                                alpha: 0.03),
+                                                        blurRadius: 4.0,
+                                                        offset: const Offset(
+                                                            0.0, 1.5),
+                                                      ),
+                                                    ],
+                                            ),
+                                            child: InkWell(
+                                              borderRadius:
+                                                  BorderRadius.circular(24.0),
+                                              onTap: () {
+                                                _model.categoriaSelezionata =
+                                                    null;
+                                                _model.categoriaSelezionataRef =
+                                                    null;
+                                                _model
+                                                    .sottocategoriaSelezionata =
+                                                    null;
+                                                safeSetState(() {});
+                                              },
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 14.0,
+                                                  vertical: 6.0,
                                                 ),
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    Icon(
+                                                      Icons
+                                                          .restaurant_menu_rounded,
+                                                      size: 16.0,
+                                                      color:
+                                                          isPanoramicaSelected
+                                                              ? Colors.white
+                                                              : theme
+                                                                  .colorScheme
+                                                                  .primary,
+                                                    ),
+                                                    const SizedBox(width: 6.0),
+                                                    Text(
+                                                      TranslationService.getUi(
+                                                          'panoramica',
+                                                          _currentLang),
+                                                      style:
+                                                          GoogleFonts.openSans(
+                                                        fontWeight:
+                                                            isPanoramicaSelected
+                                                                ? FontWeight
+                                                                    .bold
+                                                                : FontWeight
+                                                                    .w600,
+                                                        fontSize: 13.0,
+                                                        color:
+                                                            isPanoramicaSelected
+                                                                ? Colors.white
+                                                                : theme
+                                                                    .colorScheme
+                                                                    .onSurface
+                                                                    .withValues(
+                                                                        alpha:
+                                                                            0.85),
+                                                        letterSpacing: -0.2,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        }
+
+                                        final catIndex = index - 1;
+                                        final catRecord =
+                                            listViewCategoriesRecordList[
+                                                catIndex];
+                                        final isCatSelected = _model
+                                                .categoriaSelezionata ==
+                                            catRecord.reference.id;
+                                        final catIcon =
+                                            _getCategoryIcon(catRecord.name);
+
+                                        return AnimatedContainer(
+                                          duration: const Duration(
+                                              milliseconds: 200),
+                                          curve: Curves.easeOutCubic,
+                                          decoration: BoxDecoration(
+                                            color: isCatSelected
+                                                ? theme.colorScheme.primary
+                                                : theme.cardColor,
+                                            borderRadius:
+                                                BorderRadius.circular(24.0),
+                                            border: Border.all(
+                                              color: isCatSelected
+                                                  ? theme.colorScheme.primary
+                                                  : theme.dividerColor
+                                                      .withValues(
+                                                          alpha: 0.20),
+                                              width: 1.0,
+                                            ),
+                                            boxShadow: isCatSelected
+                                                ? [
+                                                    BoxShadow(
+                                                      color: theme
+                                                          .colorScheme.primary
+                                                          .withValues(
+                                                              alpha: 0.35),
+                                                      blurRadius: 8.0,
+                                                      offset: const Offset(
+                                                          0.0, 3.0),
+                                                    ),
+                                                  ]
+                                                : [
+                                                    BoxShadow(
+                                                      color: Colors.black
+                                                          .withValues(
+                                                              alpha: 0.03),
+                                                      blurRadius: 4.0,
+                                                      offset: const Offset(
+                                                          0.0, 1.5),
+                                                    ),
+                                                  ],
                                           ),
+                                          child: InkWell(
+                                            borderRadius:
+                                                BorderRadius.circular(24.0),
+                                            onTap: () {
+                                              _model
+                                                  .sottocategoriaSelezionata =
+                                                  null;
+                                              if (_model
+                                                      .categoriaSelezionataRef ==
+                                                  catRecord.reference) {
+                                                _model.categoriaSelezionataRef =
+                                                    null;
+                                                _model.categoriaSelezionata =
+                                                    null;
+                                              } else {
+                                                _model.categoriaSelezionataRef =
+                                                    catRecord.reference;
+                                                _model.categoriaSelezionata =
+                                                    catRecord.reference.id;
+                                              }
+                                              safeSetState(() {});
+                                            },
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                horizontal: 14.0,
+                                                vertical: 6.0,
+                                              ),
+                                              child: Row(
+                                                mainAxisSize:
+                                                    MainAxisSize.min,
+                                                children: [
+                                                  Icon(
+                                                    catIcon,
+                                                    size: 16.0,
+                                                    color: isCatSelected
+                                                        ? Colors.white
+                                                        : theme
+                                                            .colorScheme
+                                                            .primary
+                                                            .withValues(
+                                                                alpha: 0.85),
+                                                  ),
+                                                  const SizedBox(width: 6.0),
+                                                  Text(
+                                                    TranslationService
+                                                        .getCategoryName(
+                                                            catRecord.name,
+                                                            _currentLang),
+                                                    maxLines: 1,
+                                                    style:
+                                                        GoogleFonts.openSans(
+                                                      fontWeight: isCatSelected
+                                                          ? FontWeight.bold
+                                                          : FontWeight.w600,
+                                                      fontSize: 13.0,
+                                                      color: isCatSelected
+                                                          ? Colors.white
+                                                          : theme
+                                                              .colorScheme
+                                                              .onSurface
+                                                              .withValues(
+                                                                  alpha:
+                                                                      0.85),
+                                                      letterSpacing: -0.2,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
+                              ),
+                              StreamBuilder<List<SottocategorieRecord>>(
+                                stream: _subcategoriesStream ??
+                                    querySottocategorieRecord(
+                                      queryBuilder: (sottocategorieRecord) =>
+                                          sottocategorieRecord.where(
+                                        'proprietario',
+                                        isEqualTo: widget!.ristoranteRef,
+                                      ),
+                                    ),
+                                builder: (context, snapshot) {
+                                  final allSubcategories =
+                                      snapshot.data ?? [];
+                                  final currentSubcategories =
+                                      _model.categoriaSelezionataRef == null
+                                          ? <SottocategorieRecord>[]
+                                          : allSubcategories
+                                              .where((s) =>
+                                                  s.categoriaPadreRef ==
+                                                  _model
+                                                      .categoriaSelezionataRef)
+                                              .toList();
+
+                                  if (_model.categoriaSelezionataRef == null ||
+                                      currentSubcategories.isEmpty) {
+                                    return const SizedBox.shrink();
+                                  }
+
+                                  final isAllSubSelected =
+                                      _model.sottocategoriaSelezionata == null;
+
+                                  return Container(
+                                    width: double.infinity,
+                                    height: 44.0,
+                                    decoration: BoxDecoration(
+                                      color: theme.cardColor
+                                          .withValues(alpha: 0.45),
+                                      border: Border(
+                                        bottom: BorderSide(
+                                          color: theme.dividerColor
+                                              .withValues(alpha: 0.08),
+                                          width: 1.0,
                                         ),
                                       ),
                                     ),
-                                  ),
-                                );
-                              },
-                            ),
-                          );
-                        },
-                      ),
+                                    child: ListView.separated(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16.0, vertical: 6.0),
+                                      scrollDirection: Axis.horizontal,
+                                      physics: const BouncingScrollPhysics(),
+                                      separatorBuilder: (context, i) =>
+                                          const SizedBox(width: 6.0),
+                                      itemCount:
+                                          1 + currentSubcategories.length,
+                                      itemBuilder: (context, subIndex) {
+                                        if (subIndex == 0) {
+                                          return AnimatedContainer(
+                                            duration: const Duration(
+                                                milliseconds: 180),
+                                            decoration: BoxDecoration(
+                                              color: isAllSubSelected
+                                                  ? theme.colorScheme.primary
+                                                      .withValues(alpha: 0.14)
+                                                  : theme
+                                                      .scaffoldBackgroundColor,
+                                              borderRadius:
+                                                  BorderRadius.circular(16.0),
+                                              border: Border.all(
+                                                color: isAllSubSelected
+                                                    ? theme.colorScheme.primary
+                                                    : theme.dividerColor
+                                                        .withValues(
+                                                            alpha: 0.16),
+                                                width: 1.0,
+                                              ),
+                                            ),
+                                            child: InkWell(
+                                              borderRadius:
+                                                  BorderRadius.circular(16.0),
+                                              onTap: () {
+                                                _model
+                                                    .sottocategoriaSelezionata =
+                                                    null;
+                                                safeSetState(() {});
+                                              },
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 12.0,
+                                                  vertical: 4.0,
+                                                ),
+                                                child: Center(
+                                                  child: Text(
+                                                    TranslationService.getUi(
+                                                        'tutte', _currentLang),
+                                                    style:
+                                                        GoogleFonts.openSans(
+                                                      fontWeight:
+                                                          isAllSubSelected
+                                                              ? FontWeight.bold
+                                                              : FontWeight
+                                                                  .w500,
+                                                      fontSize: 12.0,
+                                                      color: isAllSubSelected
+                                                          ? theme
+                                                              .colorScheme
+                                                              .primary
+                                                          : theme
+                                                              .colorScheme
+                                                              .onSurface
+                                                              .withValues(
+                                                                  alpha:
+                                                                      0.72),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        }
+
+                                        final subRecord =
+                                            currentSubcategories[subIndex - 1];
+                                        final isSubSelected = _model
+                                                .sottocategoriaSelezionata ==
+                                            subRecord.reference;
+
+                                        return AnimatedContainer(
+                                          duration: const Duration(
+                                              milliseconds: 180),
+                                          decoration: BoxDecoration(
+                                            color: isSubSelected
+                                                ? theme.colorScheme.primary
+                                                    .withValues(alpha: 0.14)
+                                                : theme
+                                                    .scaffoldBackgroundColor,
+                                            borderRadius:
+                                                BorderRadius.circular(16.0),
+                                            border: Border.all(
+                                              color: isSubSelected
+                                                  ? theme.colorScheme.primary
+                                                  : theme.dividerColor
+                                                      .withValues(
+                                                          alpha: 0.16),
+                                              width: 1.0,
+                                            ),
+                                          ),
+                                          child: InkWell(
+                                            borderRadius:
+                                                BorderRadius.circular(16.0),
+                                            onTap: () {
+                                              if (_model
+                                                      .sottocategoriaSelezionata ==
+                                                  subRecord.reference) {
+                                                _model
+                                                    .sottocategoriaSelezionata =
+                                                    null;
+                                              } else {
+                                                _model
+                                                    .sottocategoriaSelezionata =
+                                                    subRecord.reference;
+                                              }
+                                              safeSetState(() {});
+                                            },
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                horizontal: 12.0,
+                                                vertical: 4.0,
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  TranslationService
+                                                      .getCategoryName(
+                                                          subRecord.nome,
+                                                          _currentLang),
+                                                  style:
+                                                      GoogleFonts.openSans(
+                                                    fontWeight: isSubSelected
+                                                        ? FontWeight.bold
+                                                        : FontWeight.w500,
+                                                    fontSize: 12.0,
+                                                    color: isSubSelected
+                                                        ? theme
+                                                            .colorScheme
+                                                            .primary
+                                                        : theme
+                                                            .colorScheme
+                                                            .onSurface
+                                                            .withValues(
+                                                                alpha: 0.72),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      ),
+                                    );
+                                  },
+                                ),
                       if ((menuClienteUsersRecord.ordinePreferito == 'A - Z') &&
                           (_model.categoriaSelezionata != null &&
                               _model.categoriaSelezionata != ''))
