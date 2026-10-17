@@ -8,6 +8,12 @@ class AbbonamentoModel extends FlutterFlowModel<AbbonamentoWidget> {
   // State field(s) for Column widget.
   ScrollController? columnController;
 
+  // 'mensile' or 'annuale'
+  String billingInterval = 'mensile';
+
+  // Selected plan tab / highlight ('pro', 'plus', 'ultra')
+  String selectedTier = 'plus';
+
   @override
   void initState(BuildContext context) {
     columnController = ScrollController();

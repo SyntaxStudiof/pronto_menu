@@ -1,7 +1,9 @@
 import '/auth/firebase_auth/auth_util.dart';
+import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
+import '/index.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'abbonamento_model.dart';
@@ -37,12 +39,222 @@ class _AbbonamentoWidgetState extends State<AbbonamentoWidget> {
     super.dispose();
   }
 
+  Future<void> _attivaPiano({
+    required String tierKey,
+    required String tierName,
+    required String priceFormatted,
+  }) async {
+    final theme = Theme.of(context);
+    final isAnnual = _model.billingInterval == 'annuale';
+    final haUsatoProva = valueOrDefault<bool>(currentUserDocument?.haUsatoProva, false);
+
+    final bool? confermato = await showModalBottomSheet<bool>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (bContext) => Container(
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(24.0),
+            topRight: Radius.circular(24.0),
+          ),
+        ),
+        padding: const EdgeInsets.fromLTRB(24.0, 16.0, 24.0, 32.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Center(
+              child: Container(
+                width: 44.0,
+                height: 4.0,
+                decoration: BoxDecoration(
+                  color: theme.dividerColor.withValues(alpha: 0.4),
+                  borderRadius: BorderRadius.circular(2.0),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20.0),
+            Row(
+              children: [
+                Container(
+                  width: 44.0,
+                  height: 44.0,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                  alignment: Alignment.center,
+                  child: Icon(
+                    Icons.workspace_premium_rounded,
+                    color: theme.colorScheme.primary,
+                    size: 26.0,
+                  ),
+                ),
+                const SizedBox(width: 14.0),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Conferma Sottoscrizione',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        '$tierName • Fatturazione ${isAnnual ? 'Annuale' : 'Mensile'}',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.hintColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 18.0),
+            Container(
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: theme.scaffoldBackgroundColor,
+                borderRadius: BorderRadius.circular(14.0),
+                border: Border.all(
+                  color: theme.dividerColor.withValues(alpha: 0.5),
+                ),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Piano selezionato:',
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                      Text(
+                        tierName,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Importo:',
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                      Text(
+                        priceFormatted,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (!haUsatoProva) ...[
+                    const Divider(height: 20.0),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.verified_rounded,
+                          color: Color(0xFF2E7D32),
+                          size: 16.0,
+                        ),
+                        const SizedBox(width: 6.0),
+                        Expanded(
+                          child: Text(
+                            '7 giorni di prova gratuita inclusi',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: const Color(0xFF2E7D32),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(height: 20.0),
+            FFButtonWidget(
+              onPressed: () => Navigator.pop(bContext, true),
+              text: !haUsatoProva
+                  ? 'Inizia la prova gratuita ora'
+                  : 'Conferma e Attiva $tierName',
+              options: FFButtonOptions(
+                height: 50.0,
+                color: theme.colorScheme.primary,
+                textStyle: theme.textTheme.titleSmall?.copyWith(
+                  color: theme.colorScheme.onPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+                elevation: 0.0,
+                borderRadius: BorderRadius.circular(14.0),
+              ),
+            ),
+            const SizedBox(height: 10.0),
+            TextButton(
+              onPressed: () => Navigator.pop(bContext, false),
+              child: Text(
+                'Annulla',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.hintColor,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (confermato != true) return;
+
+    // Aggiornamento su Firestore
+    await currentUserReference!.update(createUsersRecordData(
+      isPremium: true,
+      haUsatoProva: true,
+      pianoAbbonamento: tierKey,
+      intervalloAbbonamento: _model.billingInterval,
+    ));
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          '🎉 Complimenti! Il piano $tierName è ora attivo per il tuo locale.',
+        ),
+        backgroundColor: const Color(0xFF2E7D32),
+        duration: const Duration(seconds: 4),
+      ),
+    );
+
+    // Reindirizza alla Home Ristoratore
+    context.goNamed(
+      HomeRistoratoreWidget.routeName,
+      queryParameters: {
+        'ristoranteRef': serializeParam(
+          currentUserReference,
+          ParamType.DocumentReference,
+        ),
+      }.withoutNulls,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
     final theme = Theme.of(context);
     final canPop = Navigator.of(context).canPop();
-    final haUsatoProva = valueOrDefault<bool>(currentUserDocument?.haUsatoProva, false);
+    final isAnnual = _model.billingInterval == 'annuale';
 
     return GestureDetector(
       onTap: () {
@@ -90,7 +302,7 @@ class _AbbonamentoWidgetState extends State<AbbonamentoWidget> {
               ),
               const SizedBox(width: 10.0),
               Text(
-                'Piano ProntoMenu',
+                'Piani ProntoMenu',
                 style: theme.appBarTheme.titleTextStyle ??
                     theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
@@ -108,376 +320,180 @@ class _AbbonamentoWidgetState extends State<AbbonamentoWidget> {
         ),
         body: SafeArea(
           top: true,
-          child: Align(
-            alignment: const AlignmentDirectional(0.0, 0.0),
-            child: SingleChildScrollView(
-              controller: _model.columnController,
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
-              child: Center(
-                child: Container(
-                  width: double.infinity,
-                  constraints: const BoxConstraints(maxWidth: 560.0),
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 28.0),
-                  decoration: BoxDecoration(
-                    color: theme.cardColor,
-                    borderRadius: BorderRadius.circular(24.0),
-                    border: Border.all(
-                      color: theme.dividerColor.withValues(alpha: 0.5),
-                      width: 1.0,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        blurRadius: 24.0,
-                        color: Colors.black.withValues(alpha: 0.06),
-                        offset: const Offset(0.0, 8.0),
+          child: SingleChildScrollView(
+            controller: _model.columnController,
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
+            child: Center(
+              child: Container(
+                width: double.infinity,
+                constraints: const BoxConstraints(maxWidth: 880.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Badge Header
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 6.0),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primary.withValues(alpha: 0.10),
+                        borderRadius: BorderRadius.circular(30.0),
                       ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // Badge Piano
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 6.0),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primary.withValues(alpha: 0.10),
-                          borderRadius: BorderRadius.circular(30.0),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.star_rounded,
-                              color: theme.colorScheme.primary,
-                              size: 16.0,
-                            ),
-                            const SizedBox(width: 6.0),
-                            Text(
-                              'PIANO PRO RISTORATORE',
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: theme.colorScheme.primary,
-                                fontSize: 12.0,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.8,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 18.0),
-                      // Logo
-                      Container(
-                        width: 96.0,
-                        height: 96.0,
-                        decoration: BoxDecoration(
-                          color: theme.scaffoldBackgroundColor,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: theme.dividerColor,
-                            width: 2.0,
-                          ),
-                        ),
-                        clipBehavior: Clip.antiAlias,
-                        child: Image.network(
-                          'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/pronto-menu-f0och1/assets/i4ccmvv80eni/IMG_8006.png',
-                          width: 96.0,
-                          height: 96.0,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Image.asset(
-                            'assets/images/IMG_8006.png',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16.0),
-                      Text(
-                        'Sblocca il potenziale del tuo locale',
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.headlineSmall?.copyWith(
-                          fontSize: 24.0,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: -0.6,
-                        ),
-                      ),
-                      const SizedBox(height: 6.0),
-                      Text(
-                        'Gestisci ordini, comande, intrattenimento ai tavoli e menu senza intermediari',
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.hintColor,
-                          fontSize: 14.0,
-                          height: 1.35,
-                        ),
-                      ),
-                      const SizedBox(height: 22.0),
-
-                      // Box Servizi Inclusi
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(18.0),
-                        decoration: BoxDecoration(
-                          color: theme.scaffoldBackgroundColor,
-                          borderRadius: BorderRadius.circular(18.0),
-                          border: Border.all(
-                            color: theme.dividerColor.withValues(alpha: 0.5),
-                            width: 1.0,
-                          ),
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.check_circle_outline_rounded,
-                                  color: theme.colorScheme.primary,
-                                  size: 18.0,
-                                ),
-                                const SizedBox(width: 8.0),
-                                Text(
-                                  'TUTTI I SERVIZI INCLUSI',
-                                  style: theme.textTheme.labelMedium?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: 0.6,
-                                    fontSize: 12.0,
-                                    color: theme.colorScheme.primary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 14.0),
-                            _buildFeatureItem(
-                              context,
-                              icon: Icons.receipt_long_rounded,
-                              iconColor: const Color(0xFFE65100),
-                              title: 'Ricezione ordini in tempo reale',
-                              subtitle: 'Notifiche immediate e comande istantanee dai tavoli dei clienti',
-                            ),
-                            _buildFeatureItem(
-                              context,
-                              icon: Icons.soup_kitchen_rounded,
-                              iconColor: const Color(0xFF00897B),
-                              title: 'Schermi dedicati Cucina e Cassa',
-                              subtitle: 'Avanzamento comande (In preparazione, Pronto, Servito) e conti',
-                            ),
-                            _buildFeatureItem(
-                              context,
-                              icon: Icons.qr_code_2_rounded,
-                              iconColor: const Color(0xFF1E88E5),
-                              title: 'Menu Digitale QR Code interattivo',
-                              subtitle: 'Consultazione istantanea senza app, con QR dedicato per ogni tavolo',
-                            ),
-                            _buildFeatureItem(
-                              context,
-                              icon: Icons.restaurant_menu_rounded,
-                              iconColor: const Color(0xFFD81B60),
-                              title: 'Catalogo illimitato & Allergeni',
-                              subtitle: 'Piatti, varianti, ingredienti completi, foto HD e filtri allergeni',
-                            ),
-                            _buildFeatureItem(
-                              context,
-                              icon: Icons.format_list_bulleted_rounded,
-                              iconColor: const Color(0xFF3949AB),
-                              title: 'Categorie & Sottocategorie personalizzabili',
-                              subtitle: 'Organizzazione flessibile del menu con ordinamento rapido',
-                            ),
-                            _buildFeatureItem(
-                              context,
-                              icon: Icons.music_note_rounded,
-                              iconColor: const Color(0xFF8E24AA),
-                              title: 'Jukebox Digitale per i clienti',
-                              subtitle: 'I commensali richiedono e votano i brani musicali dal tavolo',
-                            ),
-                            _buildFeatureItem(
-                              context,
-                              icon: Icons.sports_esports_rounded,
-                              iconColor: const Color(0xFF5E35B1),
-                              title: 'Giochi ai tavoli (Tris & Quiz del Gusto)',
-                              subtitle: 'Intrattenimento interattivo al tavolo per azzerare i tempi di attesa',
-                            ),
-                            _buildFeatureItem(
-                              context,
-                              icon: Icons.palette_rounded,
-                              iconColor: const Color(0xFFF4511E),
-                              title: 'Personalizzazione completa del Brand',
-                              subtitle: 'Logo, copertina, colori aziendali, contatti e orari del tuo locale',
-                            ),
-                            _buildFeatureItem(
-                              context,
-                              icon: Icons.bar_chart_rounded,
-                              iconColor: const Color(0xFF0288D1),
-                              title: 'Statistiche & Analisi ordini',
-                              subtitle: 'Monitoraggio vendite, piatti più popolari e performance del locale',
-                            ),
-                            _buildFeatureItem(
-                              context,
-                              icon: Icons.delete_sweep_rounded,
-                              iconColor: const Color(0xFF546E7A),
-                              title: 'Cestino di sicurezza e recupero',
-                              subtitle: 'Ripristino immediato di piatti o categorie eliminate per errore',
-                            ),
-                            _buildFeatureItem(
-                              context,
-                              icon: Icons.percent_rounded,
-                              iconColor: const Color(0xFF2E7D32),
-                              title: 'Zero commissioni sul venduto',
-                              subtitle: '0% trattenute, l\'intero incasso dei tuoi ordini rimane al 100% tuo',
-                            ),
-                            _buildFeatureItem(
-                              context,
-                              icon: Icons.support_agent_rounded,
-                              iconColor: const Color(0xFF00ACC1),
-                              title: 'Assistenza & Supporto dedicato',
-                              subtitle: 'Ticket prioritari in-app con supporto rapido e aggiornamenti inclusi',
-                              isLast: true,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 20.0),
-
-                      // Box Prezzo & Periodo Prova
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primary.withValues(alpha: 0.05),
-                          borderRadius: BorderRadius.circular(16.0),
-                          border: Border.all(
-                            color: theme.colorScheme.primary.withValues(alpha: 0.2),
-                            width: 1.2,
-                          ),
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (!haUsatoProva)
-                              AuthUserStreamWidget(
-                                builder: (context) => Padding(
-                                  padding: const EdgeInsets.only(bottom: 6.0),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF2D6A4F),
-                                      borderRadius: BorderRadius.circular(12.0),
-                                    ),
-                                    child: const Text(
-                                      'PROVA GRATUITA 7 GIORNI',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 11.5,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 0.6,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.baseline,
-                              textBaseline: TextBaseline.alphabetic,
-                              children: [
-                                Text(
-                                  '19,90€',
-                                  style: theme.textTheme.headlineMedium?.copyWith(
-                                    fontSize: 34.0,
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: -1.0,
-                                  ),
-                                ),
-                                const SizedBox(width: 4.0),
-                                Text(
-                                  '/ mese',
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    color: theme.hintColor,
-                                    fontSize: 17.0,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4.0),
-                            Wrap(
-                              alignment: WrapAlignment.center,
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.lock_outline_rounded,
-                                  size: 13.0,
-                                  color: theme.hintColor,
-                                ),
-                                const SizedBox(width: 4.0),
-                                Text(
-                                  'Nessun vincolo, disdici quando vuoi con un click',
-                                  textAlign: TextAlign.center,
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: theme.hintColor,
-                                    fontSize: 12.0,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 20.0),
-
-                      // Bottone CTA Stripe
-                      FFButtonWidget(
-                        onPressed: () async {
-                          if (haUsatoProva) {
-                            await launchURL(
-                                'https://buy.stripe.com/test_9B69AM82w238ddbcJEfQI01?client_reference_id=$currentUserUid');
-                          } else {
-                            await launchURL(
-                                'https://buy.stripe.com/test_fZu3cofuYbDIgpneRMfQI00?client_reference_id=$currentUserUid');
-                          }
-                        },
-                        text: haUsatoProva
-                            ? 'Abbonati ora a 19,90€/mese'
-                            : 'Inizia la prova gratuita ora (7 giorni)',
-                        options: FFButtonOptions(
-                          width: double.infinity,
-                          height: 52.0,
-                          padding: const EdgeInsetsDirectional.fromSTEB(24.0, 0.0, 24.0, 0.0),
-                          iconPadding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
-                          color: theme.colorScheme.primary,
-                          textStyle: theme.textTheme.titleSmall?.copyWith(
-                            color: theme.colorScheme.onPrimary,
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.2,
-                          ),
-                          elevation: 0.0,
-                          borderRadius: BorderRadius.circular(14.0),
-                        ),
-                      ),
-                      const SizedBox(height: 12.0),
-
-                      // Garanzia Stripe
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            Icons.verified_user_outlined,
-                            size: 14.0,
-                            color: theme.hintColor,
+                            Icons.star_rounded,
+                            color: theme.colorScheme.primary,
+                            size: 16.0,
                           ),
-                          const SizedBox(width: 5.0),
+                          const SizedBox(width: 6.0),
                           Text(
-                            'Pagamenti sicuri e crittografati con Stripe',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.hintColor,
+                            'SCEGLI IL TUO PIANO',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.colorScheme.primary,
                               fontSize: 12.0,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.8,
                             ),
                           ),
                         ],
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 14.0),
+                    Text(
+                      'Fai crescere il tuo locale con ProntoMenu',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        fontSize: 26.0,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: -0.6,
+                      ),
+                    ),
+                    const SizedBox(height: 6.0),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 580.0),
+                      child: Text(
+                        'Scegli il piano ideale per le tue esigenze: dal menu digitale base all\'automazione ordini e intrattenimento.',
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.hintColor,
+                          fontSize: 14.5,
+                          height: 1.35,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 22.0),
+
+                    // Toggle Mensile / Annuale
+                    Container(
+                      padding: const EdgeInsets.all(4.0),
+                      decoration: BoxDecoration(
+                        color: theme.cardColor,
+                        borderRadius: BorderRadius.circular(30.0),
+                        border: Border.all(
+                          color: theme.dividerColor.withValues(alpha: 0.6),
+                          width: 1.0,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 8.0,
+                            color: Colors.black.withValues(alpha: 0.03),
+                            offset: const Offset(0.0, 2.0),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _buildIntervalButton(
+                            theme: theme,
+                            label: 'Mensile',
+                            isSelected: !isAnnual,
+                            onTap: () {
+                              safeSetState(() => _model.billingInterval = 'mensile');
+                            },
+                          ),
+                          _buildIntervalButton(
+                            theme: theme,
+                            label: 'Annuale',
+                            badge: '-20%',
+                            isSelected: isAnnual,
+                            onTap: () {
+                              safeSetState(() => _model.billingInterval = 'annuale');
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 28.0),
+
+                    // Layout dei 3 Piani
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final isDesktop = constraints.maxWidth >= 760.0;
+                        if (isDesktop) {
+                          return IntrinsicHeight(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Expanded(child: _buildCardPro(theme, isAnnual)),
+                                const SizedBox(width: 16.0),
+                                Expanded(child: _buildCardPlus(theme, isAnnual)),
+                                const SizedBox(width: 16.0),
+                                Expanded(child: _buildCardUltra(theme, isAnnual)),
+                              ],
+                            ),
+                          );
+                        }
+
+                        // Su mobile / schermi compatti: lista verticale di card
+                        return Column(
+                          children: [
+                            _buildCardPro(theme, isAnnual),
+                            const SizedBox(height: 20.0),
+                            _buildCardPlus(theme, isAnnual),
+                            const SizedBox(height: 20.0),
+                            _buildCardUltra(theme, isAnnual),
+                          ],
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 28.0),
+
+                    // Footer di sicurezza e trasparenza
+                    Container(
+                      constraints: const BoxConstraints(maxWidth: 580.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
+                      decoration: BoxDecoration(
+                        color: theme.cardColor,
+                        borderRadius: BorderRadius.circular(16.0),
+                        border: Border.all(
+                          color: theme.dividerColor.withValues(alpha: 0.5),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.verified_user_outlined,
+                            size: 18.0,
+                            color: theme.hintColor,
+                          ),
+                          const SizedBox(width: 10.0),
+                          Expanded(
+                            child: Text(
+                              'Nessun vincolo contrattuale • Disdici quando vuoi in un click • 0% commissioni sul venduto',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.hintColor,
+                                height: 1.3,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20.0),
+                  ],
                 ),
               ),
             ),
@@ -487,74 +503,481 @@ class _AbbonamentoWidgetState extends State<AbbonamentoWidget> {
     );
   }
 
-  Widget _buildFeatureItem(
-    BuildContext context, {
-    required IconData icon,
-    required Color iconColor,
-    required String title,
-    required String subtitle,
-    bool isLast = false,
+  Widget _buildIntervalButton({
+    required ThemeData theme,
+    required String label,
+    String? badge,
+    required bool isSelected,
+    required VoidCallback onTap,
   }) {
-    final theme = Theme.of(context);
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 9.0),
+        decoration: BoxDecoration(
+          color: isSelected ? theme.colorScheme.primary : Colors.transparent,
+          borderRadius: BorderRadius.circular(26.0),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? theme.colorScheme.onPrimary : theme.hintColor,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                fontSize: 13.5,
+              ),
+            ),
+            if (badge != null) ...[
+              const SizedBox(width: 6.0),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? theme.colorScheme.onPrimary.withValues(alpha: 0.25)
+                      : const Color(0xFF2E7D32).withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: Text(
+                  badge,
+                  style: TextStyle(
+                    color: isSelected ? theme.colorScheme.onPrimary : const Color(0xFF2E7D32),
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ─── CARD 1: PRONTOMENU PRO ─────────────────────────────────────────────
+  Widget _buildCardPro(ThemeData theme, bool isAnnual) {
+    const accentColor = Color(0xFF0D9488); // Teal
+    final price = isAnnual ? '69,90€' : '6,90€';
+    final period = isAnnual ? '/ anno' : '/ mese';
+    final subtitlePrice = isAnnual ? 'equivale a 5,82€ al mese' : 'fatturato mensilmente';
+
+    return Container(
+      padding: const EdgeInsets.all(22.0),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(22.0),
+        border: Border.all(
+          color: theme.dividerColor.withValues(alpha: 0.7),
+          width: 1.0,
+        ),
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 16.0,
+            color: Colors.black.withValues(alpha: 0.03),
+            offset: const Offset(0.0, 4.0),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
+                decoration: BoxDecoration(
+                  color: accentColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: const Text(
+                  'ESSENZIALE',
+                  style: TextStyle(
+                    color: accentColor,
+                    fontSize: 11.0,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.6,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14.0),
+          Text(
+            'ProntoMenu Pro',
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              fontSize: 22.0,
+              letterSpacing: -0.3,
+            ),
+          ),
+          const SizedBox(height: 4.0),
+          Text(
+            'Il menu digitale completo e conforme per presentare i tuoi piatti.',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.hintColor,
+              height: 1.3,
+            ),
+          ),
+          const SizedBox(height: 16.0),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(
+                price,
+                style: theme.textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 32.0,
+                  letterSpacing: -0.5,
+                ),
+              ),
+              const SizedBox(width: 4.0),
+              Text(
+                period,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: theme.hintColor,
+                ),
+              ),
+            ],
+          ),
+          Text(
+            subtitlePrice,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.hintColor,
+              fontSize: 11.5,
+            ),
+          ),
+          const Divider(height: 28.0),
+          _buildCheckItem(theme, 'Menu Digitale QR Code nativo per i tavoli'),
+          _buildCheckItem(theme, 'Categorie e sottocategorie illimitate'),
+          _buildCheckItem(theme, 'Allergeni completi & preferenze (Senza glutine, lattosio...)'),
+          _buildCheckItem(theme, 'Foto piatti in alta risoluzione e descrizioni dettagliate'),
+          _buildCheckItem(theme, 'Zero commissioni sul venduto'),
+          _buildCheckItem(theme, 'Supporto base e aggiornamenti inclusi'),
+          const SizedBox(height: 20.0),
+          FFButtonWidget(
+            onPressed: () => _attivaPiano(
+              tierKey: 'pro',
+              tierName: 'ProntoMenu Pro',
+              priceFormatted: '$price $period',
+            ),
+            text: 'Scegli Piano Pro',
+            options: FFButtonOptions(
+              height: 46.0,
+              color: accentColor,
+              textStyle: theme.textTheme.titleSmall?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              elevation: 0.0,
+              borderRadius: BorderRadius.circular(12.0),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ─── CARD 2: PRONTOMENU PLUS (CONSIGLIATO) ──────────────────────────────
+  Widget _buildCardPlus(ThemeData theme, bool isAnnual) {
+    final price = isAnnual ? '109,90€' : '11,90€';
+    final period = isAnnual ? '/ anno' : '/ mese';
+    final subtitlePrice = isAnnual ? 'equivale a 9,15€ al mese' : 'fatturato mensilmente';
+    final primaryColor = theme.colorScheme.primary;
+
+    return Container(
+      padding: const EdgeInsets.all(22.0),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(22.0),
+        border: Border.all(
+          color: primaryColor,
+          width: 2.0,
+        ),
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 20.0,
+            color: primaryColor.withValues(alpha: 0.12),
+            offset: const Offset(0.0, 6.0),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
+                decoration: BoxDecoration(
+                  color: primaryColor,
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.star_rounded, color: Colors.white, size: 14.0),
+                    const SizedBox(width: 4.0),
+                    Text(
+                      'PIÙ POPOLARE',
+                      style: TextStyle(
+                        color: theme.colorScheme.onPrimary,
+                        fontSize: 11.0,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.6,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14.0),
+          Text(
+            'ProntoMenu Plus',
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              fontSize: 22.0,
+              letterSpacing: -0.3,
+            ),
+          ),
+          const SizedBox(height: 4.0),
+          Text(
+            'Ricezione ordini dal vivo, gestione comande e menù mutaforma dinamici.',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.hintColor,
+              height: 1.3,
+            ),
+          ),
+          const SizedBox(height: 16.0),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(
+                price,
+                style: theme.textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 32.0,
+                  letterSpacing: -0.5,
+                  color: primaryColor,
+                ),
+              ),
+              const SizedBox(width: 4.0),
+              Text(
+                period,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: theme.hintColor,
+                ),
+              ),
+            ],
+          ),
+          Text(
+            subtitlePrice,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.hintColor,
+              fontSize: 11.5,
+            ),
+          ),
+          const Divider(height: 28.0),
+          _buildCheckItem(theme, 'Tutto ciò che include ProntoMenu Pro', isBold: true),
+          _buildCheckItem(theme, 'Ricezione ordini in tempo reale dai tavoli'),
+          _buildCheckItem(theme, 'Schermi dedicati Cucina e Cassa per le comande'),
+          _buildCheckItem(theme, 'Prenotazioni tavoli gestibili direttamente sull\'app'),
+          _buildCheckItem(theme, 'Menù Mutaforma (più menu per orari, eventi e pranzi)'),
+          _buildCheckItem(theme, 'Personalizzazione grafica e colore tema del locale'),
+          _buildCheckItem(theme, 'Zero commissioni sul venduto'),
+          const SizedBox(height: 20.0),
+          FFButtonWidget(
+            onPressed: () => _attivaPiano(
+              tierKey: 'plus',
+              tierName: 'ProntoMenu Plus',
+              priceFormatted: '$price $period',
+            ),
+            text: 'Scegli Piano Plus ⭐',
+            options: FFButtonOptions(
+              height: 46.0,
+              color: primaryColor,
+              textStyle: theme.textTheme.titleSmall?.copyWith(
+                color: theme.colorScheme.onPrimary,
+                fontWeight: FontWeight.bold,
+              ),
+              elevation: 0.0,
+              borderRadius: BorderRadius.circular(12.0),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ─── CARD 3: PRONTOMENU ULTRA (TUTTO INCLUSO) ───────────────────────────
+  Widget _buildCardUltra(ThemeData theme, bool isAnnual) {
+    const accentColor = Color(0xFF7C3AED); // Purple
+    final price = isAnnual ? '289,90€' : '29,90€';
+    final period = isAnnual ? '/ anno' : '/ mese';
+    final subtitlePrice = isAnnual ? 'equivale a 24,15€ al mese' : 'fatturato mensilmente';
+
+    return Container(
+      padding: const EdgeInsets.all(22.0),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(22.0),
+        border: Border.all(
+          color: accentColor.withValues(alpha: 0.6),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 18.0,
+            color: accentColor.withValues(alpha: 0.08),
+            offset: const Offset(0.0, 4.0),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
+                decoration: BoxDecoration(
+                  color: accentColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('👑', style: TextStyle(fontSize: 12.0)),
+                    SizedBox(width: 4.0),
+                    Text(
+                      'TUTTO INCLUSO',
+                      style: TextStyle(
+                        color: accentColor,
+                        fontSize: 11.0,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.6,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14.0),
+          Text(
+            'ProntoMenu Ultra',
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              fontSize: 22.0,
+              letterSpacing: -0.3,
+            ),
+          ),
+          const SizedBox(height: 4.0),
+          Text(
+            'La suite definitiva: intrattenimento clienti ai tavoli, statistiche e supporto prioritario.',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.hintColor,
+              height: 1.3,
+            ),
+          ),
+          const SizedBox(height: 16.0),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(
+                price,
+                style: theme.textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 32.0,
+                  letterSpacing: -0.5,
+                  color: accentColor,
+                ),
+              ),
+              const SizedBox(width: 4.0),
+              Text(
+                period,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: theme.hintColor,
+                ),
+              ),
+            ],
+          ),
+          Text(
+            subtitlePrice,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.hintColor,
+              fontSize: 11.5,
+            ),
+          ),
+          const Divider(height: 28.0),
+          _buildCheckItem(theme, 'Tutto ciò che include ProntoMenu Plus', isBold: true),
+          _buildCheckItem(theme, 'Jukebox Digitale per richieste musicali dei clienti'),
+          _buildCheckItem(theme, 'Giochi ai tavoli (Tris & Quiz del Gusto multiplayer)'),
+          _buildCheckItem(theme, 'Statistiche avanzate e report vendite in tempo reale'),
+          _buildCheckItem(theme, 'Cestino di sicurezza e ripristino immediato piatti'),
+          _buildCheckItem(theme, 'Assistenza prioritaria dedicata in-app con ticket diretti'),
+          _buildCheckItem(theme, 'Zero commissioni sul venduto'),
+          const SizedBox(height: 20.0),
+          FFButtonWidget(
+            onPressed: () => _attivaPiano(
+              tierKey: 'ultra',
+              tierName: 'ProntoMenu Ultra',
+              priceFormatted: '$price $period',
+            ),
+            text: 'Scegli Piano Ultra 👑',
+            options: FFButtonOptions(
+              height: 46.0,
+              color: accentColor,
+              textStyle: theme.textTheme.titleSmall?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              elevation: 0.0,
+              borderRadius: BorderRadius.circular(12.0),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCheckItem(ThemeData theme, String text, {bool isBold = false}) {
     return Padding(
-      padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, isLast ? 0.0 : 13.0),
+      padding: const EdgeInsets.only(bottom: 10.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 36.0,
-            height: 36.0,
-            decoration: BoxDecoration(
-              color: iconColor.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(10.0),
+            width: 18.0,
+            height: 18.0,
+            decoration: const BoxDecoration(
+              color: Color(0xFFE8F5E9),
+              shape: BoxShape.circle,
             ),
             alignment: Alignment.center,
-            child: Icon(
-              icon,
-              color: iconColor,
-              size: 19.0,
+            child: const Icon(
+              Icons.check_rounded,
+              color: Color(0xFF2E7D32),
+              size: 13.0,
             ),
           ),
-          const SizedBox(width: 12.0),
+          const SizedBox(width: 10.0),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: -0.2,
-                  ),
-                ),
-                const SizedBox(height: 2.0),
-                Text(
-                  subtitle,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.hintColor,
-                    fontSize: 12.0,
-                    height: 1.3,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8.0),
-          Padding(
-            padding: const EdgeInsets.only(top: 2.0),
-            child: Container(
-              width: 20.0,
-              height: 20.0,
-              decoration: const BoxDecoration(
-                color: Color(0xFFE8F5E9),
-                shape: BoxShape.circle,
-              ),
-              alignment: Alignment.center,
-              child: const Icon(
-                Icons.check_rounded,
-                color: Color(0xFF2E7D32),
-                size: 14.0,
+            child: Text(
+              text,
+              style: theme.textTheme.bodySmall?.copyWith(
+                fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
+                color: isBold ? theme.colorScheme.onSurface : theme.colorScheme.onSurface.withValues(alpha: 0.85),
+                fontSize: 12.5,
+                height: 1.25,
               ),
             ),
           ),

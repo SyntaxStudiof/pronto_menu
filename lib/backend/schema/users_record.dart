@@ -105,6 +105,21 @@ class UsersRecord extends FirestoreRecord {
   bool get haUsatoProva => _haUsatoProva ?? false;
   bool hasHaUsatoProva() => _haUsatoProva != null;
 
+  // "piano_abbonamento" field. ('pro', 'plus', 'ultra')
+  String? _pianoAbbonamento;
+  String get pianoAbbonamento => _pianoAbbonamento ?? (isPremium ? 'ultra' : '');
+  bool hasPianoAbbonamento() => _pianoAbbonamento != null;
+
+  // "intervallo_abbonamento" field. ('mensile', 'annuale')
+  String? _intervalloAbbonamento;
+  String get intervalloAbbonamento => _intervalloAbbonamento ?? 'mensile';
+  bool hasIntervalloAbbonamento() => _intervalloAbbonamento != null;
+
+  // Subscription tier helpers
+  bool get hasPro => isPremium;
+  bool get hasPlus => isPremium && (pianoAbbonamento == 'plus' || pianoAbbonamento == 'ultra');
+  bool get hasUltra => isPremium && pianoAbbonamento == 'ultra';
+
   // Jukebox fields
   bool? _jukeboxAttivo;
   bool get jukeboxAttivo => _jukeboxAttivo ?? false;
@@ -199,6 +214,8 @@ class UsersRecord extends FirestoreRecord {
     _stripeId = snapshotData['stripeId'] as String?;
     _premiumExpiryDate = snapshotData['premium_expiry_date'] as DateTime?;
     _haUsatoProva = snapshotData['ha_usato_prova'] as bool?;
+    _pianoAbbonamento = snapshotData['piano_abbonamento'] as String?;
+    _intervalloAbbonamento = snapshotData['intervallo_abbonamento'] as String?;
     _jukeboxAttivo = snapshotData['jukebox_attivo'] as bool?;
     _spotifyPlaylistId = snapshotData['spotify_playlist_id'] as String?;
     _jukeboxCooldownMinuti =
@@ -272,6 +289,8 @@ Map<String, dynamic> createUsersRecordData({
   String? stripeId,
   DateTime? premiumExpiryDate,
   bool? haUsatoProva,
+  String? pianoAbbonamento,
+  String? intervalloAbbonamento,
   bool? jukeboxAttivo,
   String? spotifyPlaylistId,
   int? jukeboxCooldownMinuti,
@@ -311,6 +330,8 @@ Map<String, dynamic> createUsersRecordData({
       'stripeId': stripeId,
       'premium_expiry_date': premiumExpiryDate,
       'ha_usato_prova': haUsatoProva,
+      'piano_abbonamento': pianoAbbonamento,
+      'intervallo_abbonamento': intervalloAbbonamento,
       'jukebox_attivo': jukeboxAttivo,
       'spotify_playlist_id': spotifyPlaylistId,
       'jukebox_cooldown_minuti': jukeboxCooldownMinuti,
@@ -357,7 +378,9 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
         e1?.isPremium == e2?.isPremium &&
         e1?.stripeId == e2?.stripeId &&
         e1?.premiumExpiryDate == e2?.premiumExpiryDate &&
-        e1?.haUsatoProva == e2?.haUsatoProva;
+        e1?.haUsatoProva == e2?.haUsatoProva &&
+        e1?.pianoAbbonamento == e2?.pianoAbbonamento &&
+        e1?.intervalloAbbonamento == e2?.intervalloAbbonamento;
   }
 
   @override
@@ -379,7 +402,9 @@ class UsersRecordDocumentEquality implements Equality<UsersRecord> {
         e?.isPremium,
         e?.stripeId,
         e?.premiumExpiryDate,
-        e?.haUsatoProva
+        e?.haUsatoProva,
+        e?.pianoAbbonamento,
+        e?.intervalloAbbonamento
       ]);
 
   @override

@@ -1,3 +1,4 @@
+import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
@@ -45,6 +46,80 @@ class _NavBarDinamicaWidgetState extends State<NavBarDinamicaWidget> {
     _model.maybeDispose();
 
     super.dispose();
+  }
+
+  void _mostraUpgradePlus(BuildContext context, String featureName) {
+    final theme = Theme.of(context);
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (bContext) => Container(
+        padding: const EdgeInsets.fromLTRB(24.0, 20.0, 24.0, 32.0),
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(24.0),
+            topRight: Radius.circular(24.0),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 50.0,
+              height: 50.0,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+              ),
+              alignment: Alignment.center,
+              child: Icon(
+                Icons.lock_rounded,
+                color: theme.colorScheme.primary,
+                size: 26.0,
+              ),
+            ),
+            const SizedBox(height: 14.0),
+            Text(
+              'Funzionalità ProntoMenu Plus & Ultra',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8.0),
+            Text(
+              '$featureName è inclusa nei piani Plus e Ultra.\nPassa a Plus a soli 11,90€/mese per sbloccarla subito!',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.hintColor,
+                height: 1.35,
+              ),
+            ),
+            const SizedBox(height: 20.0),
+            SizedBox(
+              width: double.infinity,
+              height: 48.0,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pop(bContext);
+                  context.pushNamed(AbbonamentoWidget.routeName);
+                },
+                icon: const Icon(Icons.arrow_upward_rounded, size: 18.0),
+                label: const Text('Scopri i Piani & Esegui Upgrade'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.colorScheme.primary,
+                  foregroundColor: theme.colorScheme.onPrimary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -146,6 +221,10 @@ class _NavBarDinamicaWidgetState extends State<NavBarDinamicaWidget> {
                       hoverColor: Colors.transparent,
                       highlightColor: Colors.transparent,
                       onTap: () async {
+                        if (currentUserDocument != null && !currentUserDocument!.hasPlus) {
+                          _mostraUpgradePlus(context, 'La gestione Cucina e comande in tempo reale');
+                          return;
+                        }
                         context.goNamed(
                           DashboardRistoranteWidget.routeName,
                           queryParameters: {
@@ -246,6 +325,10 @@ class _NavBarDinamicaWidgetState extends State<NavBarDinamicaWidget> {
                       hoverColor: Colors.transparent,
                       highlightColor: Colors.transparent,
                       onTap: () async {
+                        if (currentUserDocument != null && !currentUserDocument!.hasPlus) {
+                          _mostraUpgradePlus(context, 'La cassa e lo storico comande completate');
+                          return;
+                        }
                         context.goNamed(
                           StoricoOrdiniWidget.routeName,
                           queryParameters: {

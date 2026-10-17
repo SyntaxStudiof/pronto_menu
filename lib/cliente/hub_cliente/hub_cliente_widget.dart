@@ -402,10 +402,14 @@ class _HubClienteWidgetState extends State<HubClienteWidget> {
                         ? Colors.orange.shade800
                         : colorScheme.primary,
                     subtitle: fasciaAttiva != null
-                        ? 'Disponibile ora per ordinare al tavolo'
+                        ? (userRecord.hasPlus
+                            ? 'Disponibile ora per ordinare al tavolo'
+                            : 'Consulta il menù completo')
                         : (mutaformaInPausa
                             ? 'Consulta il menù in pausa o verifica orari'
-                            : 'Esplora i nostri piatti ed effettua l\'ordine'),
+                            : (userRecord.hasPlus
+                                ? 'Esplora i nostri piatti ed effettua l\'ordine'
+                                : 'Esplora il nostro menù digitale')),
                     onTap: () {
                       context.pushNamed(
                         MenuClienteWidget.routeName,
@@ -416,6 +420,10 @@ class _HubClienteWidgetState extends State<HubClienteWidget> {
                           ),
                           'isAnteprima': serializeParam(
                             true,
+                            ParamType.bool,
+                          ),
+                          'solaConsultazione': serializeParam(
+                            !userRecord.hasPlus,
                             ParamType.bool,
                           ),
                         }.withoutNulls,
@@ -454,8 +462,8 @@ class _HubClienteWidgetState extends State<HubClienteWidget> {
                     const SizedBox(height: 16.0),
                   ],
 
-                  // OPZIONE 3: JUKEBOX (Se abilitato per il locale)
-                  if (userRecord.jukeboxAttivo) ...[
+                  // OPZIONE 3: JUKEBOX (Se abilitato per il locale e con piano Ultra)
+                  if (userRecord.jukeboxAttivo && userRecord.hasUltra) ...[
                     _buildHubOptionCard(
                       theme: theme,
                       icon: Icons.music_note_rounded,
@@ -477,61 +485,63 @@ class _HubClienteWidgetState extends State<HubClienteWidget> {
                     const SizedBox(height: 16.0),
                   ],
 
-                  // OPZIONE 4: SALA GIOCHI (TRIS AL TAVOLO)
-                  _buildHubOptionCard(
-                    theme: theme,
-                    icon: Icons.sports_esports_rounded,
-                    iconColor: const Color(0xFF8B5CF6),
-                    iconBgColor:
-                        const Color(0xFF8B5CF6).withValues(alpha: 0.12),
-                    title: 'Sala Giochi • Tris al Tavolo',
-                    subtitle:
-                        'Gioca con chi è al tuo tavolo o sfida gli altri tavoli del ristorante!',
-                    onTap: () {
-                      context.pushNamed(
-                        TrisGameWidget.routeName,
-                        queryParameters: {
-                          'ristoranteRef': serializeParam(
-                            widget.ristoranteRef,
-                            ParamType.DocumentReference,
-                          ),
-                          'tavoloPreimpostato': serializeParam(
-                            FFAppState().numeroTavolo,
-                            ParamType.String,
-                          ),
-                        }.withoutNulls,
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 16.0),
+                  // OPZIONE 4: SALA GIOCHI (TRIS AL TAVOLO - Solo piano Ultra)
+                  if (userRecord.hasUltra) ...[
+                    _buildHubOptionCard(
+                      theme: theme,
+                      icon: Icons.sports_esports_rounded,
+                      iconColor: const Color(0xFF8B5CF6),
+                      iconBgColor:
+                          const Color(0xFF8B5CF6).withValues(alpha: 0.12),
+                      title: 'Sala Giochi • Tris al Tavolo',
+                      subtitle:
+                          'Gioca con chi è al tuo tavolo o sfida gli altri tavoli del ristorante!',
+                      onTap: () {
+                        context.pushNamed(
+                          TrisGameWidget.routeName,
+                          queryParameters: {
+                            'ristoranteRef': serializeParam(
+                              widget.ristoranteRef,
+                              ParamType.DocumentReference,
+                            ),
+                            'tavoloPreimpostato': serializeParam(
+                              FFAppState().numeroTavolo,
+                              ParamType.String,
+                            ),
+                          }.withoutNulls,
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 16.0),
 
-                  // OPZIONE 5: QUIZ AL TAVOLO
-                  _buildHubOptionCard(
-                    theme: theme,
-                    icon: Icons.lightbulb_rounded,
-                    iconColor: const Color(0xFFF59E0B),
-                    iconBgColor:
-                        const Color(0xFFF59E0B).withValues(alpha: 0.12),
-                    title: 'Quiz del Gusto & Curiosità',
-                    subtitle:
-                        'Rispondi a 5 domande sul cibo o sfida in tempo reale gli altri tavoli!',
-                    onTap: () {
-                      context.pushNamed(
-                        QuizGameWidget.routeName,
-                        queryParameters: {
-                          'ristoranteRef': serializeParam(
-                            widget.ristoranteRef,
-                            ParamType.DocumentReference,
-                          ),
-                          'tavoloPreimpostato': serializeParam(
-                            FFAppState().numeroTavolo,
-                            ParamType.String,
-                          ),
-                        }.withoutNulls,
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 16.0),
+                    // OPZIONE 5: QUIZ AL TAVOLO
+                    _buildHubOptionCard(
+                      theme: theme,
+                      icon: Icons.lightbulb_rounded,
+                      iconColor: const Color(0xFFF59E0B),
+                      iconBgColor:
+                          const Color(0xFFF59E0B).withValues(alpha: 0.12),
+                      title: 'Quiz del Gusto & Curiosità',
+                      subtitle:
+                          'Rispondi a 5 domande sul cibo o sfida in tempo reale gli altri tavoli!',
+                      onTap: () {
+                        context.pushNamed(
+                          QuizGameWidget.routeName,
+                          queryParameters: {
+                            'ristoranteRef': serializeParam(
+                              widget.ristoranteRef,
+                              ParamType.DocumentReference,
+                            ),
+                            'tavoloPreimpostato': serializeParam(
+                              FFAppState().numeroTavolo,
+                              ParamType.String,
+                            ),
+                          }.withoutNulls,
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 16.0),
+                  ],
                 ],
               ),
             ),

@@ -1123,6 +1123,8 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
             fasciaAttiva == null;
         final FasciaMutaforma? prossimaFascia =
             mutaformaInPausa ? MutaformaService.getProssimaFascia(fasceMutaforma) : null;
+        final bool isSolaConsultazione =
+            widget.solaConsultazione || !menuClienteUsersRecord.hasPlus;
 
         if (fasciaTarget != null &&
             _model.categoriaSelezionata != null &&
@@ -1274,7 +1276,7 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                 ],
               ),
               actions: [
-                if (!widget.solaConsultazione)
+                if (!isSolaConsultazione)
                   InkWell(
                     splashColor: Colors.transparent,
                     focusColor: Colors.transparent,
@@ -1812,7 +1814,7 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                                                     ingredientiManualiAttivi:
                                                         menuClienteUsersRecord.ingredientiManualiAttivi,
                                                     solaConsultazione:
-                                                        widget.solaConsultazione,
+                                                        isSolaConsultazione,
                                                   ),
                                                 ),
                                               );
@@ -2022,7 +2024,7 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                                                             listViewNomePiattiRecord.prezzo, formatType: FormatType.decimal, decimalType: DecimalType.periodDecimal, currency: '€'), textAlign: TextAlign.end, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600, color: theme.hintColor)),
                                                       ),
                                                     ),
-                                                    if (!widget.solaConsultazione) ...[
+                                                    if (!isSolaConsultazione) ...[
                                                       if (menuClienteUsersRecord.dispensaAttiva &&
                                                           menuClienteUsersRecord.modifichePiattiAttive &&
                                                           widget.ristoranteRef != null)
@@ -2265,7 +2267,7 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                                                     ingredientiManualiAttivi:
                                                         menuClienteUsersRecord.ingredientiManualiAttivi,
                                                     solaConsultazione:
-                                                        widget.solaConsultazione,
+                                                        isSolaConsultazione,
                                                   ),
                                                 ),
                                               );
@@ -2475,7 +2477,7 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                                                             listViewPrezzoPiattiRecord.prezzo, formatType: FormatType.decimal, decimalType: DecimalType.periodDecimal, currency: '€'), textAlign: TextAlign.end, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600, color: theme.hintColor)),
                                                       ),
                                                     ),
-                                                    if (!widget.solaConsultazione) ...[
+                                                    if (!isSolaConsultazione) ...[
                                                       if (menuClienteUsersRecord.dispensaAttiva &&
                                                           menuClienteUsersRecord.modifichePiattiAttive &&
                                                           widget.ristoranteRef != null)

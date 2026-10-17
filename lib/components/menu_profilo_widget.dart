@@ -42,6 +42,80 @@ class _MenuProfiloWidgetState extends State<MenuProfiloWidget> {
     super.dispose();
   }
 
+  void _mostraUpgradeUltra(BuildContext context, String featureName) {
+    final theme = Theme.of(context);
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (bContext) => Container(
+        padding: const EdgeInsets.fromLTRB(24.0, 20.0, 24.0, 32.0),
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(24.0),
+            topRight: Radius.circular(24.0),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 50.0,
+              height: 50.0,
+              decoration: BoxDecoration(
+                color: const Color(0xFF7C3AED).withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+              ),
+              alignment: Alignment.center,
+              child: const Icon(
+                Icons.workspace_premium_rounded,
+                color: Color(0xFF7C3AED),
+                size: 26.0,
+              ),
+            ),
+            const SizedBox(height: 14.0),
+            Text(
+              'Funzionalità Esclusiva ProntoMenu Ultra',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8.0),
+            Text(
+              '$featureName è disponibile con il piano ProntoMenu Ultra.\nPassa a Ultra per sbloccare la suite completa del tuo locale!',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.hintColor,
+                height: 1.35,
+              ),
+            ),
+            const SizedBox(height: 20.0),
+            SizedBox(
+              width: double.infinity,
+              height: 48.0,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pop(bContext);
+                  context.pushNamed(AbbonamentoWidget.routeName);
+                },
+                icon: const Icon(Icons.arrow_upward_rounded, size: 18.0),
+                label: const Text('Passa a ProntoMenu Ultra 👑'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF7C3AED),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildMenuItem({
     required BuildContext context,
     required String title,
@@ -196,6 +270,54 @@ class _MenuProfiloWidgetState extends State<MenuProfiloWidget> {
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.bodySmall,
                         ),
+                        AuthUserStreamWidget(
+                          builder: (context) {
+                            final isPremium = valueOrDefault<bool>(currentUserDocument?.isPremium, false);
+                            final tier = currentUserDocument?.pianoAbbonamento ?? (isPremium ? 'ultra' : 'nessuno');
+                            String tierName;
+                            Color tierColor;
+                            switch (tier) {
+                              case 'pro':
+                                tierName = 'Piano Pro';
+                                tierColor = const Color(0xFF0D9488);
+                                break;
+                              case 'plus':
+                                tierName = 'Piano Plus ⭐';
+                                tierColor = theme.colorScheme.primary;
+                                break;
+                              case 'ultra':
+                                tierName = 'Piano Ultra 👑';
+                                tierColor = const Color(0xFF7C3AED);
+                                break;
+                              default:
+                                tierName = 'Non attivo';
+                                tierColor = theme.colorScheme.error;
+                                break;
+                            }
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 4.0),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 7.0, vertical: 2.0),
+                                decoration: BoxDecoration(
+                                  color: tierColor.withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(6.0),
+                                  border: Border.all(
+                                    color: tierColor.withValues(alpha: 0.3),
+                                    width: 0.8,
+                                  ),
+                                ),
+                                child: Text(
+                                  tierName,
+                                  style: TextStyle(
+                                    color: tierColor,
+                                    fontSize: 10.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -326,8 +448,22 @@ class _MenuProfiloWidgetState extends State<MenuProfiloWidget> {
                       icon: Icons.delete_outline_rounded,
                       iconColor: const Color(0xFFD97706),
                       iconBgColor: const Color(0xFFD97706).withValues(alpha: 0.12),
+                      trailingBadge: (currentUserDocument != null && !currentUserDocument!.hasUltra)
+                          ? Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 1.5),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF7C3AED).withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(4.0),
+                              ),
+                              child: const Text('ULTRA', style: TextStyle(color: Color(0xFF7C3AED), fontSize: 9.5, fontWeight: FontWeight.bold)),
+                            )
+                          : null,
                       onTap: () async {
                         Navigator.pop(context);
+                        if (currentUserDocument != null && !currentUserDocument!.hasUltra) {
+                          _mostraUpgradeUltra(context, 'Il cestino di sicurezza e recupero piatti');
+                          return;
+                        }
                         context.pushNamed(
                           CestinoWidget.routeName,
                           extra: <String, dynamic>{

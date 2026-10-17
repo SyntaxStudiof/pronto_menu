@@ -5,6 +5,7 @@ import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/flutter_flow/form_field_controller.dart';
+import '/index.dart';
 import 'package:flutter/material.dart';
 import 'pagina_abbonamento_model.dart';
 export 'pagina_abbonamento_model.dart';
@@ -47,6 +48,37 @@ class _PaginaAbbonamentoWidgetState extends State<PaginaAbbonamentoWidget> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isPremium = valueOrDefault<bool>(currentUserDocument?.isPremium, false);
+    final String tier = currentUserDocument?.pianoAbbonamento ?? (isPremium ? 'ultra' : 'nessuno');
+    final String interval = currentUserDocument?.intervalloAbbonamento ?? 'mensile';
+    final isAnnual = interval == 'annuale';
+
+    String nomePiano;
+    String prezzoPiano;
+    Color tierColor;
+    String tierBadge;
+
+    switch (tier) {
+      case 'pro':
+        nomePiano = 'ProntoMenu Pro';
+        prezzoPiano = isAnnual ? '69,90€ / anno' : '6,90€ / mese';
+        tierColor = const Color(0xFF0D9488);
+        tierBadge = 'PRO';
+        break;
+      case 'plus':
+        nomePiano = 'ProntoMenu Plus';
+        prezzoPiano = isAnnual ? '109,90€ / anno' : '11,90€ / mese';
+        tierColor = theme.colorScheme.primary;
+        tierBadge = 'PLUS ⭐';
+        break;
+      case 'ultra':
+      default:
+        nomePiano = 'ProntoMenu Ultra';
+        prezzoPiano = isAnnual ? '289,90€ / anno' : '29,90€ / mese';
+        tierColor = const Color(0xFF7C3AED);
+        tierBadge = 'ULTRA 👑';
+        break;
+    }
 
     return GestureDetector(
       onTap: () {
@@ -126,13 +158,13 @@ class _PaginaAbbonamentoWidgetState extends State<PaginaAbbonamentoWidget> {
                         color: theme.cardColor,
                         borderRadius: BorderRadius.circular(20.0),
                         border: Border.all(
-                          color: theme.dividerColor.withValues(alpha: 0.6),
-                          width: 1.0,
+                          color: tierColor.withValues(alpha: 0.6),
+                          width: 1.5,
                         ),
                         boxShadow: [
                           BoxShadow(
                             blurRadius: 16.0,
-                            color: Colors.black.withValues(alpha: 0.04),
+                            color: tierColor.withValues(alpha: 0.06),
                             offset: const Offset(0.0, 4.0),
                           ),
                         ],
@@ -144,44 +176,33 @@ class _PaginaAbbonamentoWidgetState extends State<PaginaAbbonamentoWidget> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+                                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 5.0),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFE8F5E9),
+                                  color: tierColor.withValues(alpha: 0.12),
                                   borderRadius: BorderRadius.circular(20.0),
                                 ),
-                                child: const Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      Icons.check_circle_rounded,
-                                      size: 14.0,
-                                      color: Color(0xFF2E7D32),
-                                    ),
-                                    SizedBox(width: 4.0),
-                                    Text(
-                                      'PIANO ATTIVO',
-                                      style: TextStyle(
-                                        color: Color(0xFF2E7D32),
-                                        fontSize: 11.5,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 0.5,
-                                      ),
-                                    ),
-                                  ],
+                                child: Text(
+                                  tierBadge,
+                                  style: TextStyle(
+                                    color: tierColor,
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 0.6,
+                                  ),
                                 ),
                               ),
                               Text(
-                                '19,90€ / mese',
+                                prezzoPiano,
                                 style: theme.textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.bold,
-                                  color: theme.colorScheme.primary,
+                                  color: tierColor,
                                 ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 14.0),
                           Text(
-                            'Piano Pro Ristoratore',
+                            nomePiano,
                             style: theme.textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.bold,
                               fontSize: 22.0,
@@ -207,31 +228,25 @@ class _PaginaAbbonamentoWidgetState extends State<PaginaAbbonamentoWidget> {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 12.0),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-                            decoration: BoxDecoration(
-                              color: theme.scaffoldBackgroundColor,
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            child: Row(
-                              children: [
-                                const Icon(
-                                  Icons.verified_outlined,
-                                  color: Color(0xFF2D6A4F),
-                                  size: 18.0,
-                                ),
-                                const SizedBox(width: 8.0),
-                                Expanded(
-                                  child: Text(
-                                    'Accesso a tutti i 12 servizi della piattaforma • 0% commissioni',
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      fontWeight: FontWeight.w600,
+                          const SizedBox(height: 16.0),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: OutlinedButton.icon(
+                                  onPressed: () {
+                                    context.pushNamed(AbbonamentoWidget.routeName);
+                                  },
+                                  icon: const Icon(Icons.swap_horiz_rounded, size: 18.0),
+                                  label: const Text('Cambia piano / Upgrade'),
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12.0),
                                     ),
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -239,12 +254,12 @@ class _PaginaAbbonamentoWidgetState extends State<PaginaAbbonamentoWidget> {
 
                     const SizedBox(height: 24.0),
 
-                    // Servizi Abilitati
+                    // Servizi Inclusi nel tuo piano
                     Text(
-                      'I tuoi servizi inclusi',
+                      'Servizi attivi con il tuo piano ($nomePiano)',
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
-                        fontSize: 17.0,
+                        fontSize: 16.5,
                       ),
                     ),
                     const SizedBox(height: 12.0),
@@ -262,87 +277,91 @@ class _PaginaAbbonamentoWidgetState extends State<PaginaAbbonamentoWidget> {
                         children: [
                           _buildServiceTile(
                             context,
+                            icon: Icons.qr_code_2_rounded,
+                            iconColor: const Color(0xFF0D9488),
+                            title: 'Menu Digitale QR Code nativo',
+                            desc: 'Accesso istantaneo senza app con categorie, sottocategorie e allergeni',
+                            isIncluded: true,
+                          ),
+                          _buildServiceTile(
+                            context,
                             icon: Icons.receipt_long_rounded,
                             iconColor: const Color(0xFFE65100),
-                            title: 'Ricezione ordini in tempo reale',
-                            desc: 'Notifiche e gestione comande istantanee dai tavoli',
+                            title: 'Ricezione ordini dal vivo & Prenotazioni',
+                            desc: 'Notifiche in tempo reale e gestione prenotazioni direttamente sull\'app',
+                            isIncluded: tier == 'plus' || tier == 'ultra',
+                            requiredPlan: 'Plus / Ultra',
                           ),
                           _buildServiceTile(
                             context,
                             icon: Icons.soup_kitchen_rounded,
                             iconColor: const Color(0xFF00897B),
                             title: 'Schermi dedicati Cucina e Cassa',
-                            desc: 'Avanzamento piatti e totale conti con filtri rapidi',
+                            desc: 'Avanzamento stati piatti (in preparazione, pronto, servito) e totale cassa',
+                            isIncluded: tier == 'plus' || tier == 'ultra',
+                            requiredPlan: 'Plus / Ultra',
                           ),
                           _buildServiceTile(
                             context,
-                            icon: Icons.qr_code_2_rounded,
-                            iconColor: const Color(0xFF1E88E5),
-                            title: 'Menu QR Code illimitato',
-                            desc: 'Accesso da smartphone per ogni tavolo senza scaricare app',
-                          ),
-                          _buildServiceTile(
-                            context,
-                            icon: Icons.restaurant_menu_rounded,
-                            iconColor: const Color(0xFFD81B60),
-                            title: 'Catalogo illimitato & Allergeni',
-                            desc: 'Foto HD, varianti, ingredienti e filtri allergeni completi',
-                          ),
-                          _buildServiceTile(
-                            context,
-                            icon: Icons.format_list_bulleted_rounded,
-                            iconColor: const Color(0xFF3949AB),
-                            title: 'Categorie e sottocategorie',
-                            desc: 'Ordinamento rapido e organizzazione personalizzata',
-                          ),
-                          _buildServiceTile(
-                            context,
-                            icon: Icons.music_note_rounded,
-                            iconColor: const Color(0xFF8E24AA),
-                            title: 'Jukebox Digitale clienti',
-                            desc: 'Richiesta e votazione brani con approvazione del locale',
-                          ),
-                          _buildServiceTile(
-                            context,
-                            icon: Icons.sports_esports_rounded,
-                            iconColor: const Color(0xFF5E35B1),
-                            title: 'Giochi ai tavoli (Tris & Quiz)',
-                            desc: 'Intrattenimento esclusivo al tavolo tra commensali',
+                            icon: Icons.auto_awesome_motion_rounded,
+                            iconColor: const Color(0xFF673AB7),
+                            title: 'Menù Mutaforma (Più Menù)',
+                            desc: 'Gestione automatica o manuale di menu per pranzo, cena ed eventi speciali',
+                            isIncluded: tier == 'plus' || tier == 'ultra',
+                            requiredPlan: 'Plus / Ultra',
                           ),
                           _buildServiceTile(
                             context,
                             icon: Icons.palette_rounded,
                             iconColor: const Color(0xFFF4511E),
-                            title: 'Personalizzazione del Brand',
-                            desc: 'Logo, cover, contatti, orari e colori aziendali',
+                            title: 'Personalizzazione grafica del Brand',
+                            desc: 'Colori personalizzati, tema dell\'app e stile coordinato del locale',
+                            isIncluded: tier == 'plus' || tier == 'ultra',
+                            requiredPlan: 'Plus / Ultra',
+                          ),
+                          _buildServiceTile(
+                            context,
+                            icon: Icons.music_note_rounded,
+                            iconColor: const Color(0xFF8E24AA),
+                            title: 'Jukebox Digitale per i clienti',
+                            desc: 'I commensali propongono e votano la musica del locale dal proprio tavolo',
+                            isIncluded: tier == 'ultra',
+                            requiredPlan: 'Ultra',
+                          ),
+                          _buildServiceTile(
+                            context,
+                            icon: Icons.sports_esports_rounded,
+                            iconColor: const Color(0xFF5E35B1),
+                            title: 'Giochi ai tavoli (Tris & Quiz del Gusto)',
+                            desc: 'Intrattenimento esclusivo al tavolo per azzerare i tempi di attesa',
+                            isIncluded: tier == 'ultra',
+                            requiredPlan: 'Ultra',
                           ),
                           _buildServiceTile(
                             context,
                             icon: Icons.bar_chart_rounded,
                             iconColor: const Color(0xFF0288D1),
-                            title: 'Statistiche e analisi vendite',
-                            desc: 'Report ordini e piatti più venduti in tempo reale',
+                            title: 'Statistiche e analisi ordini',
+                            desc: 'Report vendite in tempo reale e classifica piatti più ordinati',
+                            isIncluded: tier == 'ultra',
+                            requiredPlan: 'Ultra',
                           ),
                           _buildServiceTile(
                             context,
                             icon: Icons.delete_sweep_rounded,
                             iconColor: const Color(0xFF546E7A),
-                            title: 'Cestino di sicurezza e ripristino',
-                            desc: 'Recupero immediato di piatti o categorie cancellate',
+                            title: 'Cestino di sicurezza e recupero',
+                            desc: 'Ripristino rapido di piatti o categorie eliminate per sbaglio',
+                            isIncluded: tier == 'ultra',
+                            requiredPlan: 'Ultra',
                           ),
                           _buildServiceTile(
                             context,
                             icon: Icons.percent_rounded,
                             iconColor: const Color(0xFF2E7D32),
                             title: 'Zero commissioni sul venduto',
-                            desc: '100% dell\'incasso rimane sempre al ristorante',
-                          ),
-                          _buildServiceTile(
-                            context,
-                            icon: Icons.support_agent_rounded,
-                            iconColor: const Color(0xFF00ACC1),
-                            title: 'Assistenza & Supporto ticket in-app',
-                            desc: 'Canale prioritario e aggiornamenti continui inclusi',
+                            desc: '0% di trattenute, l\'intero incasso rimane sempre al 100% tuo',
+                            isIncluded: true,
                             isLast: true,
                           ),
                         ],
@@ -571,6 +590,8 @@ class _PaginaAbbonamentoWidgetState extends State<PaginaAbbonamentoWidget> {
     required Color iconColor,
     required String title,
     required String desc,
+    required bool isIncluded,
+    String? requiredPlan,
     bool isLast = false,
   }) {
     final theme = Theme.of(context);
@@ -583,13 +604,15 @@ class _PaginaAbbonamentoWidgetState extends State<PaginaAbbonamentoWidget> {
             width: 34.0,
             height: 34.0,
             decoration: BoxDecoration(
-              color: iconColor.withValues(alpha: 0.12),
+              color: isIncluded
+                  ? iconColor.withValues(alpha: 0.12)
+                  : theme.dividerColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8.0),
             ),
             alignment: Alignment.center,
             child: Icon(
               icon,
-              color: iconColor,
+              color: isIncluded ? iconColor : theme.hintColor.withValues(alpha: 0.6),
               size: 18.0,
             ),
           ),
@@ -603,6 +626,7 @@ class _PaginaAbbonamentoWidgetState extends State<PaginaAbbonamentoWidget> {
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     fontSize: 13.5,
+                    color: isIncluded ? null : theme.hintColor,
                   ),
                 ),
                 Text(
@@ -616,13 +640,29 @@ class _PaginaAbbonamentoWidgetState extends State<PaginaAbbonamentoWidget> {
             ),
           ),
           const SizedBox(width: 8.0),
-          const Padding(
-            padding: EdgeInsets.only(top: 2.0),
-            child: Icon(
-              Icons.check_circle_rounded,
-              color: Color(0xFF2E7D32),
-              size: 16.0,
-            ),
+          Padding(
+            padding: const EdgeInsets.only(top: 2.0),
+            child: isIncluded
+                ? const Icon(
+                    Icons.check_circle_rounded,
+                    color: Color(0xFF2E7D32),
+                    size: 18.0,
+                  )
+                : Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
+                    decoration: BoxDecoration(
+                      color: theme.dividerColor.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(6.0),
+                    ),
+                    child: Text(
+                      requiredPlan ?? 'Upgrade',
+                      style: TextStyle(
+                        color: theme.hintColor,
+                        fontSize: 10.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
           ),
         ],
       ),

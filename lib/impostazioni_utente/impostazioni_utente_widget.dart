@@ -162,7 +162,18 @@ class _ImpostazioniUtenteWidgetState extends State<ImpostazioniUtenteWidget> {
                           iconColor: colorScheme.primary,
                           title: 'Personalizzazione',
                           subtitle: 'Preset di design, stile grafico e tema',
+                          trailingBadge: (currentUserDocument != null && !currentUserDocument!.hasPlus)
+                              ? _buildTierBadge('PLUS', colorScheme.primary)
+                              : null,
                           onTap: () {
+                            if (currentUserDocument != null && !currentUserDocument!.hasPlus) {
+                              _mostraUpgradePrompt(
+                                context,
+                                requiredPlan: 'Plus',
+                                featureName: 'La personalizzazione grafica e del tema',
+                              );
+                              return;
+                            }
                             context.pushNamed(
                               PersonalizzazioneWidget.routeName,
                               queryParameters: {
@@ -243,9 +254,20 @@ class _ImpostazioniUtenteWidgetState extends State<ImpostazioniUtenteWidget> {
                           title: 'Attiva Menù Mutaforma',
                           subtitle:
                               'Mostra ai clienti il menù adatto in base all\'orario (Colazione, Pranzo, Aperitivo, Cena). Gli altri menù saranno invisibili.',
+                          trailingBadge: (currentUserDocument != null && !currentUserDocument!.hasPlus)
+                              ? _buildTierBadge('PLUS', const Color(0xFF6366F1))
+                              : null,
                           value: valueOrDefault<bool>(
                               currentUserDocument?.menuMutaformaAttivo, false),
                           onChanged: (val) async {
+                            if (currentUserDocument != null && !currentUserDocument!.hasPlus) {
+                              _mostraUpgradePrompt(
+                                context,
+                                requiredPlan: 'Plus',
+                                featureName: 'I Menù Mutaforma per fasce orarie',
+                              );
+                              return;
+                            }
                             await currentUserReference?.update({
                               'menu_mutaforma_attivo': val,
                             });
@@ -301,7 +323,18 @@ class _ImpostazioniUtenteWidgetState extends State<ImpostazioniUtenteWidget> {
                           title: 'Jukebox & Musica',
                           subtitle:
                               'Consenti ai clienti di richiedere brani dalla tua playlist Spotify',
+                          trailingBadge: (currentUserDocument != null && !currentUserDocument!.hasUltra)
+                              ? _buildTierBadge('ULTRA', const Color(0xFF7C3AED))
+                              : null,
                           onTap: () {
+                            if (currentUserDocument != null && !currentUserDocument!.hasUltra) {
+                              _mostraUpgradePrompt(
+                                context,
+                                requiredPlan: 'Ultra',
+                                featureName: 'Il Jukebox Digitale e la musica per i clienti',
+                              );
+                              return;
+                            }
                             context.pushNamed(
                               ImpostazioniJukeboxWidget.routeName,
                               extra: <String, dynamic>{
@@ -575,6 +608,7 @@ class _ImpostazioniUtenteWidgetState extends State<ImpostazioniUtenteWidget> {
     required String title,
     required String subtitle,
     required VoidCallback onTap,
+    Widget? trailingBadge,
   }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
@@ -628,6 +662,10 @@ class _ImpostazioniUtenteWidgetState extends State<ImpostazioniUtenteWidget> {
                 ],
               ),
             ),
+            if (trailingBadge != null) ...[
+              const SizedBox(width: 8.0),
+              trailingBadge,
+            ],
             const SizedBox(width: 8.0),
             // Freccia di navigazione morbida
             Icon(
@@ -650,6 +688,7 @@ class _ImpostazioniUtenteWidgetState extends State<ImpostazioniUtenteWidget> {
     required String subtitle,
     required bool value,
     required ValueChanged<bool> onChanged,
+    Widget? trailingBadge,
   }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
@@ -697,6 +736,10 @@ class _ImpostazioniUtenteWidgetState extends State<ImpostazioniUtenteWidget> {
               ],
             ),
           ),
+          if (trailingBadge != null) ...[
+            const SizedBox(width: 8.0),
+            trailingBadge,
+          ],
           const SizedBox(width: 8.0),
           Switch(
             value: value,
@@ -705,6 +748,105 @@ class _ImpostazioniUtenteWidgetState extends State<ImpostazioniUtenteWidget> {
             onChanged: onChanged,
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildTierBadge(String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(6.0),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: color,
+          fontSize: 10.0,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  void _mostraUpgradePrompt(
+    BuildContext context, {
+    required String requiredPlan,
+    required String featureName,
+  }) {
+    final theme = Theme.of(context);
+    final isUltra = requiredPlan.toLowerCase().contains('ultra');
+    final accentColor = isUltra ? const Color(0xFF7C3AED) : theme.colorScheme.primary;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (bContext) => Container(
+        padding: const EdgeInsets.fromLTRB(24.0, 20.0, 24.0, 32.0),
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(24.0),
+            topRight: Radius.circular(24.0),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 50.0,
+              height: 50.0,
+              decoration: BoxDecoration(
+                color: accentColor.withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+              ),
+              alignment: Alignment.center,
+              child: Icon(
+                isUltra ? Icons.workspace_premium_rounded : Icons.lock_rounded,
+                color: accentColor,
+                size: 26.0,
+              ),
+            ),
+            const SizedBox(height: 14.0),
+            Text(
+              'Funzionalità ProntoMenu $requiredPlan',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8.0),
+            Text(
+              '$featureName è disponibile con il piano ProntoMenu $requiredPlan.\nPassa al piano superiore per sbloccare questo strumento!',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.hintColor,
+                height: 1.35,
+              ),
+            ),
+            const SizedBox(height: 20.0),
+            SizedBox(
+              width: double.infinity,
+              height: 48.0,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pop(bContext);
+                  context.pushNamed(AbbonamentoWidget.routeName);
+                },
+                icon: const Icon(Icons.arrow_upward_rounded, size: 18.0),
+                label: Text('Passa a ProntoMenu $requiredPlan'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: accentColor,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
