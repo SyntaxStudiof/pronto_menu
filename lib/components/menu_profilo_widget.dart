@@ -42,8 +42,9 @@ class _MenuProfiloWidgetState extends State<MenuProfiloWidget> {
     super.dispose();
   }
 
-  void _mostraUpgradeUltra(BuildContext context, String featureName) {
+  void _mostraUpgradePro(BuildContext context, String featureName) {
     final theme = Theme.of(context);
+    const proColor = Color(0xFF0D9488);
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -63,19 +64,19 @@ class _MenuProfiloWidgetState extends State<MenuProfiloWidget> {
               width: 50.0,
               height: 50.0,
               decoration: BoxDecoration(
-                color: const Color(0xFF7C3AED).withValues(alpha: 0.12),
+                color: proColor.withValues(alpha: 0.12),
                 shape: BoxShape.circle,
               ),
               alignment: Alignment.center,
               child: const Icon(
                 Icons.workspace_premium_rounded,
-                color: Color(0xFF7C3AED),
+                color: proColor,
                 size: 26.0,
               ),
             ),
             const SizedBox(height: 14.0),
             Text(
-              'Funzionalità Esclusiva ProntoMenu Ultra',
+              'Disponibile con ProntoMenu Pro',
               textAlign: TextAlign.center,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
@@ -83,7 +84,7 @@ class _MenuProfiloWidgetState extends State<MenuProfiloWidget> {
             ),
             const SizedBox(height: 8.0),
             Text(
-              '$featureName è disponibile con il piano ProntoMenu Ultra.\nPassa a Ultra per sbloccare la suite completa del tuo locale!',
+              '$featureName richiede un abbonamento ProntoMenu attivo.\nScegli il piano per attivarlo subito con 7 giorni di prova gratuita!',
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.hintColor,
@@ -100,9 +101,9 @@ class _MenuProfiloWidgetState extends State<MenuProfiloWidget> {
                   context.pushNamed(AbbonamentoWidget.routeName);
                 },
                 icon: const Icon(Icons.arrow_upward_rounded, size: 18.0),
-                label: const Text('Passa a ProntoMenu Ultra 👑'),
+                label: const Text('Scopri i Piani ProntoMenu'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF7C3AED),
+                  backgroundColor: proColor,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12.0),
@@ -448,20 +449,20 @@ class _MenuProfiloWidgetState extends State<MenuProfiloWidget> {
                       icon: Icons.delete_outline_rounded,
                       iconColor: const Color(0xFFD97706),
                       iconBgColor: const Color(0xFFD97706).withValues(alpha: 0.12),
-                      trailingBadge: (currentUserDocument != null && !currentUserDocument!.hasUltra)
+                      trailingBadge: (currentUserDocument != null && !currentUserDocument!.hasPro)
                           ? Container(
                               padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 1.5),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF7C3AED).withValues(alpha: 0.15),
+                                color: const Color(0xFF0D9488).withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(4.0),
                               ),
-                              child: const Text('ULTRA', style: TextStyle(color: Color(0xFF7C3AED), fontSize: 9.5, fontWeight: FontWeight.bold)),
+                              child: const Text('PRO', style: TextStyle(color: Color(0xFF0D9488), fontSize: 9.5, fontWeight: FontWeight.bold)),
                             )
                           : null,
                       onTap: () async {
                         Navigator.pop(context);
-                        if (currentUserDocument != null && !currentUserDocument!.hasUltra) {
-                          _mostraUpgradeUltra(context, 'Il cestino di sicurezza e recupero piatti');
+                        if (currentUserDocument != null && !currentUserDocument!.hasPro) {
+                          _mostraUpgradePro(context, 'Il cestino di sicurezza e recupero piatti');
                           return;
                         }
                         context.pushNamed(

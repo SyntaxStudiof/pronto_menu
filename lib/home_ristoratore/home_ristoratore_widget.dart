@@ -6,6 +6,7 @@ import '/components/nav_bar_dinamica_widget.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/flutter_flow/custom_functions.dart' as functions;
+import '/services/cestino_service.dart';
 import '/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -46,6 +47,10 @@ class _HomeRistoratoreWidgetState extends State<HomeRistoratoreWidget> {
           false) {
         context.pushNamed(AbbonamentoWidget.routeName);
       }
+      // Pulizia automatica dei piatti cestinati scaduti (> 7 giorni)
+      await CestinoService.pulisciPiattiScaduti(
+        ristoranteRef: currentUserReference,
+      );
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) => safeSetState(() {}));

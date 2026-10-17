@@ -5,6 +5,7 @@ import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/custom_code/actions/index.dart' as actions;
 import '/services/audit_log_service.dart';
+import '/services/cestino_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +35,12 @@ class _CestinoWidgetState extends State<CestinoWidget> {
     super.initState();
     _model = createModel(context, () => CestinoModel());
 
-    WidgetsBinding.instance.addPostFrameCallback((_) => safeSetState(() {}));
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await CestinoService.pulisciPiattiScaduti(
+        ristoranteRef: currentUserReference,
+      );
+      if (mounted) safeSetState(() {});
+    });
   }
 
   @override
@@ -152,12 +158,35 @@ class _CestinoWidgetState extends State<CestinoWidget> {
             mainAxisSize: MainAxisSize.max,
             children: [
               Padding(
-                padding: const EdgeInsetsDirectional.fromSTEB(12.0, 16.0, 12.0, 16.0),
-                child: Text(
-                  'Avrai 7 giorni per ripristinare i tuoi piatti,\ndopo tale tempo verranno definitivamente eliminati',
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                padding: const EdgeInsetsDirectional.fromSTEB(14.0, 14.0, 14.0, 10.0),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(12.0),
+                    border: Border.all(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.2),
+                      width: 1.0,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.auto_delete_outlined,
+                        color: theme.colorScheme.primary,
+                        size: 20.0,
+                      ),
+                      const SizedBox(width: 10.0),
+                      Expanded(
+                        child: Text(
+                          'I piatti restano nel cestino per 7 giorni. Dopo tale periodo vengono eliminati automaticamente da Firebase.',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                            height: 1.3,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -202,6 +231,11 @@ class _CestinoWidgetState extends State<CestinoWidget> {
                     itemBuilder: (context, listViewIndex) {
                       final listViewPiattiRecord =
                           listViewPiattiRecordList[listViewIndex];
+                      final giorniRimanenti = CestinoService.calcolaGiorniRimanenti(
+                        listViewPiattiRecord.dataCestinamento,
+                      );
+                      final isUrgent = giorniRimanenti <= 1;
+
                       return Padding(
                         padding: const EdgeInsetsDirectional.fromSTEB(
                             10.0, 6.0, 10.0, 6.0),
@@ -268,17 +302,60 @@ class _CestinoWidgetState extends State<CestinoWidget> {
                                         ),
                                       ),
                                       const SizedBox(height: 4.0),
-                                      Text(
-                                        formatNumber(
-                                          listViewPiattiRecord.prezzo,
-                                          formatType: FormatType.decimal,
-                                          decimalType: DecimalType.commaDecimal,
-                                          currency: '€',
-                                        ),
-                                        textAlign: TextAlign.start,
-                                        style: theme.textTheme.bodyMedium?.copyWith(
-                                          fontWeight: FontWeight.w600,
-                                        ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            formatNumber(
+                                              listViewPiattiRecord.prezzo,
+                                              formatType: FormatType.decimal,
+                                              decimalType: DecimalType.commaDecimal,
+                                              currency: '€',
+                                            ),
+                                            textAlign: TextAlign.start,
+                                            style: theme.textTheme.bodyMedium?.copyWith(
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8.0),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 6.0, vertical: 2.0),
+                                            decoration: BoxDecoration(
+                                              color: isUrgent
+                                                  ? const Color(0xFFEF4444)
+                                                      .withValues(alpha: 0.12)
+                                                  : const Color(0xFFD97706)
+                                                      .withValues(alpha: 0.12),
+                                              borderRadius:
+                                                  BorderRadius.circular(6.0),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Icon(
+                                                  Icons.timer_outlined,
+                                                  size: 11.0,
+                                                  color: isUrgent
+                                                      ? const Color(0xFFEF4444)
+                                                      : const Color(0xFFD97706),
+                                                ),
+                                                const SizedBox(width: 3.0),
+                                                Text(
+                                                  isUrgent
+                                                      ? 'Scade oggi'
+                                                      : '$giorniRimanenti gg rimasti',
+                                                  style: TextStyle(
+                                                    fontSize: 10.5,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: isUrgent
+                                                        ? const Color(0xFFEF4444)
+                                                        : const Color(0xFFD97706),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),

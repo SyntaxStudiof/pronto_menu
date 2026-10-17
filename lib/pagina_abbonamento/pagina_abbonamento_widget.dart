@@ -358,11 +358,11 @@ class _PaginaAbbonamentoWidgetState extends State<PaginaAbbonamentoWidget> {
                           _buildServiceTile(
                             context,
                             icon: Icons.delete_sweep_rounded,
-                            iconColor: const Color(0xFF546E7A),
+                            iconColor: const Color(0xFF0D9488),
                             title: 'Cestino di sicurezza e recupero',
-                            desc: 'Ripristino rapido di piatti o categorie eliminate per sbaglio',
-                            isIncluded: tier == 'ultra',
-                            requiredPlan: 'Ultra',
+                            desc: 'Ripristino rapido di piatti entro 7 giorni con eliminazione automatica definitiva',
+                            isIncluded: isPremium,
+                            requiredPlan: 'Pro',
                           ),
                           _buildServiceTile(
                             context,

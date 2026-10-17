@@ -749,6 +749,7 @@ class _AbbonamentoWidgetState extends State<AbbonamentoWidget> {
           _buildCheckItem(theme, 'Categorie e sottocategorie illimitate'),
           _buildCheckItem(theme, 'Allergeni completi & preferenze (Senza glutine, lattosio...)'),
           _buildCheckItem(theme, 'Menù testuale con descrizioni dettagliate, ingredienti e prezzi'),
+          _buildCheckItem(theme, 'Cestino di sicurezza e ripristino piatti entro 7 giorni'),
           _buildCheckItem(theme, 'Zero commissioni sul venduto'),
           _buildCheckItem(theme, 'Supporto base e aggiornamenti inclusi'),
           const SizedBox(height: 20.0),
@@ -1104,7 +1105,6 @@ class _AbbonamentoWidgetState extends State<AbbonamentoWidget> {
           _buildCheckItem(theme, 'Jukebox Digitale per richieste musicali dei clienti'),
           _buildCheckItem(theme, 'Giochi ai tavoli (Tris & Quiz del Gusto multiplayer)'),
           _buildCheckItem(theme, 'Statistiche avanzate e report vendite in tempo reale'),
-          _buildCheckItem(theme, 'Cestino di sicurezza e ripristino immediato piatti'),
           _buildCheckItem(theme, 'Assistenza prioritaria dedicata in-app con ticket diretti'),
           const SizedBox(height: 20.0),
           FFButtonWidget(
