@@ -673,6 +673,14 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     );
     final dishLayout = themeProvider.dishCardLayout;
 
+    final Color contrastPrimaryText = isDark
+        ? (primaryColor.computeLuminance() < 0.40
+            ? HSLColor.fromColor(primaryColor).withLightness(0.70).toColor()
+            : primaryColor)
+        : (primaryColor.computeLuminance() > 0.22
+            ? HSLColor.fromColor(primaryColor).withLightness(0.32).withSaturation(0.85).toColor()
+            : primaryColor);
+
     return Card(
       elevation: 2.0,
       shadowColor: isDark
@@ -728,7 +736,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                           fontSize: 11.0,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 0.8,
-                          color: primaryColor,
+                          color: contrastPrimaryText,
                         ),
                       ),
                     ),
@@ -740,7 +748,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
                     decoration: BoxDecoration(
-                      color: primaryColor.withValues(alpha: 0.12),
+                      color: primaryColor.withValues(alpha: isDark ? 0.20 : 0.12),
                       borderRadius: BorderRadius.circular(6.0),
                     ),
                     child: Text(
@@ -748,7 +756,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                       style: TextStyle(
                         fontSize: 9.5,
                         fontWeight: FontWeight.w700,
-                        color: primaryColor,
+                        color: contrastPrimaryText,
                       ),
                     ),
                   ),
@@ -1551,8 +1559,14 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
               icon,
               size: 14.5,
               color: isSelected
-                  ? primaryColor
-                  : (isDark ? const Color(0xFF9E9E9E) : const Color(0xFF6B7280)),
+                  ? (isDark
+                      ? (primaryColor.computeLuminance() < 0.40
+                          ? HSLColor.fromColor(primaryColor).withLightness(0.68).toColor()
+                          : primaryColor)
+                      : (primaryColor.computeLuminance() > 0.25
+                          ? HSLColor.fromColor(primaryColor).withLightness(0.35).toColor()
+                          : primaryColor))
+                  : (isDark ? const Color(0xFFB0B0B0) : const Color(0xFF475569)),
             ),
             const SizedBox(width: 4.0),
             Flexible(
@@ -1563,10 +1577,10 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                   maxLines: 1,
                   style: TextStyle(
                     fontSize: 11.5,
-                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
                     color: isSelected
                         ? (isDark ? Colors.white : Colors.black87)
-                        : (isDark ? const Color(0xFF9E9E9E) : const Color(0xFF6B7280)),
+                        : (isDark ? const Color(0xFFB0B0B0) : const Color(0xFF475569)),
                   ),
                 ),
               ),
@@ -2041,7 +2055,15 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                             alignment: Alignment.center,
                             child: Icon(
                               bStyle.icon,
-                              color: isSelected ? Colors.white : primaryColor,
+                              color: isSelected
+                                  ? (primaryColor.computeLuminance() > 0.55 ? Colors.black87 : Colors.white)
+                                  : (isDark
+                                      ? (primaryColor.computeLuminance() < 0.40
+                                          ? HSLColor.fromColor(primaryColor).withLightness(0.68).toColor()
+                                          : primaryColor)
+                                      : (primaryColor.computeLuminance() > 0.25
+                                          ? HSLColor.fromColor(primaryColor).withLightness(0.35).toColor()
+                                          : primaryColor)),
                               size: 19.0,
                             ),
                           ),
@@ -2071,17 +2093,23 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                                           borderRadius:
                                               BorderRadius.circular(8.0),
                                         ),
-                                        child: const Row(
+                                        child: Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            Icon(Icons.check_rounded,
-                                                size: 12.0,
-                                                color: Colors.white),
-                                            SizedBox(width: 3.0),
+                                            Icon(
+                                              Icons.check_rounded,
+                                              size: 12.0,
+                                              color: primaryColor.computeLuminance() > 0.55
+                                                  ? Colors.black87
+                                                  : Colors.white,
+                                            ),
+                                            const SizedBox(width: 3.0),
                                             Text(
                                               'ATTIVO',
                                               style: TextStyle(
-                                                color: Colors.white,
+                                                color: primaryColor.computeLuminance() > 0.55
+                                                    ? Colors.black87
+                                                    : Colors.white,
                                                 fontSize: 9.5,
                                                 fontWeight: FontWeight.bold,
                                               ),
@@ -3181,16 +3209,23 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                                       color: primaryColor,
                                       borderRadius: BorderRadius.circular(10.0),
                                     ),
-                                    child: const Row(
+                                    child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Icon(Icons.check_rounded,
-                                            size: 13.0, color: Colors.white),
-                                        SizedBox(width: 3.0),
+                                        Icon(
+                                          Icons.check_rounded,
+                                          size: 13.0,
+                                          color: primaryColor.computeLuminance() > 0.55
+                                              ? Colors.black87
+                                              : Colors.white,
+                                        ),
+                                        const SizedBox(width: 3.0),
                                         Text(
                                           'ATTIVO',
                                           style: TextStyle(
-                                            color: Colors.white,
+                                            color: primaryColor.computeLuminance() > 0.55
+                                                ? Colors.black87
+                                                : Colors.white,
                                             fontSize: 10.0,
                                             fontWeight: FontWeight.bold,
                                           ),

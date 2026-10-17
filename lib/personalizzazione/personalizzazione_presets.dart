@@ -199,12 +199,21 @@ class PersonalizzazionePresets {
         );
 
       case BadgeStyle.minimalOutline:
+        // In minimalOutline, non c'è mai riempimento di sfondo (è trasparente).
+        // Calibriamo il colore del contorno affinché sia ben visibile sia su chiaro che su scuro:
+        final outlineColor = isDark
+            ? (baseColor.computeLuminance() < 0.35
+                ? HSLColor.fromColor(baseColor).withLightness(0.65).toColor()
+                : baseColor)
+            : (baseColor.computeLuminance() > 0.38
+                ? HSLColor.fromColor(baseColor).withLightness(0.38).toColor()
+                : baseColor);
         return BoxDecoration(
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(8.0),
           border: Border.all(
-            color: baseColor.withValues(alpha: isDark ? 0.85 : 0.75),
-            width: 1.2,
+            color: outlineColor.withValues(alpha: isDark ? 0.90 : 0.85),
+            width: 1.3,
           ),
         );
 
@@ -230,29 +239,49 @@ class PersonalizzazionePresets {
     bool isDark = false,
     bool isFilled = false,
   }) {
-    if (isFilled || style == BadgeStyle.boldTag) {
-      // Quando il badge è pieno, lo sfondo è baseColor:
-      // Se baseColor è chiaro, testo scuro; se baseColor è scuro, testo bianco!
-      return baseColor.computeLuminance() > 0.48 ? const Color(0xFF1A1A1A) : Colors.white;
+    // 1. Determina se il badge ha un effettivo sfondo pieno colorato.
+    // NOTA FONDAMENTALE: MinimalOutline non ha MAI sfondo pieno (è trasparente)!
+    final bool hasSolidBackground = (isFilled || style == BadgeStyle.boldTag) &&
+        style != BadgeStyle.minimalOutline;
+
+    if (hasSolidBackground) {
+      // Quando il badge ha sfondo pieno, il testo poggia su baseColor:
+      // Se baseColor è molto chiaro (luminanza > 0.48), usiamo un antracite scuro per contrasto;
+      // altrimenti usiamo bianco nitido.
+      return baseColor.computeLuminance() > 0.48
+          ? const Color(0xFF1A1A1A)
+          : Colors.white;
     }
 
-    // Se il badge è outline o soft:
-    // Su sfondo scuro, se baseColor ha tonalità troppo scura (luminanza < 0.45),
-    // lo schiariamo armonicamente affinché sia nitido e perfettamente leggibile!
+    // 2. Se il badge è outline o soft (sfondo trasparente o velato al 10-15%):
+    // Il testo poggia direttamente sul colore della superficie (chiara o scura della card)!
     if (isDark) {
-      if (baseColor.computeLuminance() < 0.45) {
+      // Su sfondo scuro:
+      // Il testo DEVE essere luminoso e vivace per essere leggibile.
+      // Se baseColor è troppo scuro (luminanza < 0.40), aumentiamo la luminosità.
+      final luminance = baseColor.computeLuminance();
+      if (luminance < 0.40) {
         final hsl = HSLColor.fromColor(baseColor);
-        return hsl.withLightness((hsl.lightness + 0.35).clamp(0.55, 0.88)).toColor();
+        return hsl
+            .withLightness((hsl.lightness + 0.35).clamp(0.60, 0.90))
+            .withSaturation(hsl.saturation.clamp(0.65, 1.0))
+            .toColor();
+      }
+      return baseColor;
+    } else {
+      // Su sfondo chiaro (bianco / panna / grigio chiarissimo):
+      // Il testo DEVE essere scuro e intenso per garantire contrasto WCAG elevato (> 4.5:1).
+      // Se baseColor è chiaro o medio (luminanza > 0.22, es. arancio, oro, verde chiaro, pastello),
+      // lo scuriamo armonicamente conservando la tonalità (hue) e saturazione.
+      final luminance = baseColor.computeLuminance();
+      if (luminance > 0.22) {
+        final hsl = HSLColor.fromColor(baseColor);
+        return hsl
+            .withLightness(hsl.lightness.clamp(0.24, 0.38))
+            .withSaturation(hsl.saturation.clamp(0.70, 1.0))
+            .toColor();
       }
       return baseColor;
     }
-
-    // Su sfondo chiaro, se baseColor è troppo chiaro (luminanza > 0.65),
-    // lo scuriamo per garantire il contrasto:
-    if (baseColor.computeLuminance() > 0.65) {
-      final hsl = HSLColor.fromColor(baseColor);
-      return hsl.withLightness((hsl.lightness - 0.28).clamp(0.22, 0.50)).toColor();
-    }
-    return baseColor;
   }
 }
