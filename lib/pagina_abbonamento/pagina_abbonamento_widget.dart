@@ -280,8 +280,17 @@ class _PaginaAbbonamentoWidgetState extends State<PaginaAbbonamentoWidget> {
                             icon: Icons.qr_code_2_rounded,
                             iconColor: const Color(0xFF0D9488),
                             title: 'Menu Digitale QR Code nativo',
-                            desc: 'Accesso istantaneo senza app con categorie, sottocategorie e allergeni',
+                            desc: 'Menù testuale con categorie, sottocategorie, prezzi, ingredienti e allergeni',
                             isIncluded: true,
+                          ),
+                          _buildServiceTile(
+                            context,
+                            icon: Icons.photo_camera_rounded,
+                            iconColor: const Color(0xFFE91E63),
+                            title: 'Foto piatti in alta risoluzione',
+                            desc: 'Caricamento immagini dei piatti e galleria visiva nel menù digitale',
+                            isIncluded: tier == 'ultra',
+                            requiredPlan: 'Ultra',
                           ),
                           _buildServiceTile(
                             context,

@@ -22,6 +22,7 @@ class DettagliPiattoPopupWidget extends StatefulWidget {
     this.ingredientiManualiAttivi = false,
     this.prezzoAggiuntaManuale = 0.0,
     this.solaConsultazione = false,
+    this.mostraFoto = true,
   });
 
   final PiattiRecord? piattoSelezionato;
@@ -33,6 +34,7 @@ class DettagliPiattoPopupWidget extends StatefulWidget {
   final bool ingredientiManualiAttivi;
   final double prezzoAggiuntaManuale;
   final bool solaConsultazione;
+  final bool mostraFoto;
 
   @override
   State<DettagliPiattoPopupWidget> createState() =>
@@ -84,7 +86,8 @@ class _DettagliPiattoPopupWidgetState extends State<DettagliPiattoPopupWidget> {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              if (widget.piattoSelezionato?.foto != null &&
+              if (widget.mostraFoto &&
+                  widget.piattoSelezionato?.foto != null &&
                   widget.piattoSelezionato!.foto.trim().isNotEmpty) ...[
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12.0),

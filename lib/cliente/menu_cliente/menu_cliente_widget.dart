@@ -1815,6 +1815,9 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                                                         menuClienteUsersRecord.ingredientiManualiAttivi,
                                                     solaConsultazione:
                                                         isSolaConsultazione,
+                                                    mostraFoto:
+                                                        menuClienteUsersRecord
+                                                            .hasUltra,
                                                   ),
                                                 ),
                                               );
@@ -1848,7 +1851,8 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.center,
                                               children: [
-                                                if (listViewNomePiattiRecord
+                                                if (menuClienteUsersRecord.hasUltra &&
+                                                    listViewNomePiattiRecord
                                                             .foto !=
                                                         null &&
                                                     listViewNomePiattiRecord
@@ -2268,6 +2272,9 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                                                         menuClienteUsersRecord.ingredientiManualiAttivi,
                                                     solaConsultazione:
                                                         isSolaConsultazione,
+                                                    mostraFoto:
+                                                        menuClienteUsersRecord
+                                                            .hasUltra,
                                                   ),
                                                 ),
                                               );
@@ -2301,7 +2308,8 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.center,
                                               children: [
-                                                if (listViewPrezzoPiattiRecord
+                                                if (menuClienteUsersRecord.hasUltra &&
+                                                    listViewPrezzoPiattiRecord
                                                             .foto !=
                                                         null &&
                                                     listViewPrezzoPiattiRecord

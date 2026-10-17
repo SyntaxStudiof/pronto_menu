@@ -320,181 +320,230 @@ class _AbbonamentoWidgetState extends State<AbbonamentoWidget> {
         ),
         body: SafeArea(
           top: true,
-          child: SingleChildScrollView(
-            controller: _model.columnController,
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
-            child: Center(
-              child: Container(
-                width: double.infinity,
-                constraints: const BoxConstraints(maxWidth: 880.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    // Badge Header
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 6.0),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primary.withValues(alpha: 0.10),
-                        borderRadius: BorderRadius.circular(30.0),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
+          child: Align(
+            alignment: const AlignmentDirectional(0.0, 0.0),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 880.0),
+              child: CustomScrollView(
+                controller: _model.columnController,
+                slivers: [
+                  // 1. Header con Badge, Logo circolare ProntoMenu com'era prima, Titolo e Sottotitolo
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16.0, 20.0, 16.0, 12.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Icon(
-                            Icons.star_rounded,
-                            color: theme.colorScheme.primary,
-                            size: 16.0,
-                          ),
-                          const SizedBox(width: 6.0),
-                          Text(
-                            'SCEGLI IL TUO PIANO',
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: theme.colorScheme.primary,
-                              fontSize: 12.0,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.8,
+                          // Badge Header
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 6.0),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primary.withValues(alpha: 0.10),
+                              borderRadius: BorderRadius.circular(30.0),
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 14.0),
-                    Text(
-                      'Fai crescere il tuo locale con ProntoMenu',
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.headlineMedium?.copyWith(
-                        fontSize: 26.0,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: -0.6,
-                      ),
-                    ),
-                    const SizedBox(height: 6.0),
-                    ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 580.0),
-                      child: Text(
-                        'Scegli il piano ideale per le tue esigenze: dal menu digitale base all\'automazione ordini e intrattenimento.',
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.hintColor,
-                          fontSize: 14.5,
-                          height: 1.35,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 22.0),
-
-                    // Toggle Mensile / Annuale
-                    Container(
-                      padding: const EdgeInsets.all(4.0),
-                      decoration: BoxDecoration(
-                        color: theme.cardColor,
-                        borderRadius: BorderRadius.circular(30.0),
-                        border: Border.all(
-                          color: theme.dividerColor.withValues(alpha: 0.6),
-                          width: 1.0,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            blurRadius: 8.0,
-                            color: Colors.black.withValues(alpha: 0.03),
-                            offset: const Offset(0.0, 2.0),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          _buildIntervalButton(
-                            theme: theme,
-                            label: 'Mensile',
-                            isSelected: !isAnnual,
-                            onTap: () {
-                              safeSetState(() => _model.billingInterval = 'mensile');
-                            },
-                          ),
-                          _buildIntervalButton(
-                            theme: theme,
-                            label: 'Annuale',
-                            badge: '-20%',
-                            isSelected: isAnnual,
-                            onTap: () {
-                              safeSetState(() => _model.billingInterval = 'annuale');
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 28.0),
-
-                    // Layout dei 3 Piani
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        final isDesktop = constraints.maxWidth >= 760.0;
-                        if (isDesktop) {
-                          return IntrinsicHeight(
                             child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                Expanded(child: _buildCardPro(theme, isAnnual)),
-                                const SizedBox(width: 16.0),
-                                Expanded(child: _buildCardPlus(theme, isAnnual)),
-                                const SizedBox(width: 16.0),
-                                Expanded(child: _buildCardUltra(theme, isAnnual)),
+                                Icon(
+                                  Icons.star_rounded,
+                                  color: theme.colorScheme.primary,
+                                  size: 16.0,
+                                ),
+                                const SizedBox(width: 6.0),
+                                Text(
+                                  'PIANI PRONTOMENU',
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    color: theme.colorScheme.primary,
+                                    fontSize: 12.0,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 0.8,
+                                  ),
+                                ),
                               ],
                             ),
-                          );
-                        }
-
-                        // Su mobile / schermi compatti: lista verticale di card
-                        return Column(
-                          children: [
-                            _buildCardPro(theme, isAnnual),
-                            const SizedBox(height: 20.0),
-                            _buildCardPlus(theme, isAnnual),
-                            const SizedBox(height: 20.0),
-                            _buildCardUltra(theme, isAnnual),
-                          ],
-                        );
-                      },
-                    ),
-
-                    const SizedBox(height: 28.0),
-
-                    // Footer di sicurezza e trasparenza
-                    Container(
-                      constraints: const BoxConstraints(maxWidth: 580.0),
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
-                      decoration: BoxDecoration(
-                        color: theme.cardColor,
-                        borderRadius: BorderRadius.circular(16.0),
-                        border: Border.all(
-                          color: theme.dividerColor.withValues(alpha: 0.5),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.verified_user_outlined,
-                            size: 18.0,
-                            color: theme.hintColor,
                           ),
-                          const SizedBox(width: 10.0),
-                          Expanded(
+                          const SizedBox(height: 18.0),
+
+                          // Logo 96x96 circolare (com'era prima)
+                          Container(
+                            width: 96.0,
+                            height: 96.0,
+                            decoration: BoxDecoration(
+                              color: theme.scaffoldBackgroundColor,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: theme.dividerColor,
+                                width: 2.0,
+                              ),
+                            ),
+                            clipBehavior: Clip.antiAlias,
+                            child: Image.network(
+                              'https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/pronto-menu-f0och1/assets/i4ccmvv80eni/IMG_8006.png',
+                              width: 96.0,
+                              height: 96.0,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) => Image.asset(
+                                'assets/images/IMG_8006.png',
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16.0),
+
+                          Text(
+                            'Sblocca il potenziale del tuo locale',
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.headlineMedium?.copyWith(
+                              fontSize: 24.0,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: -0.6,
+                            ),
+                          ),
+                          const SizedBox(height: 6.0),
+                          ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 580.0),
                             child: Text(
-                              'Nessun vincolo contrattuale • Disdici quando vuoi in un click • 0% commissioni sul venduto',
-                              style: theme.textTheme.bodySmall?.copyWith(
+                              'Gestisci ordini, comande, intrattenimento ai tavoli e menu senza intermediari. Zero commissioni sul venduto.',
+                              textAlign: TextAlign.center,
+                              style: theme.textTheme.bodyMedium?.copyWith(
                                 color: theme.hintColor,
-                                height: 1.3,
+                                fontSize: 14.0,
+                                height: 1.35,
                               ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 20.0),
-                  ],
-                ),
+                  ),
+
+                  // 2. Toggle Mensile / Annuale BLOCCATO IN ALTO anche mentre la pagina scorre!
+                  SliverPersistentHeader(
+                    pinned: true,
+                    delegate: _StickyBillingToggleDelegate(
+                      isAnnual: isAnnual,
+                      height: 64.0,
+                      child: Container(
+                        padding: const EdgeInsets.all(4.0),
+                        decoration: BoxDecoration(
+                          color: theme.cardColor,
+                          borderRadius: BorderRadius.circular(30.0),
+                          border: Border.all(
+                            color: theme.dividerColor.withValues(alpha: 0.6),
+                            width: 1.0,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              blurRadius: 8.0,
+                              color: Colors.black.withValues(alpha: 0.04),
+                              offset: const Offset(0.0, 2.0),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _buildIntervalButton(
+                              theme: theme,
+                              label: 'Mensile',
+                              isSelected: !isAnnual,
+                              onTap: () {
+                                safeSetState(() => _model.billingInterval = 'mensile');
+                              },
+                            ),
+                            _buildIntervalButton(
+                              theme: theme,
+                              label: 'Annuale',
+                              badge: '-20%',
+                              isSelected: isAnnual,
+                              onTap: () {
+                                safeSetState(() => _model.billingInterval = 'annuale');
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // 3. I 3 Piani e Footer di sicurezza
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 32.0),
+                      child: Column(
+                        children: [
+                          // Layout dei 3 Piani
+                          LayoutBuilder(
+                            builder: (context, constraints) {
+                              final isDesktop = constraints.maxWidth >= 760.0;
+                              if (isDesktop) {
+                                return IntrinsicHeight(
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    children: [
+                                      Expanded(child: _buildCardPro(theme, isAnnual)),
+                                      const SizedBox(width: 16.0),
+                                      Expanded(child: _buildCardPlus(theme, isAnnual)),
+                                      const SizedBox(width: 16.0),
+                                      Expanded(child: _buildCardUltra(theme, isAnnual)),
+                                    ],
+                                  ),
+                                );
+                              }
+
+                              // Su mobile / schermi compatti: lista verticale di card
+                              return Column(
+                                children: [
+                                  _buildCardPro(theme, isAnnual),
+                                  const SizedBox(height: 20.0),
+                                  _buildCardPlus(theme, isAnnual),
+                                  const SizedBox(height: 20.0),
+                                  _buildCardUltra(theme, isAnnual),
+                                ],
+                              );
+                            },
+                          ),
+
+                          const SizedBox(height: 28.0),
+
+                          // Footer di sicurezza e trasparenza
+                          Container(
+                            constraints: const BoxConstraints(maxWidth: 580.0),
+                            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
+                            decoration: BoxDecoration(
+                              color: theme.cardColor,
+                              borderRadius: BorderRadius.circular(16.0),
+                              border: Border.all(
+                                color: theme.dividerColor.withValues(alpha: 0.5),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.verified_user_outlined,
+                                  size: 18.0,
+                                  color: theme.hintColor,
+                                ),
+                                const SizedBox(width: 10.0),
+                                Expanded(
+                                  child: Text(
+                                    'Nessun vincolo contrattuale • Disdici quando vuoi in un click • 0% commissioni sul venduto',
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: theme.hintColor,
+                                      height: 1.3,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 20.0),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -654,7 +703,7 @@ class _AbbonamentoWidgetState extends State<AbbonamentoWidget> {
           _buildCheckItem(theme, 'Menu Digitale QR Code nativo per i tavoli'),
           _buildCheckItem(theme, 'Categorie e sottocategorie illimitate'),
           _buildCheckItem(theme, 'Allergeni completi & preferenze (Senza glutine, lattosio...)'),
-          _buildCheckItem(theme, 'Foto piatti in alta risoluzione e descrizioni dettagliate'),
+          _buildCheckItem(theme, 'Menù testuale con descrizioni dettagliate, ingredienti e prezzi'),
           _buildCheckItem(theme, 'Zero commissioni sul venduto'),
           _buildCheckItem(theme, 'Supporto base e aggiornamenti inclusi'),
           const SizedBox(height: 20.0),
@@ -919,6 +968,7 @@ class _AbbonamentoWidgetState extends State<AbbonamentoWidget> {
           ),
           const Divider(height: 28.0),
           _buildCheckItem(theme, 'Tutto ciò che include ProntoMenu Plus', isBold: true),
+          _buildCheckItem(theme, 'Foto piatti in alta risoluzione sul menù digitale', isBold: true),
           _buildCheckItem(theme, 'Jukebox Digitale per richieste musicali dei clienti'),
           _buildCheckItem(theme, 'Giochi ai tavoli (Tris & Quiz del Gusto multiplayer)'),
           _buildCheckItem(theme, 'Statistiche avanzate e report vendite in tempo reale'),
@@ -984,5 +1034,61 @@ class _AbbonamentoWidgetState extends State<AbbonamentoWidget> {
         ],
       ),
     );
+  }
+}
+
+class _StickyBillingToggleDelegate extends SliverPersistentHeaderDelegate {
+  _StickyBillingToggleDelegate({
+    required this.child,
+    required this.height,
+    required this.isAnnual,
+  });
+
+  final Widget child;
+  final double height;
+  final bool isAnnual;
+
+  @override
+  double get minExtent => height;
+
+  @override
+  double get maxExtent => height;
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    final theme = Theme.of(context);
+    return Container(
+      height: height,
+      decoration: BoxDecoration(
+        color: theme.scaffoldBackgroundColor,
+        border: Border(
+          bottom: BorderSide(
+            color: overlapsContent
+                ? theme.dividerColor.withValues(alpha: 0.18)
+                : Colors.transparent,
+            width: 1.0,
+          ),
+        ),
+        boxShadow: overlapsContent
+            ? [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 6.0,
+                  offset: const Offset(0.0, 2.0),
+                ),
+              ]
+            : null,
+      ),
+      alignment: Alignment.center,
+      child: child,
+    );
+  }
+
+  @override
+  bool shouldRebuild(covariant _StickyBillingToggleDelegate oldDelegate) {
+    return oldDelegate.isAnnual != isAnnual ||
+        oldDelegate.height != height ||
+        oldDelegate.child != child;
   }
 }
