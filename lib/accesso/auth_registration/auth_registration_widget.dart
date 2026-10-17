@@ -536,10 +536,17 @@ class _AuthRegistrationWidgetState extends State<AuthRegistrationWidget> {
                         color: theme.colorScheme.primary,
                         textStyle: theme.textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          fontSize: 16.0,
+                          color: theme.colorScheme.onPrimary,
                         ),
-                        elevation: 0.0,
+                        elevation: 2.0,
                         borderRadius: BorderRadius.circular(14.0),
+                        borderSide: theme.brightness == Brightness.dark
+                            ? BorderSide(
+                                color: Colors.white.withValues(alpha: 0.15),
+                                width: 1.0,
+                              )
+                            : BorderSide.none,
                       ),
                     ),
                     const SizedBox(height: 22.0),

@@ -228,29 +228,38 @@ class _AuthWelcomeWidgetState extends State<AuthWelcomeWidget> {
                   ),
                 ),
                 Align(
-                  alignment: AlignmentDirectional(0.0, 0.0),
+                  alignment: Alignment.center,
                   child: Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(0.0, 8.0, 0.0, 0.0),
-                    child: InkWell(
-                      splashColor: Colors.transparent,
-                      focusColor: Colors.transparent,
-                      hoverColor: Colors.transparent,
-                      highlightColor: Colors.transparent,
-                      onTap: () async {
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: TextButton.icon(
+                      onPressed: () async {
                         context.pushNamed(RecuperoPasswordWidget.routeName);
                       },
-                      child: Text(
+                      icon: Icon(
+                        Icons.lock_reset_rounded,
+                        size: 17.0,
+                        color: theme.colorScheme.primary,
+                      ),
+                      label: Text(
                         'Password dimenticata?',
-                        textAlign: TextAlign.end,
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontSize: 15.0,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13.5,
+                        ),
+                      ),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12.0, vertical: 4.0),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
                         ),
                       ),
                     ),
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(0.0, 32.0, 0.0, 16.0),
+                  padding: EdgeInsetsDirectional.fromSTEB(0.0, 24.0, 0.0, 16.0),
                   child: FFButtonWidget(
                     onPressed: () async {
                       await authManager.refreshUser();
@@ -306,7 +315,7 @@ class _AuthWelcomeWidgetState extends State<AuthWelcomeWidget> {
                     text: 'Accedi',
                     options: FFButtonOptions(
                       width: 280.0,
-                      height: 45.0,
+                      height: 48.0,
                       padding:
                           EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
                       iconPadding:
@@ -314,10 +323,17 @@ class _AuthWelcomeWidgetState extends State<AuthWelcomeWidget> {
                       color: theme.colorScheme.primary,
                       textStyle: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        fontSize: 16.0,
+                        color: theme.colorScheme.onPrimary,
                       ),
                       elevation: 2.0,
-                      borderRadius: BorderRadius.circular(12.0),
+                      borderRadius: BorderRadius.circular(14.0),
+                      borderSide: theme.brightness == Brightness.dark
+                          ? BorderSide(
+                              color: Colors.white.withValues(alpha: 0.15),
+                              width: 1.0,
+                            )
+                          : BorderSide.none,
                     ),
                   ),
                 ),
@@ -417,15 +433,29 @@ class _AuthWelcomeWidgetState extends State<AuthWelcomeWidget> {
                         focusColor: Colors.transparent,
                         hoverColor: Colors.transparent,
                         highlightColor: Colors.transparent,
+                        borderRadius: BorderRadius.circular(8.0),
                         onTap: () async {
                           context.pushNamed(AuthRegistrationWidget.routeName);
                         },
-                        child: Text(
-                          'Registrati',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            decoration: TextDecoration.underline,
-                            color: theme.colorScheme.primary,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10.0, vertical: 4.0),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primary
+                                .withValues(alpha: 0.14),
+                            borderRadius: BorderRadius.circular(8.0),
+                            border: Border.all(
+                              color: theme.colorScheme.primary
+                                  .withValues(alpha: 0.35),
+                              width: 1.0,
+                            ),
+                          ),
+                          child: Text(
+                            'Registrati',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: theme.colorScheme.primary,
+                            ),
                           ),
                         ),
                       ),

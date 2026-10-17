@@ -189,18 +189,24 @@ class AppThemes {
     return bgLum < 0.45 ? Colors.white : const Color(0xFF1A1A1A);
   }
 
-  /// Schiarisce armonicamente un colore se usato in Dark Mode per garantire visibilità e contrasto WCAG
-  static Color ensureContrastOnDark(Color color, {double minLuminance = 0.42}) {
-    if (color.computeLuminance() >= minLuminance) return color;
+  /// In Dark Mode: calcola una tonalità brillante, vivace e luminosa dello stesso colore base (Hue)
+  /// affinché pulsanti, accenti e link spicchino fortemente contro il fondo scuro senza fondersi.
+  static Color ensureContrastOnDark(Color color) {
     final hsl = HSLColor.fromColor(color);
-    return hsl.withLightness((hsl.lightness + 0.32).clamp(0.48, 0.78)).toColor();
+    final targetSat = (hsl.saturation * 1.30).clamp(0.60, 0.95);
+    final targetLight = (hsl.lightness * 0.35 + 0.52).clamp(0.55, 0.68);
+    return HSLColor.fromAHSL(1.0, hsl.hue, targetSat, targetLight).toColor();
   }
 
-  /// Scurisce armonicamente un colore se usato in Light Mode per garantire visibilità e contrasto WCAG
-  static Color ensureContrastOnLight(Color color, {double maxLuminance = 0.65}) {
-    if (color.computeLuminance() <= maxLuminance) return color;
+  /// In Light Mode: garantisce che il colore sia sufficientemente profondo e saturo
+  /// per risaltare contro sfondi chiari o bianchi senza sembrare sbiadito.
+  static Color ensureContrastOnLight(Color color) {
     final hsl = HSLColor.fromColor(color);
-    return hsl.withLightness((hsl.lightness - 0.25).clamp(0.25, 0.52)).toColor();
+    final targetSat = hsl.saturation.clamp(0.50, 0.95);
+    final targetLight = hsl.lightness > 0.45
+        ? (hsl.lightness * 0.65).clamp(0.28, 0.44)
+        : hsl.lightness.clamp(0.28, 0.44);
+    return HSLColor.fromAHSL(1.0, hsl.hue, targetSat, targetLight).toColor();
   }
 
   static ThemeData _buildPresetTheme({
