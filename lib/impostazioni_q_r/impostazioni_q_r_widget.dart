@@ -1252,12 +1252,14 @@ class _ImpostazioniQRWidgetState extends State<ImpostazioniQRWidget> {
                 ),
               ),
               const SizedBox(width: 10.0),
-              Text(
-                'Consigli per l\'Esposizione dei QR in Sala',
-                style: TextStyle(
-                  fontSize: 15.0,
-                  fontWeight: FontWeight.bold,
-                  color: textPrimary,
+              Expanded(
+                child: Text(
+                  'Consigli per l\'Esposizione dei QR in Sala',
+                  style: TextStyle(
+                    fontSize: 15.0,
+                    fontWeight: FontWeight.bold,
+                    color: textPrimary,
+                  ),
                 ),
               ),
             ],
