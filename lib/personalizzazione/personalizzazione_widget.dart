@@ -218,6 +218,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
       }, SetOptions(merge: true));
 
       if (!mounted) return;
+      setState(() => _hasUnpublishedChanges = false);
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -260,23 +261,11 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     }
   }
 
-  Future<void> _autoSaveToCloud(ThemeProvider themeProvider) async {
-    try {
-      final docRef = widget.ristoranteRef ?? currentUserReference;
-      if (docRef == null) return;
-      final hexColor = '#${themeProvider.primaryColor.toARGB32().toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}';
-      await docRef.set({
-        'temaScelto': themeProvider.designStyle.name,
-        'colore_primario': hexColor,
-        'font_titoli': themeProvider.titleFont,
-        'font_testi': themeProvider.bodyFont,
-        'layout_piatti': themeProvider.dishCardLayout.name,
-        'banner_copertina': themeProvider.coverBanner,
-        'texture_sfondo': themeProvider.backgroundTexture.name,
-        'stile_badge': themeProvider.badgeStyle.value,
-      }, SetOptions(merge: true));
-    } catch (e) {
-      debugPrint('Errore auto-salvataggio tema cloud: $e');
+  bool _hasUnpublishedChanges = false;
+
+  void _markChangesUnpublished() {
+    if (!_hasUnpublishedChanges && mounted) {
+      setState(() => _hasUnpublishedChanges = true);
     }
   }
 
@@ -297,6 +286,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     setState(() {
       _justClickedStyle = preset;
       _dishWiggleTrigger++;
+      _hasUnpublishedChanges = true;
     });
     themeProvider.setDesignStyle(preset);
     _hexController.text = preset.defaultPrimaryColor
@@ -305,7 +295,6 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
         .padLeft(8, '0')
         .substring(2)
         .toUpperCase();
-    _autoSaveToCloud(themeProvider);
   }
 
   void _openSimulator(BuildContext context, ThemeProvider themeProvider) {
@@ -3867,7 +3856,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
               child: InkWell(
                 onTap: () {
                   themeProvider.setBadgeStyle(bStyle);
-                  _autoSaveToCloud(themeProvider);
+                  _markChangesUnpublished();
                 },
                 borderRadius: BorderRadius.circular(14.0),
                 child: Padding(
@@ -4247,7 +4236,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                 colorScheme: colorScheme,
                 onTap: () {
                   themeProvider.setTitleFont(opt.family);
-                  _autoSaveToCloud(themeProvider);
+                  _markChangesUnpublished();
                 },
               ),
             );
@@ -4277,7 +4266,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                 colorScheme: colorScheme,
                 onTap: () {
                   themeProvider.setBodyFont(opt.family);
-                  _autoSaveToCloud(themeProvider);
+                  _markChangesUnpublished();
                 },
               ),
             );
@@ -4614,7 +4603,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                     .padLeft(8, '0')
                     .substring(2)
                     .toUpperCase();
-                _autoSaveToCloud(themeProvider);
+                _markChangesUnpublished();
               },
               borderRadius: BorderRadius.circular(14.0),
               child: AnimatedContainer(
@@ -4800,7 +4789,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                       .padLeft(8, '0')
                       .substring(2)
                       .toUpperCase();
-                  _autoSaveToCloud(themeProvider);
+                  _markChangesUnpublished();
                 },
                 style: TextButton.styleFrom(
                   visualDensity: VisualDensity.compact,
@@ -4924,7 +4913,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
         final newColor = Color(intVal);
         themeProvider.setPrimaryColor(newColor);
         _hexController.text = cleanHex.toUpperCase();
-        _autoSaveToCloud(themeProvider);
+        _markChangesUnpublished();
         return;
       }
     }
@@ -5004,7 +4993,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
               child: InkWell(
                 onTap: () {
                   themeProvider.setDishCardLayout(layout);
-                  _autoSaveToCloud(themeProvider);
+                  _markChangesUnpublished();
                 },
                 borderRadius: BorderRadius.circular(14.0),
                 child: Padding(
@@ -5158,7 +5147,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                   onPressed: () {
                     themeProvider.setCoverBanner('');
                     _bannerUrlController.clear();
-                    _autoSaveToCloud(themeProvider);
+                    _markChangesUnpublished();
                   },
                   icon: const Icon(Icons.close_rounded, size: 14.0),
                   label: const Text('Rimuovi', style: TextStyle(fontSize: 11.5)),
@@ -5194,7 +5183,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
             onTap: () {
               themeProvider.setCoverBanner('');
               _bannerUrlController.clear();
-              _autoSaveToCloud(themeProvider);
+              _markChangesUnpublished();
             },
             borderRadius: BorderRadius.circular(12.0),
             child: Padding(
@@ -5259,7 +5248,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                 onTap: () {
                   themeProvider.setCoverBanner(b.id);
                   _bannerUrlController.text = b.id;
-                  _autoSaveToCloud(themeProvider);
+                  _markChangesUnpublished();
                 },
                 child: Container(
                   decoration: BoxDecoration(
@@ -5385,7 +5374,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                       final val = _bannerUrlController.text.trim();
                       if (val.isNotEmpty) {
                         themeProvider.setCoverBanner(val);
-                        _autoSaveToCloud(themeProvider);
+                        _markChangesUnpublished();
                         FocusScope.of(context).unfocus();
                       }
                     },
@@ -5461,7 +5450,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
               child: InkWell(
                 onTap: () {
                   themeProvider.setBackgroundTexture(texture);
-                  _autoSaveToCloud(themeProvider);
+                  _markChangesUnpublished();
                 },
                 borderRadius: BorderRadius.circular(12.0),
                 child: Padding(
@@ -5571,10 +5560,10 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
               child: ElevatedButton.icon(
                 onPressed: _isSavingCloud ? null : () => _publishThemeToCloud(themeProvider),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
+                  backgroundColor: _hasUnpublishedChanges ? primaryColor : primaryColor.withValues(alpha: 0.85),
                   foregroundColor: Colors.white,
-                  disabledBackgroundColor: primaryColor.withValues(alpha: 0.6),
-                  elevation: 2.0,
+                  disabledBackgroundColor: primaryColor.withValues(alpha: 0.5),
+                  elevation: _hasUnpublishedChanges ? 3.0 : 1.0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12.0),
                   ),
@@ -5588,9 +5577,14 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                           valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                         ),
                       )
-                    : const Icon(Icons.cloud_done_rounded, size: 22.0),
+                    : Icon(
+                        _hasUnpublishedChanges ? Icons.cloud_upload_rounded : Icons.cloud_done_rounded,
+                        size: 22.0,
+                      ),
                 label: Text(
-                  _isSavingCloud ? 'Pubblicazione in corso...' : 'Pubblica Modifiche nel Menù',
+                  _isSavingCloud
+                      ? 'Pubblicazione in corso...'
+                      : (_hasUnpublishedChanges ? 'Pubblica Modifiche nel Menù' : 'Pubblica Modifiche nel Menù'),
                   style: const TextStyle(
                     fontSize: 15.0,
                     fontWeight: FontWeight.w700,
@@ -5604,20 +5598,25 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
-                  Icons.sync_rounded,
-                  size: 13.0,
-                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+                  _hasUnpublishedChanges ? Icons.edit_note_rounded : Icons.check_circle_rounded,
+                  size: 14.0,
+                  color: _hasUnpublishedChanges ? Colors.amber.shade700 : const Color(0xFF10B981),
                 ),
                 const SizedBox(width: 5.0),
                 Flexible(
                   child: Text(
-                    'Sincronizzato in tempo reale con il QR Code del menù',
+                    _hasUnpublishedChanges
+                        ? 'Modifiche nel simulatore non ancora pubblicate ai clienti'
+                        : 'Menù sincronizzato e pubblicato sul QR Code live',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 11.0,
-                      color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+                      fontSize: 11.5,
+                      fontWeight: _hasUnpublishedChanges ? FontWeight.w600 : FontWeight.w500,
+                      color: _hasUnpublishedChanges
+                          ? (isDark ? Colors.amber.shade300 : Colors.amber.shade800)
+                          : const Color(0xFF10B981),
                     ),
                   ),
                 ),
