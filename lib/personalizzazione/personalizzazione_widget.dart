@@ -1236,36 +1236,12 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
 
                                 const SizedBox(height: 12.0),
 
-                                // Piatto 1: Pizza Margherita (reattivo a dishCardLayout e badgeStyle)
-                                _buildMockupDishCard(
+                                // Piatti reattivi al layout selezionato (Classico, Foto Grande, Griglia 2 Col, Minimale)
+                                _buildMockupDishesSection(
                                   context: context,
-                                  name: 'Pizza Margherita DOP',
-                                  description: 'Pomodoro San Marzano DOP, mozzarella di bufala campana, basilico fresco, olio EVO',
-                                  price: '€ 8,50',
-                                  badgeLabel: 'CONSIGLIATO',
-                                  imageUrl: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=400&q=80',
-                                  layout: dishLayout,
+                                  dishLayout: dishLayout,
                                   badgeStyle: badgeStyle,
-                                  style: currentStyle,
-                                  primaryColor: primaryColor,
-                                  titleFont: titleFont,
-                                  bodyFont: bodyFont,
-                                  clientDark: clientDark,
-                                ),
-
-                                const SizedBox(height: 9.0),
-
-                                // Piatto 2: Pizza Vesuvio Piccante
-                                _buildMockupDishCard(
-                                  context: context,
-                                  name: 'Pizza Vesuvio Piccante',
-                                  description: 'Salame piccante di Spilinga, fiordilatte, \'nduja calabrese, peperoncino fresco',
-                                  price: '€ 10,50',
-                                  badgeLabel: 'PICCANTE 🌶️',
-                                  imageUrl: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=400&q=80',
-                                  layout: dishLayout,
-                                  badgeStyle: badgeStyle,
-                                  style: currentStyle,
+                                  currentStyle: currentStyle,
                                   primaryColor: primaryColor,
                                   titleFont: titleFont,
                                   bodyFont: bodyFont,
@@ -1513,6 +1489,442 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     );
   }
 
+  Widget _buildMockupDishesSection({
+    required BuildContext context,
+    required DishCardLayout dishLayout,
+    required BadgeStyle badgeStyle,
+    required AppDesignStyle currentStyle,
+    required Color primaryColor,
+    required String titleFont,
+    required String bodyFont,
+    required bool clientDark,
+  }) {
+    switch (dishLayout) {
+      case DishCardLayout.griglia:
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: _buildMockupGridDishCard(
+                context: context,
+                name: 'Margherita DOP',
+                description: 'Pomodoro San Marzano DOP, mozzarella di bufala campana',
+                price: '€ 8,50',
+                badgeLabel: 'CONSIGLIATO',
+                imageUrl: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=400&q=80',
+                badgeStyle: badgeStyle,
+                style: currentStyle,
+                primaryColor: primaryColor,
+                titleFont: titleFont,
+                bodyFont: bodyFont,
+                clientDark: clientDark,
+              ),
+            ),
+            const SizedBox(width: 8.0),
+            Expanded(
+              child: _buildMockupGridDishCard(
+                context: context,
+                name: 'Vesuvio Piccante',
+                description: 'Salame piccante di Spilinga, fiordilatte, \'nduja',
+                price: '€ 10,50',
+                badgeLabel: 'PICCANTE 🌶️',
+                imageUrl: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=400&q=80',
+                badgeStyle: badgeStyle,
+                style: currentStyle,
+                primaryColor: primaryColor,
+                titleFont: titleFont,
+                bodyFont: bodyFont,
+                clientDark: clientDark,
+              ),
+            ),
+          ],
+        );
+
+      case DishCardLayout.minimale:
+        return Container(
+          decoration: BoxDecoration(
+            color: clientDark ? const Color(0xFF1E293B) : Colors.white,
+            borderRadius: BorderRadius.circular(12.0),
+            border: Border.all(
+              color: clientDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: clientDark ? 0.2 : 0.04),
+                blurRadius: 6.0,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 11.0, vertical: 10.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildMockupMinimaleDishCard(
+                context: context,
+                name: 'Pizza Margherita DOP',
+                description: 'Pomodoro San Marzano DOP, mozzarella di bufala campana, basilico fresco, olio EVO',
+                price: '€ 8,50',
+                badgeLabel: 'CONSIGLIATO',
+                badgeStyle: badgeStyle,
+                style: currentStyle,
+                primaryColor: primaryColor,
+                titleFont: titleFont,
+                bodyFont: bodyFont,
+                clientDark: clientDark,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Divider(
+                  color: clientDark ? Colors.white.withValues(alpha: 0.1) : const Color(0xFFE2E8F0),
+                  height: 1.0,
+                  thickness: 1.0,
+                ),
+              ),
+              _buildMockupMinimaleDishCard(
+                context: context,
+                name: 'Pizza Vesuvio Piccante',
+                description: 'Salame piccante di Spilinga, fiordilatte, \'nduja calabrese, peperoncino fresco',
+                price: '€ 10,50',
+                badgeLabel: 'PICCANTE 🌶️',
+                badgeStyle: badgeStyle,
+                style: currentStyle,
+                primaryColor: primaryColor,
+                titleFont: titleFont,
+                bodyFont: bodyFont,
+                clientDark: clientDark,
+              ),
+            ],
+          ),
+        );
+
+      case DishCardLayout.fotoGrande:
+      case DishCardLayout.classico:
+        return Column(
+          children: [
+            _buildMockupDishCard(
+              context: context,
+              name: 'Pizza Margherita DOP',
+              description: 'Pomodoro San Marzano DOP, mozzarella di bufala campana, basilico fresco, olio EVO',
+              price: '€ 8,50',
+              badgeLabel: 'CONSIGLIATO',
+              imageUrl: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=400&q=80',
+              layout: dishLayout,
+              badgeStyle: badgeStyle,
+              style: currentStyle,
+              primaryColor: primaryColor,
+              titleFont: titleFont,
+              bodyFont: bodyFont,
+              clientDark: clientDark,
+            ),
+            const SizedBox(height: 9.0),
+            _buildMockupDishCard(
+              context: context,
+              name: 'Pizza Vesuvio Piccante',
+              description: 'Salame piccante di Spilinga, fiordilatte, \'nduja calabrese, peperoncino fresco',
+              price: '€ 10,50',
+              badgeLabel: 'PICCANTE 🌶️',
+              imageUrl: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=400&q=80',
+              layout: dishLayout,
+              badgeStyle: badgeStyle,
+              style: currentStyle,
+              primaryColor: primaryColor,
+              titleFont: titleFont,
+              bodyFont: bodyFont,
+              clientDark: clientDark,
+            ),
+          ],
+        );
+    }
+  }
+
+  Widget _buildMockupGridDishCard({
+    required BuildContext context,
+    required String name,
+    required String description,
+    required String price,
+    required String badgeLabel,
+    required String imageUrl,
+    required BadgeStyle badgeStyle,
+    required AppDesignStyle style,
+    required Color primaryColor,
+    required String titleFont,
+    required String bodyFont,
+    required bool clientDark,
+  }) {
+    final BorderRadius cardRadius = switch (style) {
+      AppDesignStyle.premium => BorderRadius.circular(6.0),
+      AppDesignStyle.pub => BorderRadius.circular(16.0),
+      AppDesignStyle.minimal => BorderRadius.zero,
+      AppDesignStyle.tradizionale => BorderRadius.circular(12.0),
+    };
+
+    final badgeDeco = PersonalizzazionePresets.getBadgeDecoration(
+      style: badgeStyle,
+      baseColor: primaryColor,
+      isDark: clientDark,
+      isFilled: true,
+    );
+    final badgeTextColor = PersonalizzazionePresets.getBadgeTextColor(
+      style: badgeStyle,
+      baseColor: primaryColor,
+      isDark: clientDark,
+      isFilled: true,
+    );
+
+    final cardBg = clientDark ? const Color(0xFF1E293B) : Colors.white;
+    final cardBorder = clientDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: cardRadius,
+        border: Border.all(color: cardBorder),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: clientDark ? 0.2 : 0.04),
+            blurRadius: 6.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Stack(
+            children: [
+              Image.network(
+                imageUrl,
+                height: 76.0,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  height: 76.0,
+                  color: primaryColor.withValues(alpha: 0.1),
+                  child: Center(child: Icon(Icons.fastfood_rounded, color: primaryColor, size: 22.0)),
+                ),
+              ),
+              Positioned(
+                top: 5.0,
+                left: 5.0,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 2.0),
+                  decoration: badgeDeco,
+                  child: Text(
+                    badgeLabel,
+                    style: TextStyle(
+                      fontSize: 7.5,
+                      fontWeight: FontWeight.bold,
+                      color: badgeTextColor,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.all(7.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.getFont(
+                    titleFont,
+                    textStyle: TextStyle(
+                      fontSize: 11.0,
+                      fontWeight: FontWeight.bold,
+                      color: clientDark ? Colors.white : const Color(0xFF0F172A),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 2.0),
+                Text(
+                  description,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.getFont(
+                    bodyFont,
+                    textStyle: TextStyle(
+                      fontSize: 8.5,
+                      color: clientDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 6.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 5.5, vertical: 2.0),
+                      decoration: badgeDeco,
+                      child: Text(
+                        price,
+                        style: GoogleFonts.getFont(
+                          titleFont,
+                          textStyle: TextStyle(
+                            fontSize: 10.0,
+                            fontWeight: FontWeight.bold,
+                            color: badgeTextColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: 22.0,
+                      height: 22.0,
+                      decoration: BoxDecoration(
+                        color: primaryColor,
+                        borderRadius: BorderRadius.circular(6.0),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Icon(
+                        Icons.add,
+                        color: Colors.white,
+                        size: 14.0,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMockupMinimaleDishCard({
+    required BuildContext context,
+    required String name,
+    required String description,
+    required String price,
+    required String badgeLabel,
+    required BadgeStyle badgeStyle,
+    required AppDesignStyle style,
+    required Color primaryColor,
+    required String titleFont,
+    required String bodyFont,
+    required bool clientDark,
+  }) {
+    final badgeDeco = PersonalizzazionePresets.getBadgeDecoration(
+      style: badgeStyle,
+      baseColor: primaryColor,
+      isDark: clientDark,
+      isFilled: true,
+    );
+    final badgeTextColor = PersonalizzazionePresets.getBadgeTextColor(
+      style: badgeStyle,
+      baseColor: primaryColor,
+      isDark: clientDark,
+      isFilled: true,
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.getFont(
+                            titleFont,
+                            textStyle: TextStyle(
+                              fontSize: 12.0,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: -0.2,
+                              color: clientDark ? Colors.white : const Color(0xFF0F172A),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 5.0),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 4.5, vertical: 1.5),
+                        decoration: badgeDeco,
+                        child: Text(
+                          badgeLabel,
+                          style: TextStyle(
+                            fontSize: 7.5,
+                            fontWeight: FontWeight.bold,
+                            color: badgeTextColor,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2.0),
+                  Text(
+                    description,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.getFont(
+                      bodyFont,
+                      textStyle: TextStyle(
+                        fontSize: 9.0,
+                        color: clientDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                        height: 1.25,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8.0),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.5),
+                  decoration: badgeDeco,
+                  child: Text(
+                    price,
+                    style: GoogleFonts.getFont(
+                      titleFont,
+                      textStyle: TextStyle(
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.bold,
+                        color: badgeTextColor,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 4.0),
+                Container(
+                  width: 22.0,
+                  height: 22.0,
+                  decoration: BoxDecoration(
+                    color: primaryColor.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(6.0),
+                  ),
+                  alignment: Alignment.center,
+                  child: Icon(
+                    Icons.add,
+                    color: primaryColor,
+                    size: 14.0,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   Widget _buildMockupDishCard({
     required BuildContext context,
     required String name,
@@ -1528,6 +1940,56 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     required String bodyFont,
     required bool clientDark,
   }) {
+    if (layout == DishCardLayout.griglia) {
+      return _buildMockupGridDishCard(
+        context: context,
+        name: name,
+        description: description,
+        price: price,
+        badgeLabel: badgeLabel,
+        imageUrl: imageUrl,
+        badgeStyle: badgeStyle,
+        style: style,
+        primaryColor: primaryColor,
+        titleFont: titleFont,
+        bodyFont: bodyFont,
+        clientDark: clientDark,
+      );
+    }
+
+    if (layout == DishCardLayout.minimale) {
+      return Container(
+        decoration: BoxDecoration(
+          color: clientDark ? const Color(0xFF1E293B) : Colors.white,
+          borderRadius: BorderRadius.circular(12.0),
+          border: Border.all(
+            color: clientDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: clientDark ? 0.2 : 0.04),
+              blurRadius: 6.0,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
+        child: _buildMockupMinimaleDishCard(
+          context: context,
+          name: name,
+          description: description,
+          price: price,
+          badgeLabel: badgeLabel,
+          badgeStyle: badgeStyle,
+          style: style,
+          primaryColor: primaryColor,
+          titleFont: titleFont,
+          bodyFont: bodyFont,
+          clientDark: clientDark,
+        ),
+      );
+    }
+
     final BorderRadius cardRadius = switch (style) {
       AppDesignStyle.premium => BorderRadius.circular(6.0),
       AppDesignStyle.pub => BorderRadius.circular(16.0),
@@ -1682,7 +2144,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
       );
     }
 
-    // Default Standard & Compatto
+    // Default Standard & Compatto (Classico Orizzontale)
     return Container(
       padding: const EdgeInsets.all(9.0),
       decoration: BoxDecoration(
