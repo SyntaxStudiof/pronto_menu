@@ -19,9 +19,11 @@ class LoaderMenuWidget extends StatefulWidget {
   const LoaderMenuWidget({
     super.key,
     required this.ristoranteRef,
+    this.tavolo,
   });
 
   final DocumentReference? ristoranteRef;
+  final String? tavolo;
 
   static String routeName = 'LoaderMenu';
   static String routePath = '/loaderMenu';
@@ -43,6 +45,9 @@ class _LoaderMenuWidgetState extends State<LoaderMenuWidget> {
     // On page load action - immediato senza attese di rete bloccanti.
     SchedulerBinding.instance.addPostFrameCallback((_) {
       FFAppState().ristoranteSalvato = widget.ristoranteRef;
+      if (widget.tavolo != null && widget.tavolo!.trim().isNotEmpty) {
+        FFAppState().numeroTavolo = widget.tavolo!.trim();
+      }
       if (widget.ristoranteRef != null) {
         context.goNamed(
           HubClienteWidget.routeName,

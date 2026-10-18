@@ -359,6 +359,10 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
               isList: false,
               collectionNamePath: ['users'],
             ),
+            tavolo: params.getParam(
+              'tavolo',
+              ParamType.String,
+            ),
           ),
         ),
         FFRoute(

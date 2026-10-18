@@ -43,7 +43,10 @@ class _PopupTavoloWidgetState extends State<PopupTavoloWidget> {
     super.initState();
     _model = createModel(context, () => PopupTavoloModel());
 
-    _model.textController ??= TextEditingController();
+    final prefilledTable = FFAppState().numeroTavolo;
+    _model.textController ??= TextEditingController(
+      text: prefilledTable.isNotEmpty ? prefilledTable : '',
+    );
     _model.textFieldFocusNode ??= FocusNode();
 
     WidgetsBinding.instance.addPostFrameCallback((_) => safeSetState(() {}));
