@@ -49,7 +49,7 @@ class _GestioneDispensaWidgetState extends State<GestioneDispensaWidget> {
   DocumentReference get _targetRistoranteRef =>
       widget.ristoranteRef ?? currentUserReference!;
 
-  void _apriDialogIngrediente({DispensaRecord? record}) {
+  Future<void> _apriDialogIngrediente({DispensaRecord? record}) async {
     final isModifica = record != null;
     final nomeController = TextEditingController(text: record?.nome ?? '');
     final quantitaController = TextEditingController(
@@ -76,10 +76,42 @@ class _GestioneDispensaWidgetState extends State<GestioneDispensaWidget> {
     String unitaSelezionata = record?.unitaMisura ?? 'kg';
     bool esaurito = record?.esaurito ?? false;
     bool staPerFinire = record?.staPerFinire ?? false;
+    bool disponibileComeAggiunta = record?.disponibileComeAggiunta ?? false;
+    bool tutteLeCategorie = record?.tutteLeCategorie ?? true;
+    List<String> categorieCompatibili =
+        List<String>.from(record?.categorieCompatibili ?? []);
     bool isSaving = false;
     final formKey = GlobalKey<FormState>();
 
-    const unitaDisponibili = ['kg', 'g', 'l', 'ml', 'pz', 'confezioni', 'barattoli', 'bottiglie'];
+    const unitaDisponibili = [
+      'kg',
+      'g',
+      'l',
+      'ml',
+      'pz',
+      'confezioni',
+      'barattoli',
+      'bottiglie'
+    ];
+
+    // Carica la lista delle categorie del menu del ristorante
+    List<CategoriesRecord> categoriesList = [];
+    try {
+      categoriesList = await queryCategoriesRecordOnce(
+        queryBuilder: (q) => q
+            .where('proprietario', isEqualTo: _targetRistoranteRef)
+            .orderBy('ordine_categoria'),
+      );
+    } catch (_) {
+      try {
+        categoriesList = await queryCategoriesRecordOnce(
+          queryBuilder: (q) =>
+              q.where('proprietario', isEqualTo: _targetRistoranteRef),
+        );
+      } catch (_) {}
+    }
+
+    if (!mounted) return;
 
     showModalBottomSheet(
       context: context,
@@ -88,6 +120,7 @@ class _GestioneDispensaWidgetState extends State<GestioneDispensaWidget> {
       builder: (sheetContext) {
         final theme = Theme.of(sheetContext);
         final colorScheme = theme.colorScheme;
+        final isDark = theme.brightness == Brightness.dark;
 
         return StatefulBuilder(
           builder: (dialogContext, setDialogState) {
@@ -95,353 +128,800 @@ class _GestioneDispensaWidgetState extends State<GestioneDispensaWidget> {
               padding: EdgeInsets.only(
                 bottom: MediaQuery.of(sheetContext).viewInsets.bottom,
               ),
-              child: Container(
-                constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(sheetContext).size.height * 0.88,
-                ),
-                padding: const EdgeInsets.only(
-                  bottom: 24.0,
-                  top: 20.0,
-                  left: 20.0,
-                  right: 20.0,
-                ),
-                decoration: BoxDecoration(
-                  color: theme.cardColor,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(24.0),
-                    topRight: Radius.circular(24.0),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: 620.0,
+                    maxHeight: MediaQuery.of(sheetContext).size.height * 0.90,
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.15),
-                      blurRadius: 20.0,
-                      offset: const Offset(0, -4),
+                  child: Container(
+                    padding: const EdgeInsets.only(
+                      bottom: 24.0,
+                      top: 20.0,
+                      left: 20.0,
+                      right: 20.0,
                     ),
-                  ],
-                ),
-                child: SingleChildScrollView(
-                child: Form(
-                  key: formKey,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // Maniglia
-                      Center(
-                        child: Container(
-                          width: 40.0,
-                          height: 4.0,
-                          decoration: BoxDecoration(
-                            color: theme.dividerColor.withValues(alpha: 0.4),
-                            borderRadius: BorderRadius.circular(2.0),
-                          ),
-                        ),
+                    decoration: BoxDecoration(
+                      color: theme.cardColor,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(24.0),
+                        topRight: Radius.circular(24.0),
                       ),
-                      const SizedBox(height: 16.0),
-
-                      // Intestazione
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                width: 36.0,
-                                height: 36.0,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.15),
+                          blurRadius: 20.0,
+                          offset: const Offset(0, -4),
+                        ),
+                      ],
+                    ),
+                    child: SingleChildScrollView(
+                      child: Form(
+                        key: formKey,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // Maniglia
+                            Center(
+                              child: Container(
+                                width: 40.0,
+                                height: 4.0,
                                 decoration: BoxDecoration(
-                                  color: colorScheme.primary.withValues(alpha: 0.12),
-                                  borderRadius: BorderRadius.circular(10.0),
+                                  color:
+                                      theme.dividerColor.withValues(alpha: 0.4),
+                                  borderRadius: BorderRadius.circular(2.0),
                                 ),
-                                alignment: Alignment.center,
-                                child: Icon(
-                                  isModifica ? Icons.edit_rounded : Icons.add_circle_outline_rounded,
-                                  color: colorScheme.primary,
-                                  size: 20.0,
-                                ),
-                              ),
-                              const SizedBox(width: 10.0),
-                              Text(
-                                isModifica ? 'Modifica Ingrediente' : 'Nuovo Ingrediente',
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18.0,
-                                ),
-                              ),
-                            ],
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.close_rounded),
-                            onPressed: () => Navigator.pop(sheetContext),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20.0),
-
-                      // Nome ingrediente
-                      TextFormField(
-                        controller: nomeController,
-                        autofocus: !isModifica,
-                        textCapitalization: TextCapitalization.sentences,
-                        decoration: InputDecoration(
-                          labelText: 'Nome ingrediente *',
-                          hintText: 'Es. Mozzarella di bufala, Pomodoro, Basilico',
-                          prefixIcon: Icon(Icons.restaurant_menu_rounded, color: colorScheme.primary),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14.0)),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Inserisci il nome dell\'ingrediente';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 14.0),
-
-                      // Quantità e unità di misura
-                      Row(
-                        children: [
-                          Expanded(
-                            flex: 3,
-                            child: TextFormField(
-                              controller: quantitaController,
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                              decoration: InputDecoration(
-                                labelText: 'Quantità (opzionale)',
-                                hintText: 'Es. 5',
-                                prefixIcon: Icon(Icons.scale_rounded, color: colorScheme.primary),
-                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(14.0)),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 10.0),
-                          Expanded(
-                            flex: 2,
-                            child: DropdownButtonFormField<String>(
-                              initialValue: unitaDisponibili.contains(unitaSelezionata) ? unitaSelezionata : 'kg',
+                            const SizedBox(height: 16.0),
+
+                            // Intestazione
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 36.0,
+                                      height: 36.0,
+                                      decoration: BoxDecoration(
+                                        color: colorScheme.primary
+                                            .withValues(alpha: 0.12),
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: Icon(
+                                        isModifica
+                                            ? Icons.edit_rounded
+                                            : Icons.add_circle_outline_rounded,
+                                        color: colorScheme.primary,
+                                        size: 20.0,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10.0),
+                                    Text(
+                                      isModifica
+                                          ? 'Modifica Ingrediente'
+                                          : 'Nuovo Ingrediente',
+                                      style:
+                                          theme.textTheme.titleMedium?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18.0,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.close_rounded),
+                                  onPressed: () => Navigator.pop(sheetContext),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 20.0),
+
+                            // Nome ingrediente
+                            TextFormField(
+                              controller: nomeController,
+                              autofocus: !isModifica,
+                              textCapitalization: TextCapitalization.sentences,
                               decoration: InputDecoration(
-                                labelText: 'Unità',
-                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(14.0)),
+                                labelText: 'Nome ingrediente *',
+                                hintText:
+                                    'Es. Mozzarella di bufala, Salsiccia, Farina',
+                                prefixIcon: Icon(Icons.restaurant_menu_rounded,
+                                    color: colorScheme.primary),
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(14.0)),
                               ),
-                              items: unitaDisponibili
-                                  .map((u) => DropdownMenuItem(value: u, child: Text(u)))
-                                  .toList(),
-                              onChanged: (val) {
-                                if (val != null) {
-                                  setDialogState(() => unitaSelezionata = val);
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Inserisci il nome dell\'ingrediente';
                                 }
+                                return null;
                               },
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 14.0),
+                            const SizedBox(height: 14.0),
 
-                      // Soglia minima di avviso (opzionale)
-                      TextFormField(
-                        controller: sogliaController,
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        decoration: InputDecoration(
-                          labelText: 'Soglia minima di scorta (opzionale)',
-                          hintText: 'Quantità sotto cui segnalare che sta per finire',
-                          prefixIcon: const Icon(Icons.warning_amber_rounded, color: Color(0xFFF59E0B)),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14.0)),
-                        ),
-                      ),
-                      const SizedBox(height: 14.0),
-
-                      // Prezzo aggiunta per il cliente (€ opzionale)
-                      TextFormField(
-                        controller: prezzoController,
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        decoration: InputDecoration(
-                          labelText: 'Prezzo aggiunta cliente (€ opzionale)',
-                          hintText: 'Es. 1.50 (costo se il cliente aggiunge questo ingrediente)',
-                          prefixIcon: Icon(Icons.euro_rounded, color: colorScheme.primary),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14.0)),
-                        ),
-                      ),
-                      const SizedBox(height: 16.0),
-
-                      // Switch: In esaurimento
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8.0),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF59E0B).withValues(alpha: 0.08),
-                          borderRadius: BorderRadius.circular(14.0),
-                          border: Border.all(
-                            color: const Color(0xFFF59E0B).withValues(alpha: 0.25),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.hourglass_bottom_rounded, color: Color(0xFFF59E0B), size: 22.0),
-                            const SizedBox(width: 12.0),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Sta per finire',
-                                    style: theme.textTheme.titleSmall?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: const Color(0xFFD97706),
+                            // Quantità e unità di misura
+                            Row(
+                              children: [
+                                Expanded(
+                                  flex: 3,
+                                  child: TextFormField(
+                                    controller: quantitaController,
+                                    keyboardType:
+                                        const TextInputType.numberWithOptions(
+                                            decimal: true),
+                                    decoration: InputDecoration(
+                                      labelText: 'Quantità (opzionale)',
+                                      hintText: 'Es. 5',
+                                      prefixIcon: Icon(Icons.scale_rounded,
+                                          color: colorScheme.primary),
+                                      border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(14.0)),
                                     ),
                                   ),
-                                  Text(
-                                    'Segnala questo ingrediente in esaurimento nella tua dispensa.',
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: theme.hintColor,
-                                      fontSize: 11.5,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Switch(
-                              value: staPerFinire,
-                              activeThumbColor: const Color(0xFFF59E0B),
-                              activeTrackColor: const Color(0xFFF59E0B).withValues(alpha: 0.5),
-                              onChanged: (val) {
-                                setDialogState(() {
-                                  staPerFinire = val;
-                                  if (val) esaurito = false;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 10.0),
-
-                      // Switch: Esaurito / Finito
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8.0),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFEF4444).withValues(alpha: 0.08),
-                          borderRadius: BorderRadius.circular(14.0),
-                          border: Border.all(
-                            color: const Color(0xFFEF4444).withValues(alpha: 0.25),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.block_rounded, color: Color(0xFFEF4444), size: 22.0),
-                            const SizedBox(width: 12.0),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Ingrediente finito (Esaurito)',
-                                    style: theme.textTheme.titleSmall?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: const Color(0xFFDC2626),
-                                    ),
-                                  ),
-                                  Text(
-                                    'Nel menu cliente i piatti con questo ingrediente lo mostreranno sbarrato.',
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: theme.hintColor,
-                                      fontSize: 11.5,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Switch(
-                              value: esaurito,
-                              activeThumbColor: const Color(0xFFEF4444),
-                              activeTrackColor: const Color(0xFFEF4444).withValues(alpha: 0.5),
-                              onChanged: (val) {
-                                setDialogState(() {
-                                  esaurito = val;
-                                  if (val) staPerFinire = false;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 22.0),
-
-                      // Pulsante Salva
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: colorScheme.primary,
-                          foregroundColor: colorScheme.onPrimary,
-                          padding: const EdgeInsets.symmetric(vertical: 14.0),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.0)),
-                          elevation: 0.0,
-                        ),
-                        onPressed: isSaving ? null : () async {
-                          if (!formKey.currentState!.validate()) return;
-                          final nome = nomeController.text.trim();
-                          if (nome.isEmpty) return;
-
-                          setDialogState(() => isSaving = true);
-                          try {
-                            final qta = double.tryParse(quantitaController.text.trim()) ?? 0.0;
-                            final soglia = double.tryParse(sogliaController.text.trim()) ?? 0.0;
-                            final prezzoAggiunta = double.tryParse(
-                                    prezzoController.text.trim().replaceAll(',', '.')) ??
-                                0.0;
-
-                            // Auto calcola staPerFinire se la quantità è <= soglia e soglia > 0
-                            final isCritico = (soglia > 0 && qta > 0 && qta <= soglia) || staPerFinire;
-
-                            if (isModifica) {
-                              await record.reference.update(createDispensaRecordData(
-                                nome: nome,
-                                quantita: qta,
-                                unitaMisura: unitaSelezionata,
-                                sogliaMinima: soglia,
-                                esaurito: esaurito,
-                                staPerFinire: isCritico,
-                                prezzo: prezzoAggiunta,
-                                dataAggiornamento: DateTime.now(),
-                              ));
-                            } else {
-                              await DispensaRecord.collection.add(createDispensaRecordData(
-                                nome: nome,
-                                quantita: qta,
-                                unitaMisura: unitaSelezionata,
-                                sogliaMinima: soglia,
-                                esaurito: esaurito,
-                                staPerFinire: isCritico,
-                                prezzo: prezzoAggiunta,
-                                proprietario: _targetRistoranteRef,
-                                dataAggiornamento: DateTime.now(),
-                              ));
-                            }
-
-                            if (sheetContext.mounted) {
-                              Navigator.pop(sheetContext);
-                            }
-                            if (!mounted) return;
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  isModifica
-                                      ? 'Ingrediente "$nome" aggiornato!'
-                                      : 'Ingrediente "$nome" aggiunto alla dispensa!',
                                 ),
-                                backgroundColor: const Color(0xFF10B981),
-                                duration: const Duration(seconds: 2),
+                                const SizedBox(width: 10.0),
+                                Expanded(
+                                  flex: 2,
+                                  child: DropdownButtonFormField<String>(
+                                    initialValue: unitaDisponibili
+                                            .contains(unitaSelezionata)
+                                        ? unitaSelezionata
+                                        : 'kg',
+                                    decoration: InputDecoration(
+                                      labelText: 'Unità',
+                                      border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(14.0)),
+                                    ),
+                                    items: unitaDisponibili
+                                        .map((u) => DropdownMenuItem(
+                                            value: u, child: Text(u)))
+                                        .toList(),
+                                    onChanged: (val) {
+                                      if (val != null) {
+                                        setDialogState(
+                                            () => unitaSelezionata = val);
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 14.0),
+
+                            // Soglia minima di avviso (opzionale)
+                            TextFormField(
+                              controller: sogliaController,
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                      decimal: true),
+                              decoration: InputDecoration(
+                                labelText: 'Soglia minima di scorta (opzionale)',
+                                hintText:
+                                    'Quantità sotto cui segnalare che sta per finire',
+                                prefixIcon: const Icon(
+                                    Icons.warning_amber_rounded,
+                                    color: Color(0xFFF59E0B)),
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(14.0)),
                               ),
-                            );
-                          } catch (e) {
-                            setDialogState(() => isSaving = false);
-                            if (!context.mounted) return;
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Errore durante il salvataggio: $e'),
-                                backgroundColor: colorScheme.error,
-                                duration: const Duration(seconds: 4),
+                            ),
+                            const SizedBox(height: 16.0),
+
+                            // ── SEZIONE: DISPONIBILITÀ COME AGGIUNTA NEL MENÙ ──
+                            Container(
+                              padding: const EdgeInsets.all(16.0),
+                              decoration: BoxDecoration(
+                                color: disponibileComeAggiunta
+                                    ? colorScheme.primary.withValues(
+                                        alpha: isDark ? 0.12 : 0.05)
+                                    : theme.dividerColor
+                                        .withValues(alpha: 0.05),
+                                borderRadius: BorderRadius.circular(16.0),
+                                border: Border.all(
+                                  color: disponibileComeAggiunta
+                                      ? colorScheme.primary
+                                          .withValues(alpha: 0.35)
+                                      : theme.dividerColor
+                                          .withValues(alpha: 0.2),
+                                  width: disponibileComeAggiunta ? 1.5 : 1.0,
+                                ),
                               ),
-                            );
-                          }
-                        },
-                        child: isSaving
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        width: 38.0,
+                                        height: 38.0,
+                                        decoration: BoxDecoration(
+                                          color: (disponibileComeAggiunta
+                                                  ? colorScheme.primary
+                                                  : theme.hintColor)
+                                              .withValues(alpha: 0.12),
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: Icon(
+                                          Icons.add_shopping_cart_rounded,
+                                          color: disponibileComeAggiunta
+                                              ? colorScheme.primary
+                                              : theme.hintColor,
+                                          size: 20.0,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12.0),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Disponibile come Aggiunta nel Menù',
+                                              style: theme.textTheme.titleSmall
+                                                  ?.copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                color: disponibileComeAggiunta
+                                                    ? colorScheme.primary
+                                                    : null,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 2.0),
+                                            Text(
+                                              'Permetti ai clienti di aggiungere questo ingrediente ai piatti ordinabili.',
+                                              style: theme.textTheme.bodySmall
+                                                  ?.copyWith(
+                                                color: theme.hintColor,
+                                                fontSize: 11.5,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Switch(
+                                        value: disponibileComeAggiunta,
+                                        activeThumbColor: colorScheme.primary,
+                                        onChanged: (val) {
+                                          setDialogState(() {
+                                            disponibileComeAggiunta = val;
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  ),
+
+                                  if (disponibileComeAggiunta) ...[
+                                    const SizedBox(height: 14.0),
+                                    Divider(
+                                      height: 1.0,
+                                      color: colorScheme.primary
+                                          .withValues(alpha: 0.2),
+                                    ),
+                                    const SizedBox(height: 14.0),
+
+                                    // Prezzo aggiunta cliente
+                                    TextFormField(
+                                      controller: prezzoController,
+                                      keyboardType:
+                                          const TextInputType.numberWithOptions(
+                                              decimal: true),
+                                      decoration: InputDecoration(
+                                        labelText:
+                                            'Prezzo aggiunta per il cliente (€)',
+                                        hintText:
+                                            'Es. 1.50 (lascia vuoto o 0.00 se gratuita)',
+                                        prefixIcon: Icon(Icons.euro_rounded,
+                                            color: colorScheme.primary),
+                                        border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12.0)),
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                horizontal: 14.0,
+                                                vertical: 12.0),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16.0),
+
+                                    // Selezione categorie compatibili
+                                    Text(
+                                      'In quali categorie di piatti è aggiungibile?',
+                                      style:
+                                          theme.textTheme.labelMedium?.copyWith(
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8.0),
+
+                                    // Switch: Tutto il menu vs Categorie specifiche
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: InkWell(
+                                            onTap: () {
+                                              setDialogState(() {
+                                                tutteLeCategorie = true;
+                                              });
+                                            },
+                                            borderRadius:
+                                                BorderRadius.circular(10.0),
+                                            child: Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 9.0,
+                                                      horizontal: 8.0),
+                                              decoration: BoxDecoration(
+                                                color: tutteLeCategorie
+                                                    ? colorScheme.primary
+                                                    : theme.cardColor,
+                                                borderRadius:
+                                                    BorderRadius.circular(10.0),
+                                                border: Border.all(
+                                                  color: tutteLeCategorie
+                                                      ? colorScheme.primary
+                                                      : theme.dividerColor
+                                                          .withValues(
+                                                              alpha: 0.25),
+                                                ),
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  'Tutto il Menù',
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 12.5,
+                                                    color: tutteLeCategorie
+                                                        ? colorScheme.onPrimary
+                                                        : colorScheme.onSurface,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8.0),
+                                        Expanded(
+                                          child: InkWell(
+                                            onTap: () {
+                                              setDialogState(() {
+                                                tutteLeCategorie = false;
+                                              });
+                                            },
+                                            borderRadius:
+                                                BorderRadius.circular(10.0),
+                                            child: Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 9.0,
+                                                      horizontal: 8.0),
+                                              decoration: BoxDecoration(
+                                                color: !tutteLeCategorie
+                                                    ? colorScheme.primary
+                                                    : theme.cardColor,
+                                                borderRadius:
+                                                    BorderRadius.circular(10.0),
+                                                border: Border.all(
+                                                  color: !tutteLeCategorie
+                                                      ? colorScheme.primary
+                                                      : theme.dividerColor
+                                                          .withValues(
+                                                              alpha: 0.25),
+                                                ),
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  'Categorie Specifiche',
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 12.5,
+                                                    color: !tutteLeCategorie
+                                                        ? colorScheme.onPrimary
+                                                        : colorScheme.onSurface,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+
+                                    if (!tutteLeCategorie) ...[
+                                      const SizedBox(height: 12.0),
+                                      if (categoriesList.isEmpty)
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 6.0),
+                                          child: Text(
+                                            'Nessuna categoria trovata nel tuo menù.',
+                                            style: theme.textTheme.bodySmall
+                                                ?.copyWith(
+                                              color: theme.hintColor,
+                                              fontStyle: FontStyle.italic,
+                                            ),
+                                          ),
+                                        )
+                                      else ...[
+                                        Text(
+                                          'Seleziona le categorie compatibili:',
+                                          style: theme.textTheme.bodySmall
+                                              ?.copyWith(
+                                            color: theme.hintColor,
+                                            fontSize: 11.5,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8.0),
+                                        Wrap(
+                                          spacing: 8.0,
+                                          runSpacing: 8.0,
+                                          children: categoriesList.map((cat) {
+                                            final isSelected =
+                                                categorieCompatibili.contains(
+                                                        cat.reference.id) ||
+                                                    categorieCompatibili
+                                                        .contains(cat.name);
+                                            return FilterChip(
+                                              selected: isSelected,
+                                              label: Text(cat.name),
+                                              avatar: Icon(
+                                                isSelected
+                                                    ? Icons.check_circle_rounded
+                                                    : Icons.category_rounded,
+                                                size: 15.0,
+                                                color: isSelected
+                                                    ? colorScheme.primary
+                                                    : theme.hintColor,
+                                              ),
+                                              backgroundColor: theme.cardColor,
+                                              selectedColor: colorScheme.primary
+                                                  .withValues(alpha: 0.15),
+                                              checkmarkColor:
+                                                  colorScheme.primary,
+                                              labelStyle: TextStyle(
+                                                fontSize: 12.0,
+                                                fontWeight: isSelected
+                                                    ? FontWeight.bold
+                                                    : FontWeight.w500,
+                                                color: isSelected
+                                                    ? colorScheme.primary
+                                                    : colorScheme.onSurface,
+                                              ),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(10.0),
+                                                side: BorderSide(
+                                                  color: isSelected
+                                                      ? colorScheme.primary
+                                                      : theme.dividerColor
+                                                          .withValues(
+                                                              alpha: 0.3),
+                                                ),
+                                              ),
+                                              onSelected: (selected) {
+                                                setDialogState(() {
+                                                  if (selected) {
+                                                    if (!categorieCompatibili
+                                                        .contains(cat
+                                                            .reference.id)) {
+                                                      categorieCompatibili.add(
+                                                          cat.reference.id);
+                                                    }
+                                                    if (!categorieCompatibili
+                                                        .contains(cat.name)) {
+                                                      categorieCompatibili
+                                                          .add(cat.name);
+                                                    }
+                                                  } else {
+                                                    categorieCompatibili.remove(
+                                                        cat.reference.id);
+                                                    categorieCompatibili
+                                                        .remove(cat.name);
+                                                  }
+                                                });
+                                              },
+                                            );
+                                          }).toList(),
+                                        ),
+                                        if (categorieCompatibili.isEmpty)
+                                          const Padding(
+                                            padding: EdgeInsets.only(top: 8.0),
+                                            child: Row(
+                                              children: [
+                                                Icon(
+                                                    Icons.info_outline_rounded,
+                                                    size: 14.0,
+                                                    color: Color(0xFFF59E0B)),
+                                                SizedBox(width: 4.0),
+                                                Text(
+                                                  'Seleziona almeno una categoria per quest\'ingrediente.',
+                                                  style: TextStyle(
+                                                    fontSize: 11.0,
+                                                    color: Color(0xFFD97706),
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                      ],
+                                    ],
+                                  ] else ...[
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.inventory_2_outlined,
+                                              size: 14.0,
+                                              color: theme.hintColor),
+                                          const SizedBox(width: 6.0),
+                                          Expanded(
+                                            child: Text(
+                                              'Uso interno magazzino / cucina (non apparirà come aggiunta per i clienti).',
+                                              style: theme.textTheme.bodySmall
+                                                  ?.copyWith(
+                                                color: theme.hintColor,
+                                                fontSize: 11.5,
+                                                fontStyle: FontStyle.italic,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 14.0),
+
+                            // Switch: In esaurimento
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 14.0, vertical: 8.0),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF59E0B)
+                                    .withValues(alpha: 0.08),
+                                borderRadius: BorderRadius.circular(14.0),
+                                border: Border.all(
+                                  color: const Color(0xFFF59E0B)
+                                      .withValues(alpha: 0.25),
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.hourglass_bottom_rounded,
+                                      color: Color(0xFFF59E0B), size: 22.0),
+                                  const SizedBox(width: 12.0),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Sta per finire',
+                                          style: theme.textTheme.titleSmall
+                                              ?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color: const Color(0xFFD97706),
+                                          ),
+                                        ),
+                                        Text(
+                                          'Segnala questo ingrediente in esaurimento nella tua dispensa.',
+                                          style:
+                                              theme.textTheme.bodySmall?.copyWith(
+                                            color: theme.hintColor,
+                                            fontSize: 11.5,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Switch(
+                                    value: staPerFinire,
+                                    activeThumbColor: const Color(0xFFF59E0B),
+                                    activeTrackColor: const Color(0xFFF59E0B)
+                                        .withValues(alpha: 0.5),
+                                    onChanged: (val) {
+                                      setDialogState(() {
+                                        staPerFinire = val;
+                                        if (val) esaurito = false;
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 10.0),
+
+                            // Switch: Esaurito / Finito
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 14.0, vertical: 8.0),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFEF4444)
+                                    .withValues(alpha: 0.08),
+                                borderRadius: BorderRadius.circular(14.0),
+                                border: Border.all(
+                                  color: const Color(0xFFEF4444)
+                                      .withValues(alpha: 0.25),
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.block_rounded,
+                                      color: Color(0xFFEF4444), size: 22.0),
+                                  const SizedBox(width: 12.0),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Ingrediente finito (Esaurito)',
+                                          style: theme.textTheme.titleSmall
+                                              ?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color: const Color(0xFFDC2626),
+                                          ),
+                                        ),
+                                        Text(
+                                          'Nel menu cliente i piatti con questo ingrediente lo mostreranno sbarrato.',
+                                          style:
+                                              theme.textTheme.bodySmall?.copyWith(
+                                            color: theme.hintColor,
+                                            fontSize: 11.5,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Switch(
+                                    value: esaurito,
+                                    activeThumbColor: const Color(0xFFEF4444),
+                                    activeTrackColor: const Color(0xFFEF4444)
+                                        .withValues(alpha: 0.5),
+                                    onChanged: (val) {
+                                      setDialogState(() {
+                                        esaurito = val;
+                                        if (val) staPerFinire = false;
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 22.0),
+
+                            // Pulsante Salva
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: colorScheme.primary,
+                                foregroundColor: colorScheme.onPrimary,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 14.0),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14.0)),
+                                elevation: 0.0,
+                              ),
+                              onPressed: isSaving
+                                  ? null
+                                  : () async {
+                                      if (!formKey.currentState!.validate()) {
+                                        return;
+                                      }
+                                      final nome = nomeController.text.trim();
+                                      if (nome.isEmpty) return;
+
+                                      setDialogState(() => isSaving = true);
+                                      try {
+                                        final qta = double.tryParse(
+                                                quantitaController.text
+                                                    .trim()) ??
+                                            0.0;
+                                        final soglia = double.tryParse(
+                                                sogliaController.text.trim()) ??
+                                            0.0;
+                                        final prezzoAggiunta =
+                                            disponibileComeAggiunta
+                                                ? (double.tryParse(
+                                                        prezzoController.text
+                                                            .trim()
+                                                            .replaceAll(
+                                                                ',', '.')) ??
+                                                    0.0)
+                                                : 0.0;
+
+                                        final bool isTutteLeCat =
+                                            !disponibileComeAggiunta ||
+                                                tutteLeCategorie;
+                                        final List<String> catsToSave =
+                                            isTutteLeCat
+                                                ? []
+                                                : categorieCompatibili;
+
+                                        // Auto calcola staPerFinire se la quantità è <= soglia e soglia > 0
+                                        final isCritico = (soglia > 0 &&
+                                                qta > 0 &&
+                                                qta <= soglia) ||
+                                            staPerFinire;
+
+                                        if (isModifica) {
+                                          await record.reference.update(
+                                              createDispensaRecordData(
+                                            nome: nome,
+                                            quantita: qta,
+                                            unitaMisura: unitaSelezionata,
+                                            sogliaMinima: soglia,
+                                            esaurito: esaurito,
+                                            staPerFinire: isCritico,
+                                            prezzo: prezzoAggiunta,
+                                            disponibileComeAggiunta:
+                                                disponibileComeAggiunta,
+                                            tutteLeCategorie: isTutteLeCat,
+                                            categorieCompatibili: catsToSave,
+                                            dataAggiornamento: DateTime.now(),
+                                          ));
+                                        } else {
+                                          await DispensaRecord.collection.add(
+                                              createDispensaRecordData(
+                                            nome: nome,
+                                            quantita: qta,
+                                            unitaMisura: unitaSelezionata,
+                                            sogliaMinima: soglia,
+                                            esaurito: esaurito,
+                                            staPerFinire: isCritico,
+                                            prezzo: prezzoAggiunta,
+                                            disponibileComeAggiunta:
+                                                disponibileComeAggiunta,
+                                            tutteLeCategorie: isTutteLeCat,
+                                            categorieCompatibili: catsToSave,
+                                            proprietario: _targetRistoranteRef,
+                                            dataAggiornamento: DateTime.now(),
+                                          ));
+                                        }
+
+                                        if (sheetContext.mounted) {
+                                          Navigator.pop(sheetContext);
+                                        }
+                                        if (!mounted) return;
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              isModifica
+                                                  ? 'Ingrediente "$nome" aggiornato!'
+                                                  : 'Ingrediente "$nome" aggiunto alla dispensa!',
+                                            ),
+                                            backgroundColor:
+                                                const Color(0xFF10B981),
+                                            duration:
+                                                const Duration(seconds: 2),
+                                          ),
+                                        );
+                                      } catch (e) {
+                                        setDialogState(() => isSaving = false);
+                                        if (!context.mounted) return;
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                                'Errore durante il salvataggio: $e'),
+                                            backgroundColor: colorScheme.error,
+                                            duration:
+                                                const Duration(seconds: 4),
+                                          ),
+                                        );
+                                      }
+                                    },
+                              child: isSaving
                             ? const SizedBox(
                                 width: 22.0,
                                 height: 22.0,
@@ -460,12 +940,14 @@ class _GestioneDispensaWidgetState extends State<GestioneDispensaWidget> {
                 ),
               ),
             ),
-          );
-        },
+          ),
+        ),
       );
-      },
-    );
-  }
+    },
+  );
+},
+);
+}
 
   void _eliminaIngrediente(DispensaRecord record) async {
     final theme = Theme.of(context);
@@ -801,7 +1283,7 @@ class _GestioneDispensaWidgetState extends State<GestioneDispensaWidget> {
                                           padding: const EdgeInsets.fromLTRB(16.0, 4.0, 16.0, 24.0),
                                           gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                                             maxCrossAxisExtent: 460.0,
-                                            mainAxisExtent: 110.0,
+                                            mainAxisExtent: 120.0,
                                             crossAxisSpacing: 12.0,
                                             mainAxisSpacing: 12.0,
                                           ),
@@ -1064,22 +1546,85 @@ class _GestioneDispensaWidgetState extends State<GestioneDispensaWidget> {
                             ],
                           ),
                         ),
-                        if (item.prezzo > 0)
+                        if (item.disponibileComeAggiunta) ...[
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 7.0, vertical: 2.5),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 7.0, vertical: 2.5),
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                              color: const Color(0xFF10B981)
+                                  .withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(12.0),
-                            ),
-                            child: Text(
-                              '+€${item.prezzo % 1 == 0 ? item.prezzo.toInt().toString() : item.prezzo.toStringAsFixed(2)}',
-                              style: TextStyle(
-                                color: theme.colorScheme.primary,
-                                fontSize: 11.0,
-                                fontWeight: FontWeight.bold,
+                              border: Border.all(
+                                color: const Color(0xFF10B981)
+                                    .withValues(alpha: 0.3),
+                                width: 0.8,
                               ),
                             ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.add_shopping_cart_rounded,
+                                    size: 11.0, color: Color(0xFF059669)),
+                                const SizedBox(width: 3.5),
+                                Text(
+                                  item.prezzo > 0
+                                      ? 'Aggiunta (+€${item.prezzo % 1 == 0 ? item.prezzo.toInt().toString() : item.prezzo.toStringAsFixed(2)})'
+                                      : 'Aggiunta (gratis)',
+                                  style: const TextStyle(
+                                    color: Color(0xFF059669),
+                                    fontSize: 10.5,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
+                          if (!item.tutteLeCategorie &&
+                              item.categorieCompatibili.isNotEmpty)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6.0, vertical: 2.5),
+                              decoration: BoxDecoration(
+                                color:
+                                    theme.dividerColor.withValues(alpha: 0.08),
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+                              child: Text(
+                                'Cat. specifiche',
+                                style: TextStyle(
+                                  color: theme.hintColor,
+                                  fontSize: 10.0,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                        ] else ...[
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6.5, vertical: 2.5),
+                            decoration: BoxDecoration(
+                              color:
+                                  theme.dividerColor.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.inventory_2_outlined,
+                                    size: 10.5, color: theme.hintColor),
+                                const SizedBox(width: 3.0),
+                                Text(
+                                  'Solo magazzino',
+                                  style: TextStyle(
+                                    color: theme.hintColor,
+                                    fontSize: 10.0,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ],

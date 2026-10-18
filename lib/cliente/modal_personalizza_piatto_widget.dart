@@ -145,19 +145,22 @@ class _ModalPersonalizzaPiattoWidgetState
 
     final totalePiatto = _totaleCalcolato;
 
-    return Container(
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.sizeOf(context).height * 0.85,
-      ),
-      decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(24.0),
-          topRight: Radius.circular(24.0),
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: 620.0,
+          maxHeight: MediaQuery.sizeOf(context).height * 0.88,
         ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+        child: Container(
+          decoration: BoxDecoration(
+            color: theme.cardColor,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(24.0),
+              topRight: Radius.circular(24.0),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
         children: [
           // ── Handle di trascinamento ───────────────────────────────
           Center(
@@ -395,7 +398,25 @@ class _ModalPersonalizzaPiattoWidgetState
                           );
                         }
 
-                        final items = snapshot.data!;
+                        final allItems = snapshot.data!;
+                        // Filtra solo gli ingredienti configurati come aggiunta per i clienti
+                        // e compatibili con la categoria di questo specifico piatto
+                        final items = allItems.where((it) {
+                          // 1. Deve essere contrassegnato come aggiunta nel menu
+                          if (!it.disponibileComeAggiunta) return false;
+                          // 2. Non deve essere esaurito
+                          if (it.esaurito) return false;
+                          // 3. Se vale per tutto il menù o non ha categorie impostate, è compatibile
+                          if (it.tutteLeCategorie ||
+                              it.categorieCompatibili.isEmpty) {
+                            return true;
+                          }
+                          // 4. Verifica che la categoria del piatto (ID o Nome) sia tra quelle compatibili
+                          final piattoCat = widget.piatto.categoria.trim();
+                          return piattoCat.isEmpty ||
+                              it.categorieCompatibili.contains(piattoCat);
+                        }).toList();
+
                         if (items.isEmpty) {
                           return Container(
                             width: double.infinity,
@@ -874,6 +895,8 @@ class _ModalPersonalizzaPiattoWidgetState
           ),
         ],
       ),
+    ),
+    ),
     );
   }
 }

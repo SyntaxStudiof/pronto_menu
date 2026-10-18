@@ -66,6 +66,21 @@ class DispensaRecord extends FirestoreRecord {
   double get prezzo => _prezzo ?? 0.0;
   bool hasPrezzo() => _prezzo != null;
 
+  // "disponibile_come_aggiunta" field (true se ordinabile dal cliente come extra)
+  bool? _disponibileComeAggiunta;
+  bool get disponibileComeAggiunta => _disponibileComeAggiunta ?? false;
+  bool hasDisponibileComeAggiunta() => _disponibileComeAggiunta != null;
+
+  // "tutte_le_categorie" field (true se l'aggiunta vale per tutte le categorie del menu)
+  bool? _tutteLeCategorie;
+  bool get tutteLeCategorie => _tutteLeCategorie ?? true;
+  bool hasTutteLeCategorie() => _tutteLeCategorie != null;
+
+  // "categorie_compatibili" field (lista ID/nomi categorie in cui l'ingrediente è aggiungibile)
+  List<String>? _categorieCompatibili;
+  List<String> get categorieCompatibili => _categorieCompatibili ?? const [];
+  bool hasCategorieCompatibili() => _categorieCompatibili != null;
+
   void _initializeFields() {
     _nome = snapshotData['nome'] as String?;
     _quantita = castToType<double>(snapshotData['quantita']);
@@ -77,6 +92,10 @@ class DispensaRecord extends FirestoreRecord {
     _dataAggiornamento = snapshotData['data_aggiornamento'] as DateTime?;
     _note = snapshotData['note'] as String?;
     _prezzo = castToType<double>(snapshotData['prezzo']);
+    _disponibileComeAggiunta =
+        snapshotData['disponibile_come_aggiunta'] as bool?;
+    _tutteLeCategorie = snapshotData['tutte_le_categorie'] as bool?;
+    _categorieCompatibili = getDataList(snapshotData['categorie_compatibili']);
   }
 
   static CollectionReference get collection =>
@@ -124,6 +143,9 @@ Map<String, dynamic> createDispensaRecordData({
   DateTime? dataAggiornamento,
   String? note,
   double? prezzo,
+  bool? disponibileComeAggiunta,
+  bool? tutteLeCategorie,
+  List<String>? categorieCompatibili,
 }) {
   final firestoreData = mapToFirestore(
     <String, dynamic>{
@@ -137,6 +159,9 @@ Map<String, dynamic> createDispensaRecordData({
       'data_aggiornamento': dataAggiornamento,
       'note': note,
       'prezzo': prezzo,
+      'disponibile_come_aggiunta': disponibileComeAggiunta,
+      'tutte_le_categorie': tutteLeCategorie,
+      'categorie_compatibili': categorieCompatibili,
     }.withoutNulls,
   );
 
@@ -148,6 +173,7 @@ class DispensaRecordDocumentEquality implements Equality<DispensaRecord> {
 
   @override
   bool equals(DispensaRecord? e1, DispensaRecord? e2) {
+    const listEquality = ListEquality();
     return e1?.nome == e2?.nome &&
         e1?.quantita == e2?.quantita &&
         e1?.unitaMisura == e2?.unitaMisura &&
@@ -157,7 +183,10 @@ class DispensaRecordDocumentEquality implements Equality<DispensaRecord> {
         e1?.proprietario == e2?.proprietario &&
         e1?.dataAggiornamento == e2?.dataAggiornamento &&
         e1?.note == e2?.note &&
-        e1?.prezzo == e2?.prezzo;
+        e1?.prezzo == e2?.prezzo &&
+        e1?.disponibileComeAggiunta == e2?.disponibileComeAggiunta &&
+        e1?.tutteLeCategorie == e2?.tutteLeCategorie &&
+        listEquality.equals(e1?.categorieCompatibili, e2?.categorieCompatibili);
   }
 
   @override
@@ -172,6 +201,9 @@ class DispensaRecordDocumentEquality implements Equality<DispensaRecord> {
         e?.dataAggiornamento,
         e?.note,
         e?.prezzo,
+        e?.disponibileComeAggiunta,
+        e?.tutteLeCategorie,
+        e?.categorieCompatibili,
       ]);
 
   @override
