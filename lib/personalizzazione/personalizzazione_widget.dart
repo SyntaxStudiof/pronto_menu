@@ -53,6 +53,9 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
   // Trigger per animazione elastica dell'icona del piatto in anteprima
   int _dishWiggleTrigger = 0;
 
+  // Override modalità Chiaro/Scuro nel simulatore anteprima cliente desktop (null = eredita, true = dark, false = light)
+  bool? _previewDarkModeOverride;
+
   // Font disponibili per Titoli (nomi dei piatti, prezzi, intestazioni)
   final List<FontOption> _titleFontOptions = const [
     FontOption('Playfair Display', 'Serif lusso ed eleganza classica', 'Fine dining & wine'),
@@ -432,203 +435,113 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
               final isDesktop = constraints.maxWidth >= 900 || widget.embedded;
 
               if (isDesktop) {
-                return Row(
+                return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // ═════════════════════════════════════════════════════════
-                    // COLONNA SINISTRA: IMPOSTAZIONI, TAB & SALVATAGGIO (~60%)
+                    // 1. HEADER STUDIO STATS & KPI RAPIDI
+                    // ═════════════════════════════════════════════════════════
+                    _buildStudioMetricBar(
+                      context: context,
+                      themeProvider: themeProvider,
+                      currentStyle: currentStyle,
+                      primaryColor: primaryColor,
+                      isDark: isDark,
+                      colorScheme: colorScheme,
+                    ),
+
+                    // ═════════════════════════════════════════════════════════
+                    // 2. CORPO DIVISO: CONTROLLI (SX) & DEVICE STUDIO (DX)
                     // ═════════════════════════════════════════════════════════
                     Expanded(
-                      flex: 6,
-                      child: Column(
+                      child: Row(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          // Switcher principale dei Tab
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(28.0, 20.0, 28.0, 10.0),
-                            child: _buildMain3TabSwitcher(
-                              context: context,
-                              primaryColor: primaryColor,
-                              isDark: isDark,
-                            ),
-                          ),
-
-                          // Area scrollabile dei controlli
+                          // Colonna Sinistra (~55%): Tab, Controlli, Palette, Salva
                           Expanded(
-                            child: SingleChildScrollView(
-                              padding: const EdgeInsets.fromLTRB(28.0, 8.0, 28.0, 24.0),
-                              child: AnimatedSwitcher(
-                                duration: const Duration(milliseconds: 250),
-                                child: switch (_mainTab) {
-                                  0 => _buildBrandAndStyleTab(
-                                      key: const ValueKey('brand_style_tab'),
-                                      context: context,
-                                      themeProvider: themeProvider,
-                                      currentStyle: currentStyle,
-                                      primaryColor: primaryColor,
-                                      isDark: isDark,
-                                    ),
-                                  1 => _buildDishesAndBadgesTab(
-                                      key: const ValueKey('dishes_badges_tab'),
-                                      context: context,
-                                      themeProvider: themeProvider,
-                                      primaryColor: primaryColor,
-                                      isDark: isDark,
-                                    ),
-                                  _ => _buildBackgroundAndCoverTab(
-                                      key: const ValueKey('bg_cover_tab'),
-                                      context: context,
-                                      themeProvider: themeProvider,
-                                      primaryColor: primaryColor,
-                                      isDark: isDark,
-                                    ),
-                                },
-                              ),
-                            ),
-                          ),
-
-                          // Barra di pubblicazione fissa in basso
-                          _buildPublishBottomBar(
-                            context: context,
-                            themeProvider: themeProvider,
-                            primaryColor: primaryColor,
-                            isDark: isDark,
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    // Divisore verticale
-                    VerticalDivider(
-                      width: 1.0,
-                      thickness: 1.0,
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.08)
-                          : const Color(0xFFE2E8F0),
-                    ),
-
-                    // ═════════════════════════════════════════════════════════
-                    // COLONNA DESTRA: LIVE PREVIEW SEMPRE VISIBILE (~40%)
-                    // ═════════════════════════════════════════════════════════
-                    Expanded(
-                      flex: 5,
-                      child: Container(
-                        color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
-                        padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 24.0),
-                        child: Center(
-                          child: SingleChildScrollView(
-                            child: ConstrainedBox(
-                              constraints: const BoxConstraints(maxWidth: 520.0),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  // Header Card Anteprima Live
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Container(
-                                            width: 10.0,
-                                            height: 10.0,
-                                            decoration: const BoxDecoration(
-                                              color: Color(0xFF10B981),
-                                              shape: BoxShape.circle,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8.0),
-                                          Text(
-                                            'ANTEPRIMA LIVE CLIENTE',
-                                            style: TextStyle(
-                                              fontSize: 12.0,
-                                              fontWeight: FontWeight.bold,
-                                              letterSpacing: 0.8,
-                                              color: isDark
-                                                  ? Colors.white70
-                                                  : const Color(0xFF475569),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10.0, vertical: 4.0),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFF10B981)
-                                              .withValues(alpha: 0.12),
-                                          borderRadius: BorderRadius.circular(6.0),
-                                        ),
-                                        child: const Text(
-                                          'Sincronizzato in tempo reale',
-                                          style: TextStyle(
-                                            fontSize: 11.0,
-                                            fontWeight: FontWeight.w600,
-                                            color: Color(0xFF10B981),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 16.0),
-
-                                  // Preview Card integrata con forceExpanded
-                                  _buildStickyPreviewCard(
+                            flex: 6,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                // Switcher principale dei Tab
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(28.0, 8.0, 28.0, 10.0),
+                                  child: _buildMain3TabSwitcher(
                                     context: context,
-                                    themeProvider: themeProvider,
-                                    style: currentStyle,
                                     primaryColor: primaryColor,
                                     isDark: isDark,
-                                    customTheme: customTheme,
-                                    titleFont: themeProvider.titleFont,
-                                    bodyFont: themeProvider.bodyFont,
-                                    forceExpanded: true,
                                   ),
+                                ),
 
-                                  const SizedBox(height: 16.0),
-
-                                  // Box di aiuto per il ristoratore
-                                  Container(
-                                    padding: const EdgeInsets.all(14.0),
-                                    decoration: BoxDecoration(
-                                      color: isDark
-                                          ? Colors.white.withValues(alpha: 0.04)
-                                          : Colors.white,
-                                      borderRadius: BorderRadius.circular(12.0),
-                                      border: Border.all(
-                                        color: isDark
-                                            ? Colors.white.withValues(alpha: 0.08)
-                                            : const Color(0xFFE2E8F0),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          Icons.tips_and_updates_outlined,
-                                          size: 20.0,
-                                          color: colorScheme.primary,
-                                        ),
-                                        const SizedBox(width: 10.0),
-                                        Expanded(
-                                          child: Text(
-                                            'Tutte le modifiche a font, colori e layout dei piatti si aggiornano istantaneamente in questa card prima di essere pubblicate.',
-                                            style: TextStyle(
-                                              fontSize: 12.0,
-                                              height: 1.35,
-                                              color: isDark
-                                                  ? const Color(0xFF94A3B8)
-                                                  : const Color(0xFF64748B),
-                                            ),
+                                // Area scrollabile dei controlli
+                                Expanded(
+                                  child: SingleChildScrollView(
+                                    padding: const EdgeInsets.fromLTRB(28.0, 6.0, 28.0, 24.0),
+                                    child: AnimatedSwitcher(
+                                      duration: const Duration(milliseconds: 250),
+                                      child: switch (_mainTab) {
+                                        0 => _buildBrandAndStyleTab(
+                                            key: const ValueKey('brand_style_tab'),
+                                            context: context,
+                                            themeProvider: themeProvider,
+                                            currentStyle: currentStyle,
+                                            primaryColor: primaryColor,
+                                            isDark: isDark,
+                                            isDesktop: true,
                                           ),
-                                        ),
-                                      ],
+                                        1 => _buildDishesAndBadgesTab(
+                                            key: const ValueKey('dishes_badges_tab'),
+                                            context: context,
+                                            themeProvider: themeProvider,
+                                            primaryColor: primaryColor,
+                                            isDark: isDark,
+                                          ),
+                                        _ => _buildBackgroundAndCoverTab(
+                                            key: const ValueKey('bg_cover_tab'),
+                                            context: context,
+                                            themeProvider: themeProvider,
+                                            primaryColor: primaryColor,
+                                            isDark: isDark,
+                                          ),
+                                      },
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+
+                                // Barra di pubblicazione fissa in basso
+                                _buildPublishBottomBar(
+                                  context: context,
+                                  themeProvider: themeProvider,
+                                  primaryColor: primaryColor,
+                                  isDark: isDark,
+                                ),
+                              ],
                             ),
                           ),
-                        ),
+
+                          // Divisore verticale
+                          VerticalDivider(
+                            width: 1.0,
+                            thickness: 1.0,
+                            color: isDark
+                                ? Colors.white.withValues(alpha: 0.08)
+                                : const Color(0xFFE2E8F0),
+                          ),
+
+                          // Colonna Destra (~45%): Live Mobile Device Studio
+                          Expanded(
+                            flex: 5,
+                            child: _buildDesktopPhoneStudio(
+                              context: context,
+                              themeProvider: themeProvider,
+                              currentStyle: currentStyle,
+                              primaryColor: primaryColor,
+                              isDark: isDark,
+                              customTheme: customTheme,
+                              colorScheme: colorScheme,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -844,6 +757,1049 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                     color: theme.colorScheme.onSurfaceVariant,
                     fontSize: 11.5,
                   ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 1B. KPI STUDIO METRIC BAR & SMARTPHONE LIVE STUDIO (DESKTOP WORKSPACE)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  Widget _buildStudioMetricBar({
+    required BuildContext context,
+    required ThemeProvider themeProvider,
+    required AppDesignStyle currentStyle,
+    required Color primaryColor,
+    required bool isDark,
+    required ColorScheme colorScheme,
+  }) {
+    final hexCode = '#${primaryColor.toARGB32().toRadixString(16).substring(2).toUpperCase()}';
+    final layoutName = themeProvider.dishCardLayout.displayName.split(' ').first;
+    final badgeName = themeProvider.badgeStyle.displayName;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(28.0, 16.0, 28.0, 12.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: _buildStudioKpiCard(
+              title: 'Mood & Preset',
+              value: currentStyle.displayName,
+              subtitle: currentStyle.targetAudience,
+              icon: currentStyle.defaultIcon,
+              color: currentStyle.defaultPrimaryColor,
+              isDark: isDark,
+            ),
+          ),
+          const SizedBox(width: 14.0),
+          Expanded(
+            child: _buildStudioKpiCard(
+              title: 'Colore Brand',
+              value: hexCode,
+              subtitle: primaryColor.computeLuminance() > 0.4 ? 'Tonalità Chiara' : 'Tonalità Intensa',
+              icon: Icons.palette_rounded,
+              color: primaryColor,
+              isDark: isDark,
+              swatchColor: primaryColor,
+            ),
+          ),
+          const SizedBox(width: 14.0),
+          Expanded(
+            child: _buildStudioKpiCard(
+              title: 'Layout & Font',
+              value: layoutName,
+              subtitle: '${themeProvider.titleFont} • ${themeProvider.bodyFont}',
+              icon: Icons.auto_awesome_mosaic_rounded,
+              color: const Color(0xFF3B82F6),
+              isDark: isDark,
+            ),
+          ),
+          const SizedBox(width: 14.0),
+          Expanded(
+            child: _buildStudioKpiCard(
+              title: 'Badge & Menù Live',
+              value: badgeName,
+              subtitle: 'Sincronizzato sul QR',
+              icon: Icons.verified_rounded,
+              color: const Color(0xFF10B981),
+              isDark: isDark,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStudioKpiCard({
+    required String title,
+    required String value,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+    required bool isDark,
+    Color? swatchColor,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 13.0),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        borderRadius: BorderRadius.circular(14.0),
+        border: Border.all(
+          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+          width: 1.0,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.03),
+            blurRadius: 8.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 42.0,
+            height: 42.0,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(12.0),
+            ),
+            child: Center(
+              child: swatchColor != null
+                  ? Container(
+                      width: 20.0,
+                      height: 20.0,
+                      decoration: BoxDecoration(
+                        color: swatchColor,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isDark ? Colors.white30 : Colors.black12,
+                          width: 1.5,
+                        ),
+                      ),
+                    )
+                  : Icon(icon, color: color, size: 21.0),
+            ),
+          ),
+          const SizedBox(width: 12.0),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                  ),
+                ),
+                const SizedBox(height: 2.0),
+                Text(
+                  value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 15.5,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.3,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  ),
+                ),
+                const SizedBox(height: 1.5),
+                Text(
+                  subtitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDesktopPhoneStudio({
+    required BuildContext context,
+    required ThemeProvider themeProvider,
+    required AppDesignStyle currentStyle,
+    required Color primaryColor,
+    required bool isDark,
+    required AppCustomTheme? customTheme,
+    required ColorScheme colorScheme,
+  }) {
+    final clientDark = _previewDarkModeOverride ?? isDark;
+    final resolvedBanner = PersonalizzazionePresets.resolveBannerUrl(themeProvider.coverBanner);
+    final hasTexture = themeProvider.backgroundTexture != BackgroundTexture.nessuna;
+    final textureDecoration = PersonalizzazionePresets.getTextureDecoration(
+      texture: themeProvider.backgroundTexture,
+      isDark: clientDark,
+      theme: Theme.of(context),
+    );
+    final restaurantName = currentUserDocument?.displayName.isNotEmpty == true
+        ? currentUserDocument!.displayName
+        : 'Pizzeria Pantesca';
+    final dishLayout = themeProvider.dishCardLayout;
+    final badgeStyle = themeProvider.badgeStyle;
+    final titleFont = themeProvider.titleFont;
+    final bodyFont = themeProvider.bodyFont;
+
+    return Container(
+      color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+      padding: const EdgeInsets.fromLTRB(24.0, 8.0, 28.0, 20.0),
+      child: Column(
+        children: [
+          // ── 1. Studio Toolbar Superiore ───────────────────────────────────
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8.0),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1E293B) : Colors.white,
+              borderRadius: BorderRadius.circular(14.0),
+              border: Border.all(
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
+                  blurRadius: 8.0,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                // Live Dot + Label
+                Container(
+                  width: 8.0,
+                  height: 8.0,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF10B981),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF10B981).withValues(alpha: 0.6),
+                        blurRadius: 6.0,
+                        spreadRadius: 1.5,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8.0),
+                Text(
+                  'STUDIO ANTEPRIMA MENÙ',
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.6,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  ),
+                ),
+                const SizedBox(width: 8.0),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF10B981).withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(6.0),
+                  ),
+                  child: const Text(
+                    'Live Sync',
+                    style: TextStyle(
+                      fontSize: 10.0,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF10B981),
+                    ),
+                  ),
+                ),
+                const Spacer(),
+                // Selettore Tema Menù Cliente (Chiaro / Scuro)
+                Container(
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  padding: const EdgeInsets.all(2.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      InkWell(
+                        onTap: () => setState(() => _previewDarkModeOverride = false),
+                        borderRadius: BorderRadius.circular(6.0),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 3.5),
+                          decoration: BoxDecoration(
+                            color: !clientDark
+                                ? (isDark ? const Color(0xFF334155) : Colors.white)
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(6.0),
+                            boxShadow: !clientDark
+                                ? [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(alpha: 0.08),
+                                      blurRadius: 4.0,
+                                    )
+                                  ]
+                                : null,
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.light_mode_rounded,
+                                size: 13.0,
+                                color: !clientDark ? const Color(0xFFF59E0B) : const Color(0xFF94A3B8),
+                              ),
+                              const SizedBox(width: 4.0),
+                              Text(
+                                'Chiaro',
+                                style: TextStyle(
+                                  fontSize: 11.0,
+                                  fontWeight: FontWeight.w600,
+                                  color: !clientDark
+                                      ? (isDark ? Colors.white : const Color(0xFF0F172A))
+                                      : const Color(0xFF94A3B8),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () => setState(() => _previewDarkModeOverride = true),
+                        borderRadius: BorderRadius.circular(6.0),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 3.5),
+                          decoration: BoxDecoration(
+                            color: clientDark
+                                ? (isDark ? const Color(0xFF334155) : Colors.white)
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(6.0),
+                            boxShadow: clientDark
+                                ? [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(alpha: 0.08),
+                                      blurRadius: 4.0,
+                                    )
+                                  ]
+                                : null,
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.dark_mode_rounded,
+                                size: 13.0,
+                                color: clientDark ? const Color(0xFF818CF8) : const Color(0xFF94A3B8),
+                              ),
+                              const SizedBox(width: 4.0),
+                              Text(
+                                'Scuro',
+                                style: TextStyle(
+                                  fontSize: 11.0,
+                                  fontWeight: FontWeight.w600,
+                                  color: clientDark
+                                      ? (isDark ? Colors.white : const Color(0xFF0F172A))
+                                      : const Color(0xFF94A3B8),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8.0),
+                // Tasto fullscreen simulatore
+                Tooltip(
+                  message: 'Apri Simulatore a Schermo Intero',
+                  child: InkWell(
+                    onTap: () => _openSimulator(context, themeProvider),
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: Container(
+                      padding: const EdgeInsets.all(6.0),
+                      decoration: BoxDecoration(
+                        color: colorScheme.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: Icon(Icons.fullscreen_rounded, size: 18.0, color: colorScheme.primary),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 12.0),
+
+          // ── 2. Mockup Smartphone Interattivo ──────────────────────────────
+          Expanded(
+            child: Center(
+              child: Container(
+                width: 375.0,
+                decoration: BoxDecoration(
+                  color: clientDark ? const Color(0xFF0B1120) : const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(38.0),
+                  border: Border.all(
+                    color: isDark ? const Color(0xFF334155) : const Color(0xFF94A3B8),
+                    width: 7.0,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: isDark ? 0.6 : 0.16),
+                      blurRadius: 26.0,
+                      spreadRadius: 2.0,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(31.0),
+                  child: Container(
+                    decoration: hasTexture
+                        ? textureDecoration
+                        : BoxDecoration(
+                            color: clientDark ? const Color(0xFF0F172A) : const Color(0xFFFFFFFF),
+                          ),
+                    child: Column(
+                      children: [
+                        // A. Barra di Stato & Dynamic Island
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 6.0),
+                          color: clientDark ? Colors.black.withValues(alpha: 0.6) : Colors.black.withValues(alpha: 0.05),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                '12:30',
+                                style: TextStyle(
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.bold,
+                                  color: clientDark ? Colors.white : Colors.black87,
+                                ),
+                              ),
+                              // Dynamic Island
+                              Container(
+                                width: 80.0,
+                                height: 16.0,
+                                decoration: BoxDecoration(
+                                  color: Colors.black,
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  Icon(Icons.wifi_rounded, size: 13.0, color: clientDark ? Colors.white : Colors.black87),
+                                  const SizedBox(width: 4.0),
+                                  Icon(Icons.battery_full_rounded, size: 14.0, color: clientDark ? Colors.white : Colors.black87),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // B. Schermo scorrevole del menù cliente
+                        Expanded(
+                          child: SingleChildScrollView(
+                            padding: const EdgeInsets.fromLTRB(12.0, 8.0, 12.0, 12.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                // Cover Banner & Info Ristorante
+                                _buildMockupRestaurantHeader(
+                                  bannerUrl: resolvedBanner,
+                                  restaurantName: restaurantName,
+                                  titleFont: titleFont,
+                                  primaryColor: primaryColor,
+                                  clientDark: clientDark,
+                                ),
+
+                                const SizedBox(height: 10.0),
+
+                                // Categorie a Scorrimento
+                                _buildMockupCategories(
+                                  primaryColor: primaryColor,
+                                  titleFont: titleFont,
+                                  clientDark: clientDark,
+                                ),
+
+                                const SizedBox(height: 12.0),
+
+                                // Piatto 1: Pizza Margherita (reattivo a dishCardLayout e badgeStyle)
+                                _buildMockupDishCard(
+                                  context: context,
+                                  name: 'Pizza Margherita DOP',
+                                  description: 'Pomodoro San Marzano DOP, mozzarella di bufala campana, basilico fresco, olio EVO',
+                                  price: '€ 8,50',
+                                  badgeLabel: 'CONSIGLIATO',
+                                  imageUrl: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=400&q=80',
+                                  layout: dishLayout,
+                                  badgeStyle: badgeStyle,
+                                  style: currentStyle,
+                                  primaryColor: primaryColor,
+                                  titleFont: titleFont,
+                                  bodyFont: bodyFont,
+                                  clientDark: clientDark,
+                                ),
+
+                                const SizedBox(height: 9.0),
+
+                                // Piatto 2: Pizza Vesuvio Piccante
+                                _buildMockupDishCard(
+                                  context: context,
+                                  name: 'Pizza Vesuvio Piccante',
+                                  description: 'Salame piccante di Spilinga, fiordilatte, \'nduja calabrese, peperoncino fresco',
+                                  price: '€ 10,50',
+                                  badgeLabel: 'PICCANTE 🌶️',
+                                  imageUrl: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=400&q=80',
+                                  layout: dishLayout,
+                                  badgeStyle: badgeStyle,
+                                  style: currentStyle,
+                                  primaryColor: primaryColor,
+                                  titleFont: titleFont,
+                                  bodyFont: bodyFont,
+                                  clientDark: clientDark,
+                                ),
+
+                                const SizedBox(height: 8.0),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        // C. Barra Carrello Flottante in basso al telefono
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8.0),
+                          decoration: BoxDecoration(
+                            color: clientDark ? const Color(0xFF1E293B) : Colors.white,
+                            border: Border(
+                              top: BorderSide(
+                                color: clientDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                              ),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 8.0,
+                                    height: 8.0,
+                                    decoration: BoxDecoration(
+                                      color: primaryColor,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8.0),
+                                  Text(
+                                    '1 Piatto • € 8,50',
+                                    style: GoogleFonts.getFont(
+                                      titleFont,
+                                      textStyle: TextStyle(
+                                        fontSize: 11.5,
+                                        fontWeight: FontWeight.bold,
+                                        color: clientDark ? Colors.white : const Color(0xFF0F172A),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                                decoration: BoxDecoration(
+                                  color: primaryColor,
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.shopping_bag_outlined, size: 13.0, color: Colors.white),
+                                    const SizedBox(width: 4.0),
+                                    Text(
+                                      'Carrello',
+                                      style: GoogleFonts.getFont(
+                                        titleFont,
+                                        textStyle: const TextStyle(
+                                          fontSize: 11.0,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 10.0),
+
+          // ── 3. Box Guida & Info per il Ristoratore ─────────────────────────
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8.0),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1E293B) : Colors.white,
+              borderRadius: BorderRadius.circular(12.0),
+              border: Border.all(
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.tips_and_updates_outlined, size: 16.0, color: colorScheme.primary),
+                const SizedBox(width: 8.0),
+                Expanded(
+                  child: Text(
+                    'Tutti i cambiamenti a font, colori, badge e stile dei piatti si riflettono in tempo reale in questo simulatore prima della pubblicazione.',
+                    style: TextStyle(
+                      fontSize: 11.0,
+                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMockupRestaurantHeader({
+    required String bannerUrl,
+    required String restaurantName,
+    required String titleFont,
+    required Color primaryColor,
+    required bool clientDark,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: clientDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+        borderRadius: BorderRadius.circular(14.0),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (bannerUrl.isNotEmpty)
+            Image.network(
+              bannerUrl,
+              height: 75.0,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => Container(
+                height: 55.0,
+                color: primaryColor.withValues(alpha: 0.15),
+                child: Center(child: Icon(Icons.restaurant_rounded, color: primaryColor)),
+              ),
+            ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Container(
+                  width: 34.0,
+                  height: 34.0,
+                  decoration: BoxDecoration(
+                    color: primaryColor.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(10.0),
+                    border: Border.all(color: primaryColor.withValues(alpha: 0.3)),
+                  ),
+                  child: Center(
+                    child: Icon(Icons.restaurant_menu_rounded, color: primaryColor, size: 18.0),
+                  ),
+                ),
+                const SizedBox(width: 8.0),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        restaurantName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.getFont(
+                          titleFont,
+                          textStyle: TextStyle(
+                            fontSize: 13.0,
+                            fontWeight: FontWeight.bold,
+                            color: clientDark ? Colors.white : const Color(0xFF0F172A),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 2.0),
+                      Row(
+                        children: [
+                          const Icon(Icons.star_rounded, size: 12.0, color: Color(0xFFF59E0B)),
+                          const SizedBox(width: 3.0),
+                          Text(
+                            '4.9 • Aperto • Tavolo 4',
+                            style: TextStyle(
+                              fontSize: 10.0,
+                              color: clientDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMockupCategories({
+    required Color primaryColor,
+    required String titleFont,
+    required bool clientDark,
+  }) {
+    final categories = ['🍕 Pizze', '🥗 Antipasti', '🍺 Birre', '🍰 Dolci'];
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: categories.asMap().entries.map((entry) {
+          final isFirst = entry.key == 0;
+          return Padding(
+            padding: const EdgeInsets.only(right: 6.0),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 9.0, vertical: 4.5),
+              decoration: BoxDecoration(
+                color: isFirst
+                    ? primaryColor
+                    : (clientDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0)),
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: Text(
+                entry.value,
+                style: GoogleFonts.getFont(
+                  titleFont,
+                  textStyle: TextStyle(
+                    fontSize: 10.5,
+                    fontWeight: isFirst ? FontWeight.bold : FontWeight.w500,
+                    color: isFirst
+                        ? Colors.white
+                        : (clientDark ? const Color(0xFF94A3B8) : const Color(0xFF475569)),
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildMockupDishCard({
+    required BuildContext context,
+    required String name,
+    required String description,
+    required String price,
+    required String badgeLabel,
+    required String imageUrl,
+    required DishCardLayout layout,
+    required BadgeStyle badgeStyle,
+    required AppDesignStyle style,
+    required Color primaryColor,
+    required String titleFont,
+    required String bodyFont,
+    required bool clientDark,
+  }) {
+    final BorderRadius cardRadius = switch (style) {
+      AppDesignStyle.premium => BorderRadius.circular(6.0),
+      AppDesignStyle.pub => BorderRadius.circular(16.0),
+      AppDesignStyle.minimal => BorderRadius.zero,
+      AppDesignStyle.tradizionale => BorderRadius.circular(12.0),
+    };
+
+    final badgeDeco = PersonalizzazionePresets.getBadgeDecoration(
+      style: badgeStyle,
+      baseColor: primaryColor,
+      isDark: clientDark,
+      isFilled: true,
+    );
+    final badgeTextColor = PersonalizzazionePresets.getBadgeTextColor(
+      style: badgeStyle,
+      baseColor: primaryColor,
+      isDark: clientDark,
+      isFilled: true,
+    );
+
+    final cardBg = clientDark ? const Color(0xFF1E293B) : Colors.white;
+    final cardBorder = clientDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+
+    if (layout == DishCardLayout.fotoGrande) {
+      return Container(
+        decoration: BoxDecoration(
+          color: cardBg,
+          borderRadius: cardRadius,
+          border: Border.all(color: cardBorder),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: clientDark ? 0.2 : 0.04),
+              blurRadius: 6.0,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Stack(
+              children: [
+                Image.network(
+                  imageUrl,
+                  height: 85.0,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Container(
+                    height: 85.0,
+                    color: primaryColor.withValues(alpha: 0.1),
+                    child: Center(child: Icon(Icons.fastfood_rounded, color: primaryColor)),
+                  ),
+                ),
+                Positioned(
+                  top: 6.0,
+                  left: 6.0,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.5),
+                    decoration: badgeDeco,
+                    child: Text(
+                      badgeLabel,
+                      style: TextStyle(
+                        fontSize: 8.5,
+                        fontWeight: FontWeight.bold,
+                        color: badgeTextColor,
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  bottom: 6.0,
+                  right: 6.0,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 7.0, vertical: 3.5),
+                    decoration: BoxDecoration(
+                      color: Colors.black87,
+                      borderRadius: BorderRadius.circular(6.0),
+                    ),
+                    child: Text(
+                      price,
+                      style: GoogleFonts.getFont(
+                        titleFont,
+                        textStyle: const TextStyle(
+                          fontSize: 11.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.all(9.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name,
+                    style: GoogleFonts.getFont(
+                      titleFont,
+                      textStyle: TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.bold,
+                        color: clientDark ? Colors.white : const Color(0xFF0F172A),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 2.5),
+                  Text(
+                    description,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.getFont(
+                      bodyFont,
+                      textStyle: TextStyle(
+                        fontSize: 10.0,
+                        color: clientDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                        height: 1.3,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 7.0),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 9.0, vertical: 4.0),
+                      decoration: BoxDecoration(
+                        color: primaryColor,
+                        borderRadius: cardRadius,
+                      ),
+                      child: Text(
+                        '+ Aggiungi',
+                        style: GoogleFonts.getFont(
+                          titleFont,
+                          textStyle: const TextStyle(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Default Standard & Compatto
+    return Container(
+      padding: const EdgeInsets.all(9.0),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: cardRadius,
+        border: Border.all(color: cardBorder),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: clientDark ? 0.2 : 0.04),
+            blurRadius: 6.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: cardRadius,
+            child: Image.network(
+              imageUrl,
+              width: 62.0,
+              height: 62.0,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => Container(
+                width: 62.0,
+                height: 62.0,
+                color: primaryColor.withValues(alpha: 0.1),
+                child: Center(child: Icon(Icons.fastfood_rounded, color: primaryColor)),
+              ),
+            ),
+          ),
+          const SizedBox(width: 9.0),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.getFont(
+                          titleFont,
+                          textStyle: TextStyle(
+                            fontSize: 12.0,
+                            fontWeight: FontWeight.bold,
+                            color: clientDark ? Colors.white : const Color(0xFF0F172A),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Text(
+                      price,
+                      style: GoogleFonts.getFont(
+                        titleFont,
+                        textStyle: TextStyle(
+                          fontSize: 12.0,
+                          fontWeight: FontWeight.bold,
+                          color: primaryColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 2.5),
+                Text(
+                  description,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.getFont(
+                    bodyFont,
+                    textStyle: TextStyle(
+                      fontSize: 9.5,
+                      color: clientDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                      height: 1.3,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 5.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 2.0),
+                      decoration: badgeDeco,
+                      child: Text(
+                        badgeLabel,
+                        style: TextStyle(
+                          fontSize: 8.5,
+                          fontWeight: FontWeight.bold,
+                          color: badgeTextColor,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 3.0),
+                      decoration: BoxDecoration(
+                        color: primaryColor.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(6.0),
+                      ),
+                      child: Text(
+                        '+ Aggiungi',
+                        style: GoogleFonts.getFont(
+                          titleFont,
+                          textStyle: TextStyle(
+                            fontSize: 10.0,
+                            fontWeight: FontWeight.bold,
+                            color: primaryColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -1813,6 +2769,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     required AppDesignStyle currentStyle,
     required Color primaryColor,
     required bool isDark,
+    bool isDesktop = false,
   }) {
     final dividerColor = Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.35);
 
@@ -1832,6 +2789,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
           themeProvider: themeProvider,
           currentStyle: currentStyle,
           isDark: isDark,
+          isDesktop: isDesktop,
         ),
         const SizedBox(height: 12.0),
         Divider(color: dividerColor, height: 1.0),
@@ -1953,7 +2911,91 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     required ThemeProvider themeProvider,
     required AppDesignStyle currentStyle,
     required bool isDark,
+    bool isDesktop = false,
   }) {
+    if (isDesktop) {
+      return Column(
+        key: key,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 2.0, vertical: 4.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Preset Gastronomici',
+                  style: TextStyle(
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w700,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                Text(
+                  'Tocca per applicare tutto con 1 click',
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8.0),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: _buildPresetCard(
+                  context: context,
+                  preset: AppDesignStyle.premium,
+                  currentStyle: currentStyle,
+                  themeProvider: themeProvider,
+                  isDark: isDark,
+                ),
+              ),
+              const SizedBox(width: 12.0),
+              Expanded(
+                child: _buildPresetCard(
+                  context: context,
+                  preset: AppDesignStyle.pub,
+                  currentStyle: currentStyle,
+                  themeProvider: themeProvider,
+                  isDark: isDark,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12.0),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: _buildPresetCard(
+                  context: context,
+                  preset: AppDesignStyle.minimal,
+                  currentStyle: currentStyle,
+                  themeProvider: themeProvider,
+                  isDark: isDark,
+                ),
+              ),
+              const SizedBox(width: 12.0),
+              Expanded(
+                child: _buildPresetCard(
+                  context: context,
+                  preset: AppDesignStyle.tradizionale,
+                  currentStyle: currentStyle,
+                  themeProvider: themeProvider,
+                  isDark: isDark,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16.0),
+        ],
+      );
+    }
+
     return Column(
       key: key,
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -2031,16 +3073,29 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     final cardBg = theme.colorScheme.surface;
     final Color selectedBg = isSelected
         ? presetColor.withValues(alpha: isDark ? 0.16 : 0.08)
-        : cardBg;
+        : (isDark ? const Color(0xFF1E293B) : cardBg);
+
+    // Mini palette dots per preview istantanea del preset
+    final List<Color> paletteDots = switch (preset) {
+      AppDesignStyle.premium => const [Color(0xFFC5A059), Color(0xFF0F172A), Color(0xFFE2E8F0)],
+      AppDesignStyle.pub => const [Color(0xFFD97706), Color(0xFF78350F), Color(0xFFFEF3C7)],
+      AppDesignStyle.minimal => const [Color(0xFF0F172A), Color(0xFF64748B), Color(0xFFF8FAFC)],
+      AppDesignStyle.tradizionale => const [Color(0xFFB71C1C), Color(0xFFEA580C), Color(0xFFFEE2E2)],
+    };
 
     return Card(
-      elevation: isSelected ? 2.0 : 1.0,
+      elevation: isSelected ? 3.0 : 1.0,
       shadowColor: isSelected
-          ? presetColor.withValues(alpha: isDark ? 0.35 : 0.16)
-          : Colors.black.withValues(alpha: isDark ? 0.3 : 0.04),
+          ? presetColor.withValues(alpha: isDark ? 0.35 : 0.18)
+          : Colors.black.withValues(alpha: isDark ? 0.25 : 0.04),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16.0),
-        side: BorderSide.none,
+        side: BorderSide(
+          color: isSelected
+              ? presetColor
+              : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+          width: isSelected ? 2.0 : 1.0,
+        ),
       ),
       color: selectedBg,
       margin: EdgeInsets.zero,
@@ -2072,15 +3127,15 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                             Text(
                               preset.displayName,
                               style: TextStyle(
-                                fontSize: 15.5,
+                                fontSize: 15.0,
                                 fontWeight: FontWeight.bold,
                                 color: theme.colorScheme.onSurface,
                               ),
                             ),
                             const SizedBox(width: 7.0),
                             Container(
-                              width: 10.0,
-                              height: 10.0,
+                              width: 8.0,
+                              height: 8.0,
                               decoration: BoxDecoration(
                                 color: presetColor,
                                 shape: BoxShape.circle,
@@ -2091,18 +3146,21 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                         const SizedBox(height: 2.0),
                         Text(
                           preset.targetAudience,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontSize: 11.5,
+                            fontSize: 11.0,
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],
                     ),
                   ),
+                  // Selettore check
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    width: 26.0,
-                    height: 26.0,
+                    width: 24.0,
+                    height: 24.0,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: isSelected
@@ -2113,7 +3171,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                       child: isSelected
                           ? const Icon(
                               Icons.check_rounded,
-                              size: 16.0,
+                              size: 15.0,
                               color: Colors.white,
                             )
                           : null,
@@ -2121,14 +3179,46 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                   ),
                 ],
               ),
-              const SizedBox(height: 10.0),
+              const SizedBox(height: 8.0),
               Text(
                 preset.description,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 12.5,
+                  fontSize: 12.0,
                   height: 1.35,
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
+              ),
+              const SizedBox(height: 10.0),
+              // Mini color palette dots
+              Row(
+                children: [
+                  Text(
+                    'Palette:',
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+                    ),
+                  ),
+                  const SizedBox(width: 6.0),
+                  ...paletteDots.map((c) => Padding(
+                        padding: const EdgeInsets.only(right: 4.0),
+                        child: Container(
+                          width: 12.0,
+                          height: 12.0,
+                          decoration: BoxDecoration(
+                            color: c,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isDark ? Colors.white24 : Colors.black12,
+                              width: 1.0,
+                            ),
+                          ),
+                        ),
+                      )),
+                ],
               ),
             ],
           ),
