@@ -80,6 +80,84 @@ class _ImpostazioniQRWidgetState extends State<ImpostazioniQRWidget> {
     );
   }
 
+  Future<void> _showCustomTableDialog(BuildContext context) async {
+    final controller = TextEditingController(text: '$_selectedTable');
+    final result = await showDialog<int>(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+        title: const Row(
+          children: [
+            Icon(Icons.table_restaurant_rounded,
+                color: Color(0xFF3B82F6), size: 22.0),
+            SizedBox(width: 8.0),
+            Text(
+              'Numero Tavolo',
+              style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Inserisci il numero del tavolo per generare il QR Code dedicato:',
+              style: TextStyle(fontSize: 13.0, height: 1.3),
+            ),
+            const SizedBox(height: 16.0),
+            TextField(
+              controller: controller,
+              keyboardType: TextInputType.number,
+              autofocus: true,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: InputDecoration(
+                labelText: 'Numero Tavolo',
+                hintText: 'Es. 12',
+                prefixIcon: const Icon(Icons.tag_rounded),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+              ),
+              onSubmitted: (val) {
+                final n = int.tryParse(val.trim());
+                if (n != null && n > 0) {
+                  Navigator.pop(dialogCtx, n);
+                }
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogCtx),
+            child: const Text('Annulla'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final n = int.tryParse(controller.text.trim());
+              if (n != null && n > 0) {
+                Navigator.pop(dialogCtx, n);
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF3B82F6),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+            ),
+            child: const Text('Conferma'),
+          ),
+        ],
+      ),
+    );
+    if (result != null && result > 0) {
+      _selectTable(result);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
@@ -726,15 +804,22 @@ class _ImpostazioniQRWidgetState extends State<ImpostazioniQRWidget> {
                         }
                       },
                     ),
-                    Container(
-                      width: 42.0,
-                      alignment: Alignment.center,
-                      child: Text(
-                        '#$_selectedTable',
-                        style: TextStyle(
-                          fontSize: 14.0,
-                          fontWeight: FontWeight.bold,
-                          color: colorScheme.primary,
+                    Tooltip(
+                      message: 'Tocca per inserire un numero specifico',
+                      child: InkWell(
+                        onTap: () => _showCustomTableDialog(context),
+                        borderRadius: BorderRadius.circular(6.0),
+                        child: Container(
+                          width: 48.0,
+                          alignment: Alignment.center,
+                          child: Text(
+                            '#$_selectedTable',
+                            style: TextStyle(
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.primary,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -758,51 +843,91 @@ class _ImpostazioniQRWidgetState extends State<ImpostazioniQRWidget> {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
-              children: _quickTables.map((tNum) {
-                final isSelected = _selectedTable == tNum;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 6.0),
-                  child: InkWell(
-                    onTap: () => _selectTable(tNum),
-                    borderRadius: BorderRadius.circular(8.0),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 150),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 11.0, vertical: 6.0),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? colorScheme.primary
-                            : (isDark
-                                ? const Color(0xFF0F172A)
-                                : const Color(0xFFF1F5F9)),
-                        borderRadius: BorderRadius.circular(8.0),
-                        border: Border.all(
+              children: [
+                ..._quickTables.map((tNum) {
+                  final isSelected = _selectedTable == tNum;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 6.0),
+                    child: InkWell(
+                      onTap: () => _selectTable(tNum),
+                      borderRadius: BorderRadius.circular(8.0),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 150),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 11.0, vertical: 6.0),
+                        decoration: BoxDecoration(
                           color: isSelected
                               ? colorScheme.primary
-                              : borderColor,
-                        ),
-                      ),
-                      child: Text(
-                        'T.$tNum',
-                        style: TextStyle(
-                          fontSize: 12.0,
-                          fontWeight: FontWeight.bold,
-                          color: isSelected
-                              ? Colors.white
                               : (isDark
-                                  ? const Color(0xFFCBD5E1)
-                                  : const Color(0xFF475569)),
+                                  ? const Color(0xFF0F172A)
+                                  : const Color(0xFFF1F5F9)),
+                          borderRadius: BorderRadius.circular(8.0),
+                          border: Border.all(
+                            color: isSelected
+                                ? colorScheme.primary
+                                : borderColor,
+                          ),
+                        ),
+                        child: Text(
+                          'T.$tNum',
+                          style: TextStyle(
+                            fontSize: 12.0,
+                            fontWeight: FontWeight.bold,
+                            color: isSelected
+                                ? Colors.white
+                                : (isDark
+                                    ? const Color(0xFFCBD5E1)
+                                    : const Color(0xFF475569)),
+                          ),
                         ),
                       ),
                     ),
+                  );
+                }),
+                // Chip Altro Numero personalizzato
+                Padding(
+                  padding: const EdgeInsets.only(right: 6.0),
+                  child: InkWell(
+                    onTap: () => _showCustomTableDialog(context),
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 11.0, vertical: 6.0),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? const Color(0xFF0F172A)
+                            : const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(8.0),
+                        border: Border.all(color: borderColor),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.edit_outlined,
+                            size: 13.0,
+                            color: textSecondary,
+                          ),
+                          const SizedBox(width: 4.0),
+                          Text(
+                            'Altro...',
+                            style: TextStyle(
+                              fontSize: 12.0,
+                              fontWeight: FontWeight.bold,
+                              color: textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                );
-              }).toList(),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 18.0),
 
-          // Box Anteprima del QR Tavolo Selezionato
+          // Box Anteprima del QR Tavolo Selezionato (Responsive Mobile & Desktop)
           Container(
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
@@ -810,32 +935,170 @@ class _ImpostazioniQRWidgetState extends State<ImpostazioniQRWidget> {
               borderRadius: BorderRadius.circular(14.0),
               border: Border.all(color: borderColor),
             ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8.0),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12.0),
-                    border: Border.all(color: const Color(0xFFE2E8F0)),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8.0),
-                    child: QrImageView(
-                      data: tableUrl,
-                      version: QrVersions.auto,
-                      size: 96.0,
-                      backgroundColor: Colors.white,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16.0),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            child: LayoutBuilder(
+              builder: (ctx, boxConstraints) {
+                final bool isNarrow = boxConstraints.maxWidth < 460;
+
+                if (isNarrow) {
+                  // Layout Mobile: verticale, centrato e senza overflow
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Row(
+                      Center(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10.0, vertical: 4.0),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF3B82F6)
+                                .withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: Text(
+                            'TAVOLO #$_selectedTable',
+                            style: const TextStyle(
+                              fontSize: 12.0,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF3B82F6),
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 14.0),
+                      Center(
+                        child: Container(
+                          padding: const EdgeInsets.all(12.0),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(14.0),
+                            border: Border.all(
+                              color: const Color(0xFFE2E8F0),
+                              width: 1.5,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                blurRadius: 10.0,
+                                color: Colors.black.withValues(alpha: 0.05),
+                                offset: const Offset(0.0, 2.0),
+                              ),
+                            ],
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8.0),
+                            child: QrImageView(
+                              data: tableUrl,
+                              version: QrVersions.auto,
+                              size: 160.0,
+                              backgroundColor: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 14.0),
+                      Text(
+                        'I clienti al Tavolo #$_selectedTable non dovranno inserire il numero: il sistema lo assegnerà in automatico alle comande.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          height: 1.35,
+                          color: textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 14.0),
+                      // Box Link Diretto
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10.0, vertical: 6.0),
+                        decoration: BoxDecoration(
+                          color: cardBg,
+                          borderRadius: BorderRadius.circular(10.0),
+                          border: Border.all(color: borderColor),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.link_rounded,
+                              size: 16.0,
+                              color: Color(0xFF3B82F6),
+                            ),
+                            const SizedBox(width: 6.0),
+                            Expanded(
+                              child: Text(
+                                tableUrl,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 11.5,
+                                  fontFamily: 'monospace',
+                                  color: textSecondary,
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.copy_rounded, size: 16.0),
+                              tooltip: 'Copia Link Tavolo',
+                              splashRadius: 18.0,
+                              constraints: const BoxConstraints(),
+                              padding: const EdgeInsets.all(6.0),
+                              onPressed: () => _copyToClipboard(
+                                context,
+                                tableUrl,
+                                'Link del Tavolo #$_selectedTable copiato!',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 12.0),
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          await launchURL(downloadTableQrUrl);
+                        },
+                        icon: const Icon(Icons.download_rounded, size: 17.0),
+                        label: Text('Scarica QR Tavolo #$_selectedTable (PNG)'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF3B82F6),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14.0, vertical: 12.0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          textStyle: const TextStyle(
+                            fontSize: 13.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+
+                // Layout Desktop / Tablet: side-by-side
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12.0),
+                        border: Border.all(color: const Color(0xFFE2E8F0)),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8.0),
+                        child: QrImageView(
+                          data: tableUrl,
+                          version: QrVersions.auto,
+                          size: 104.0,
+                          backgroundColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16.0),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -855,20 +1118,60 @@ class _ImpostazioniQRWidgetState extends State<ImpostazioniQRWidget> {
                               ),
                             ),
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 6.0),
-                      Text(
-                        'I clienti al Tavolo #$_selectedTable non dovranno inserire il numero: il sistema lo assegnerà in automatico alle comande.',
-                        style: TextStyle(
-                          fontSize: 12.5,
-                          height: 1.35,
-                          color: textSecondary,
-                        ),
-                      ),
-                      const SizedBox(height: 12.0),
-                      Row(
-                        children: [
+                          const SizedBox(height: 6.0),
+                          Text(
+                            'I clienti al Tavolo #$_selectedTable non dovranno inserire il numero: il sistema lo assegnerà in automatico alle comande.',
+                            style: TextStyle(
+                              fontSize: 12.5,
+                              height: 1.35,
+                              color: textSecondary,
+                            ),
+                          ),
+                          const SizedBox(height: 10.0),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0, vertical: 5.0),
+                            decoration: BoxDecoration(
+                              color: cardBg,
+                              borderRadius: BorderRadius.circular(8.0),
+                              border: Border.all(color: borderColor),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.link_rounded,
+                                  size: 15.0,
+                                  color: Color(0xFF3B82F6),
+                                ),
+                                const SizedBox(width: 6.0),
+                                Expanded(
+                                  child: Text(
+                                    tableUrl,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 11.0,
+                                      fontFamily: 'monospace',
+                                      color: textSecondary,
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.copy_rounded, size: 15.0),
+                                  tooltip: 'Copia Link Tavolo',
+                                  splashRadius: 16.0,
+                                  constraints: const BoxConstraints(),
+                                  padding: const EdgeInsets.all(4.0),
+                                  onPressed: () => _copyToClipboard(
+                                    context,
+                                    tableUrl,
+                                    'Link del Tavolo #$_selectedTable copiato!',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 10.0),
                           ElevatedButton.icon(
                             onPressed: () async {
                               await launchURL(downloadTableQrUrl);
@@ -889,23 +1192,12 @@ class _ImpostazioniQRWidgetState extends State<ImpostazioniQRWidget> {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 8.0),
-                          IconButton(
-                            icon: const Icon(Icons.copy_rounded, size: 16.0),
-                            tooltip: 'Copia Link Tavolo',
-                            splashRadius: 18.0,
-                            onPressed: () => _copyToClipboard(
-                              context,
-                              tableUrl,
-                              'Link del Tavolo #$_selectedTable copiato!',
-                            ),
-                          ),
                         ],
                       ),
-                    ],
-                  ),
-                ),
-              ],
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         ],
