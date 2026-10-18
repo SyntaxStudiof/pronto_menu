@@ -146,8 +146,10 @@ class _DesktopOrdersTableViewState extends State<DesktopOrdersTableView> {
           );
         }
 
-        // Tutti gli ordini del ristorante
-        List<OrdersRecord> allOrders = snapshot.data!;
+        // Tutti gli ordini attivi del ristorante (esclusi quelli archiviati)
+        List<OrdersRecord> allOrders = snapshot.data!
+            .where((o) => o.statoOrdine.toLowerCase() != 'archiviato')
+            .toList();
         if (docRef != null) {
           allOrders = allOrders
               .where((o) => o.ristoranteRef == null || o.ristoranteRef == docRef)
@@ -333,6 +335,26 @@ class _DesktopOrdersTableViewState extends State<DesktopOrdersTableView> {
                     _buildFilterChip('Completati ($completatiCount)', 'Completato', isDark, colorScheme),
 
                     const Spacer(),
+
+                    // Bottone "Archivia completati"
+                    if (completatiCount > 0) ...[
+                      ElevatedButton.icon(
+                        onPressed: () => _confermaArchiviaCompletati(context, allOrders),
+                        icon: const Icon(Icons.inventory_2_outlined, size: 16.0),
+                        label: Text(
+                          'Archivia completati ($completatiCount)',
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.0),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF6366F1),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                          elevation: 0,
+                        ),
+                      ),
+                      const SizedBox(width: 10.0),
+                    ],
 
                     // Bottone "Completa tutti in attesa"
                     if (inAttesaCount > 0)
@@ -675,7 +697,24 @@ class _DesktopOrdersTableViewState extends State<DesktopOrdersTableView> {
                                   ),
                                 ),
                               ],
-                              if (stato == 'completato')
+                              if (stato == 'completato') ...[
+                                ElevatedButton.icon(
+                                  onPressed: () {
+                                    order.reference.update(createOrdersRecordData(
+                                      statoOrdine: 'archiviato',
+                                    ));
+                                  },
+                                  icon: const Icon(Icons.inventory_2_outlined, size: 14.0),
+                                  label: const Text('Archivia', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold)),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF6366F1),
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+                                    elevation: 0,
+                                  ),
+                                ),
+                                const SizedBox(width: 6.0),
                                 OutlinedButton.icon(
                                   onPressed: () {
                                     order.reference.update(createOrdersRecordData(
@@ -689,6 +728,7 @@ class _DesktopOrdersTableViewState extends State<DesktopOrdersTableView> {
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
                                   ),
                                 ),
+                              ],
 
                               const SizedBox(width: 6.0),
 
@@ -703,6 +743,10 @@ class _DesktopOrdersTableViewState extends State<DesktopOrdersTableView> {
                                 onSelected: (val) async {
                                   if (val == 'dettaglio') {
                                     _mostraDettaglioOrdine(context, order, piatti);
+                                  } else if (val == 'archivia') {
+                                    await order.reference.update(createOrdersRecordData(
+                                      statoOrdine: 'archiviato',
+                                    ));
                                   } else if (val == 'elimina') {
                                     final confirm = await showDialog<bool>(
                                       context: context,
@@ -735,6 +779,16 @@ class _DesktopOrdersTableViewState extends State<DesktopOrdersTableView> {
                                         Icon(Icons.info_outline_rounded, size: 16.0),
                                         SizedBox(width: 8.0),
                                         Text('Dettagli comanda'),
+                                      ],
+                                    ),
+                                  ),
+                                  const PopupMenuItem(
+                                    value: 'archivia',
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.inventory_2_outlined, size: 16.0, color: Color(0xFF6366F1)),
+                                        SizedBox(width: 8.0),
+                                        Text('Archivia ordine'),
                                       ],
                                     ),
                                   ),
@@ -1030,6 +1084,46 @@ class _DesktopOrdersTableViewState extends State<DesktopOrdersTableView> {
         await o.reference.update(createOrdersRecordData(
           statoOrdine: 'Completato',
           visto: true,
+        ));
+      }
+    }
+  }
+
+  Future<void> _confermaArchiviaCompletati(
+    BuildContext context,
+    List<OrdersRecord> allOrders,
+  ) async {
+    final completatiOrders = allOrders
+        .where((o) => o.statoOrdine.toLowerCase() == 'completato')
+        .toList();
+
+    if (completatiOrders.isEmpty) return;
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Archivia ordini completati'),
+        content: Text(
+          'Sei sicuro di voler archiviare tutte le ${completatiOrders.length} comande completate?\n\nSaranno consultabili in ogni momento nella sezione "Archivio Ordini".',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Annulla'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6366F1)),
+            child: const Text('Archivia tutti'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      for (final o in completatiOrders) {
+        await o.reference.update(createOrdersRecordData(
+          statoOrdine: 'archiviato',
         ));
       }
     }

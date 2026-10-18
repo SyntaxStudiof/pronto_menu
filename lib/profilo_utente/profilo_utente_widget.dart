@@ -1,6 +1,7 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/backend/firebase_storage/storage.dart';
+import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/upload_data.dart';
 import '/custom_code/actions/index.dart' as actions;
@@ -81,14 +82,17 @@ class _ProfiloUtenteWidgetState extends State<ProfiloUtenteWidget> {
     IconData? prefixIcon,
   }) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: theme.textTheme.labelLarge?.copyWith(
+          style: TextStyle(
+            fontSize: 13.0,
             fontWeight: FontWeight.w600,
+            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569),
           ),
         ),
         const SizedBox(height: 6.0),
@@ -99,14 +103,57 @@ class _ProfiloUtenteWidgetState extends State<ProfiloUtenteWidget> {
           decoration: InputDecoration(
             isDense: true,
             hintText: hintText,
+            hintStyle: TextStyle(
+              fontSize: 13.5,
+              color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+            ),
+            filled: true,
+            fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
             prefixIcon: prefixIcon != null
                 ? Icon(
                     prefixIcon,
-                    size: 20.0,
+                    size: 19.0,
+                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                   )
                 : null,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 12.0),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: BorderSide(
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: BorderSide(
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: BorderSide(
+                color: theme.colorScheme.primary,
+                width: 1.5,
+              ),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: BorderSide(
+                color: theme.colorScheme.error,
+              ),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              borderSide: BorderSide(
+                color: theme.colorScheme.error,
+                width: 1.5,
+              ),
+            ),
           ),
-          style: theme.textTheme.bodyMedium,
+          style: TextStyle(
+            fontSize: 13.5,
+            color: isDark ? Colors.white : const Color(0xFF0F172A),
+          ),
           cursorColor: theme.colorScheme.primary,
           validator: validator != null ? (val) => validator(context, val) : null,
         ),
@@ -118,6 +165,7 @@ class _ProfiloUtenteWidgetState extends State<ProfiloUtenteWidget> {
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return GestureDetector(
       onTap: () {
@@ -126,76 +174,62 @@ class _ProfiloUtenteWidgetState extends State<ProfiloUtenteWidget> {
       },
       child: Scaffold(
         key: scaffoldKey,
+        backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
         appBar: widget.embedded
             ? null
             : AppBar(
-          automaticallyImplyLeading: false,
-          leading: IconButton(
-            icon: const Icon(
-              Icons.arrow_back_rounded,
-              size: 22.0,
-            ),
-            onPressed: () async {
-              context.pushNamed(
-                HomeRistoratoreWidget.routeName,
-                queryParameters: {
-                  'ristoranteRef': serializeParam(
-                    widget.ristoranteRef ?? currentUserReference,
-                    ParamType.DocumentReference,
+                backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+                automaticallyImplyLeading: false,
+                elevation: 0.0,
+                centerTitle: true,
+                leading: FlutterFlowIconButton(
+                  borderColor: Colors.transparent,
+                  borderRadius: 24.0,
+                  borderWidth: 1.0,
+                  buttonSize: 40.0,
+                  icon: Icon(
+                    Icons.arrow_back_rounded,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    size: 24.0,
                   ),
-                }.withoutNulls,
-                extra: <String, dynamic>{
-                  '__transition_info__': const TransitionInfo(
-                    hasTransition: true,
-                    transitionType: PageTransitionType.leftToRight,
-                  ),
-                },
-              );
-            },
-          ),
-          title: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 36.0,
-                height: 36.0,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(10.0),
+                  onPressed: () async {
+                    context.safePop();
+                  },
                 ),
-                alignment: Alignment.center,
-                child: Icon(
-                  Icons.person_rounded,
-                  color: theme.colorScheme.primary,
-                  size: 20.0,
-                ),
-              ),
-              const SizedBox(width: 10.0),
-              Text(
-                'Il mio Profilo',
-                style: theme.appBarTheme.titleTextStyle ??
-                    theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20.0,
-                      letterSpacing: -0.4,
+                title: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 36.0,
+                      height: 36.0,
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      alignment: Alignment.center,
+                      child: Icon(
+                        Icons.person_rounded,
+                        color: theme.colorScheme.primary,
+                        size: 20.0,
+                      ),
                     ),
+                    const SizedBox(width: 10.0),
+                    Text(
+                      'Il mio Profilo',
+                      style: theme.appBarTheme.titleTextStyle ??
+                          theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 19.0,
+                            letterSpacing: -0.4,
+                            color: isDark ? Colors.white : const Color(0xFF0F172A),
+                          ),
+                    ),
+                  ],
+                ),
+                actions: const [
+                  SizedBox(width: 48.0),
+                ],
               ),
-            ],
-          ),
-          centerTitle: true,
-          actions: const [
-            SizedBox(width: 48.0),
-          ],
-          elevation: 0.0,
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(1.0),
-            child: Divider(
-              height: 1.0,
-              thickness: 1.0,
-              color: theme.dividerColor.withValues(alpha: 0.5),
-            ),
-          ),
-        ),
         body: SafeArea(
           top: true,
           child: StreamBuilder<UsersRecord>(
@@ -235,7 +269,7 @@ class _ProfiloUtenteWidgetState extends State<ProfiloUtenteWidget> {
                               height: 120.0,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: theme.cardColor,
+                                color: isDark ? const Color(0xFF1E293B) : Colors.white,
                                 border: Border.all(
                                   color: theme.colorScheme.primary,
                                   width: 3.0,
@@ -243,7 +277,7 @@ class _ProfiloUtenteWidgetState extends State<ProfiloUtenteWidget> {
                                 boxShadow: [
                                   BoxShadow(
                                     blurRadius: 16.0,
-                                    color: Colors.black.withValues(alpha: 0.06),
+                                    color: theme.colorScheme.primary.withValues(alpha: 0.2),
                                     offset: const Offset(0.0, 4.0),
                                   ),
                                 ],
@@ -338,13 +372,13 @@ class _ProfiloUtenteWidgetState extends State<ProfiloUtenteWidget> {
                                   color: theme.colorScheme.primary,
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                    color: theme.cardColor,
+                                    color: isDark ? const Color(0xFF1E293B) : Colors.white,
                                     width: 2.5,
                                   ),
                                   boxShadow: [
                                     BoxShadow(
                                       blurRadius: 8.0,
-                                      color: Colors.black.withValues(alpha: 0.1),
+                                      color: Colors.black.withValues(alpha: 0.15),
                                       offset: const Offset(0.0, 2.0),
                                     ),
                                   ],
@@ -364,14 +398,19 @@ class _ProfiloUtenteWidgetState extends State<ProfiloUtenteWidget> {
                             currentUserDisplayName,
                             'Ristoratore',
                           ),
-                          style: theme.textTheme.titleMedium?.copyWith(
+                          style: TextStyle(
+                            fontSize: 18.0,
                             fontWeight: FontWeight.bold,
+                            letterSpacing: -0.3,
+                            color: isDark ? Colors.white : const Color(0xFF0F172A),
                           ),
                         ),
+                        const SizedBox(height: 3.0),
                         Text(
                           currentUserEmail,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                          style: TextStyle(
+                            fontSize: 13.0,
+                            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                           ),
                         ),
                         const SizedBox(height: 12.0),
@@ -380,11 +419,11 @@ class _ProfiloUtenteWidgetState extends State<ProfiloUtenteWidget> {
                               horizontal: 14.0, vertical: 7.0),
                           decoration: BoxDecoration(
                             color: theme.colorScheme.primary
-                                .withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(20.0),
+                                .withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(10.0),
                             border: Border.all(
                               color: theme.colorScheme.primary
-                                  .withValues(alpha: 0.22),
+                                  .withValues(alpha: 0.25),
                             ),
                           ),
                           child: Row(
@@ -396,15 +435,13 @@ class _ProfiloUtenteWidgetState extends State<ProfiloUtenteWidget> {
                                 color: theme.colorScheme.primary,
                               ),
                               const SizedBox(width: 8.0),
-                              Flexible(
-                                child: Text(
-                                  'La foto impostata apparirà anche nell\'intestazione del tuo menù',
-                                  textAlign: TextAlign.center,
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: theme.colorScheme.primary,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 12.0,
-                                  ),
+                              Text(
+                                'La foto impostata apparirà anche nell\'intestazione del tuo menù',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: theme.colorScheme.primary,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12.0,
                                 ),
                               ),
                             ],
@@ -412,184 +449,231 @@ class _ProfiloUtenteWidgetState extends State<ProfiloUtenteWidget> {
                         ),
                         const SizedBox(height: 24.0),
                         // Profile Data Card Form
-                        Card(
-                          elevation: 0.0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20.0),
-                            side: BorderSide(
-                              color: theme.dividerColor.withValues(alpha: 0.6),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                            borderRadius: BorderRadius.circular(16.0),
+                            border: Border.all(
+                              color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
                               width: 1.0,
                             ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+                                blurRadius: 12.0,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(24.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                AuthUserStreamWidget(
-                                  builder: (context) => _buildFormField(
-                                    context: context,
-                                    label: 'Nome',
-                                    controller: _model.nomeTextController,
-                                    focusNode: _model.nomeFocusNode,
-                                    hintText: 'Inserisci il tuo nome',
-                                    validator:
-                                        _model.nomeTextControllerValidator,
-                                    prefixIcon: Icons.person_outline_rounded,
-                                  ),
+                          padding: const EdgeInsets.all(24.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              AuthUserStreamWidget(
+                                builder: (context) => _buildFormField(
+                                  context: context,
+                                  label: 'Nome',
+                                  controller: _model.nomeTextController,
+                                  focusNode: _model.nomeFocusNode,
+                                  hintText: 'Inserisci il tuo nome',
+                                  validator:
+                                      _model.nomeTextControllerValidator,
+                                  prefixIcon: Icons.person_outline_rounded,
                                 ),
-                                const SizedBox(height: 16.0),
-                                AuthUserStreamWidget(
-                                  builder: (context) => _buildFormField(
-                                    context: context,
-                                    label: 'Cognome',
-                                    controller: _model.cognomeTextController,
-                                    focusNode: _model.cognomeFocusNode,
-                                    hintText: 'Inserisci il tuo cognome',
-                                    validator:
-                                        _model.cognomeTextControllerValidator,
-                                    prefixIcon: Icons.badge_outlined,
-                                  ),
+                              ),
+                              const SizedBox(height: 16.0),
+                              AuthUserStreamWidget(
+                                builder: (context) => _buildFormField(
+                                  context: context,
+                                  label: 'Cognome',
+                                  controller: _model.cognomeTextController,
+                                  focusNode: _model.cognomeFocusNode,
+                                  hintText: 'Inserisci il tuo cognome',
+                                  validator:
+                                      _model.cognomeTextControllerValidator,
+                                  prefixIcon: Icons.badge_outlined,
                                 ),
-                                const SizedBox(height: 16.0),
-                                AuthUserStreamWidget(
-                                  builder: (context) => _buildFormField(
-                                    context: context,
-                                    label: 'Nome Ristorante',
-                                    controller: _model.ristoranteTextController,
-                                    focusNode: _model.ristoranteFocusNode,
-                                    hintText: 'Nome della tua attività',
-                                    validator: _model
-                                        .ristoranteTextControllerValidator,
-                                    prefixIcon:
-                                        Icons.storefront_outlined,
-                                  ),
+                              ),
+                              const SizedBox(height: 16.0),
+                              AuthUserStreamWidget(
+                                builder: (context) => _buildFormField(
+                                  context: context,
+                                  label: 'Nome Ristorante',
+                                  controller: _model.ristoranteTextController,
+                                  focusNode: _model.ristoranteFocusNode,
+                                  hintText: 'Nome della tua attività',
+                                  validator: _model
+                                      .ristoranteTextControllerValidator,
+                                  prefixIcon:
+                                      Icons.storefront_outlined,
                                 ),
-                                const SizedBox(height: 16.0),
-                                // Date Picker Field
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Data di nascita',
-                                      style: theme.textTheme.labelLarge?.copyWith(
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                              ),
+                              const SizedBox(height: 16.0),
+                              // Date Picker Field
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Data di nascita',
+                                    style: TextStyle(
+                                      fontSize: 13.0,
+                                      fontWeight: FontWeight.w600,
+                                      color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF475569),
                                     ),
-                                    const SizedBox(height: 6.0),
-                                    InkWell(
-                                      onTap: () async {
-                                        final datePickedDate =
-                                            await showDatePicker(
-                                          context: context,
-                                          barrierDismissible: false,
-                                          initialDate: _model.dataScelta ??
-                                              getCurrentTimestamp,
-                                          firstDate: DateTime(1900),
-                                          lastDate: getCurrentTimestamp,
-                                        );
-
-                                        if (datePickedDate != null) {
-                                          safeSetState(() {
-                                            _model.datePicked = DateTime(
-                                              datePickedDate.year,
-                                              datePickedDate.month,
-                                              datePickedDate.day,
-                                            );
-                                          });
-                                        } else if (_model.datePicked != null) {
-                                          safeSetState(() {
-                                            _model.datePicked =
-                                                getCurrentTimestamp;
-                                          });
-                                        }
-                                        _model.dataScelta = _model.datePicked;
-                                        safeSetState(() {});
-                                      },
-                                      borderRadius: BorderRadius.circular(12.0),
-                                      child: Container(
-                                        height: 48.0,
-                                        decoration: BoxDecoration(
-                                          color: theme.inputDecorationTheme.fillColor ??
-                                              theme.colorScheme.surface,
-                                          borderRadius:
-                                              BorderRadius.circular(12.0),
-                                          border: Border.all(
-                                            color: theme.dividerColor.withValues(alpha: 0.6),
-                                            width: 1.0,
-                                          ),
-                                        ),
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 16.0),
-                                        child: Row(
-                                          children: [
-                                            Icon(
-                                              Icons.calendar_month_outlined,
-                                              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                                              size: 20.0,
-                                            ),
-                                            const SizedBox(width: 12.0),
-                                            Text(
-                                              valueOrDefault<String>(
-                                                dateTimeFormat(
-                                                  "d/M/y",
-                                                  _model.dataScelta,
-                                                  locale:
-                                                      FFLocalizations.of(context)
-                                                          .languageCode,
-                                                ),
-                                                'Seleziona data di nascita',
+                                  ),
+                                  const SizedBox(height: 6.0),
+                                  InkWell(
+                                    onTap: () async {
+                                      final datePickedDate =
+                                          await showDatePicker(
+                                        context: context,
+                                        barrierDismissible: false,
+                                        initialDate: _model.dataScelta ??
+                                            getCurrentTimestamp,
+                                        firstDate: DateTime(1900),
+                                        lastDate: getCurrentTimestamp,
+                                        builder: (context, child) {
+                                          return Theme(
+                                            data: theme.copyWith(
+                                              colorScheme: theme.colorScheme.copyWith(
+                                                primary: theme.colorScheme.primary,
+                                                surface: isDark ? const Color(0xFF1E293B) : Colors.white,
+                                                onSurface: isDark ? Colors.white : const Color(0xFF0F172A),
                                               ),
-                                              style: theme.textTheme.bodyMedium?.copyWith(
-                                                color: _model.dataScelta != null
-                                                    ? theme.colorScheme.onSurface
-                                                    : theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                                              ),
+                                              dialogTheme: DialogThemeData(backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white),
                                             ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 24.0),
-                                // Salva Modifiche Button
-                                ElevatedButton(
-                                  onPressed: () async {
-                                    await currentUserReference!
-                                        .update(createUsersRecordData(
-                                      nome: _model.nomeTextController.text,
-                                      cognome: _model.cognomeTextController.text,
-                                      displayName:
-                                          _model.ristoranteTextController.text,
-                                      dataNascita: _model.dataScelta,
-                                    ));
-                                    if (context.mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                            'Profilo aggiornato con successo!',
-                                          ),
-                                          duration:
-                                              Duration(milliseconds: 3000),
-                                          behavior: SnackBarBehavior.floating,
-                                        ),
+                                            child: child!,
+                                          );
+                                        },
                                       );
-                                    }
-                                  },
-                                  child: const Text('Salva modifiche'),
+
+                                      if (datePickedDate != null) {
+                                        safeSetState(() {
+                                          _model.datePicked = DateTime(
+                                            datePickedDate.year,
+                                            datePickedDate.month,
+                                            datePickedDate.day,
+                                          );
+                                        });
+                                      } else if (_model.datePicked != null) {
+                                        safeSetState(() {
+                                          _model.datePicked =
+                                              getCurrentTimestamp;
+                                        });
+                                      }
+                                      _model.dataScelta = _model.datePicked;
+                                      safeSetState(() {});
+                                    },
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    child: Container(
+                                      height: 48.0,
+                                      decoration: BoxDecoration(
+                                        color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+                                        borderRadius: BorderRadius.circular(10.0),
+                                        border: Border.all(
+                                          color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
+                                          width: 1.0,
+                                        ),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.calendar_month_outlined,
+                                            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                                            size: 19.0,
+                                          ),
+                                          const SizedBox(width: 12.0),
+                                          Text(
+                                            valueOrDefault<String>(
+                                              dateTimeFormat(
+                                                "d/M/y",
+                                                _model.dataScelta,
+                                                locale:
+                                                    FFLocalizations.of(context)
+                                                        .languageCode,
+                                              ),
+                                              'Seleziona data di nascita',
+                                            ),
+                                            style: TextStyle(
+                                              fontSize: 13.5,
+                                              color: _model.dataScelta != null
+                                                  ? (isDark ? Colors.white : const Color(0xFF0F172A))
+                                                  : (isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8)),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 24.0),
+                              // Salva Modifiche Button
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: theme.colorScheme.primary,
+                                  foregroundColor: Colors.white,
+                                  elevation: 0.0,
+                                  padding: const EdgeInsets.symmetric(vertical: 14.0),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
                                 ),
-                              ],
-                            ),
+                                onPressed: () async {
+                                  await currentUserReference!
+                                      .update(createUsersRecordData(
+                                    nome: _model.nomeTextController.text,
+                                    cognome: _model.cognomeTextController.text,
+                                    displayName:
+                                        _model.ristoranteTextController.text,
+                                    dataNascita: _model.dataScelta,
+                                  ));
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: const Text(
+                                          'Profilo aggiornato con successo!',
+                                          style: TextStyle(fontWeight: FontWeight.w600),
+                                        ),
+                                        backgroundColor: theme.colorScheme.primary,
+                                        duration: const Duration(milliseconds: 3000),
+                                        behavior: SnackBarBehavior.floating,
+                                      ),
+                                    );
+                                  }
+                                },
+                                child: const Text(
+                                  'Salva modifiche',
+                                  style: TextStyle(
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 0.2,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         const SizedBox(height: 24.0),
                         // Logout Button
                         OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: theme.colorScheme.error,
+                            side: BorderSide(
+                              color: theme.colorScheme.error.withValues(alpha: 0.35),
+                              width: 1.0,
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            backgroundColor: theme.colorScheme.error.withValues(alpha: 0.06),
+                          ),
                           onPressed: () async {
-                            GoRouter.of(context).prepareAuthEvent();
+                            final router = GoRouter.of(context); router.prepareAuthEvent();
                             await authManager.signOut();
-                            GoRouter.of(context).clearRedirectLocation();
+                            router.clearRedirectLocation();
 
                             if (context.mounted) {
                               context.goNamedAuth(
@@ -598,11 +682,18 @@ class _ProfiloUtenteWidgetState extends State<ProfiloUtenteWidget> {
                               );
                             }
                           },
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.logout_rounded,
                             size: 18.0,
+                            color: theme.colorScheme.error,
                           ),
-                          label: const Text('Disconnetti account'),
+                          label: const Text(
+                            'Disconnetti account',
+                            style: TextStyle(
+                              fontSize: 13.0,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
                       ],
                     ),

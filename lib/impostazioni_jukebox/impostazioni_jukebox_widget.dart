@@ -152,17 +152,42 @@ class _ImpostazioniJukeboxWidgetState extends State<ImpostazioniJukeboxWidget> {
                     }
                     final accessToken =
                         sessionData?['accessToken'] as String? ?? '';
-                    final refreshToken =
-                        sessionData?['refreshToken'] as String? ?? '';
-                    final expiresAt = sessionData?['expiresAt'] != null
-                        ? (sessionData!['expiresAt'] as Timestamp).toDate()
-                        : DateTime.now().add(const Duration(hours: 1));
+                    final newRefreshToken =
+                        (sessionData?['refreshToken'] as String? ?? '').trim();
 
-                    await currentUserReference!.update({
+                    int expiresIn = 3600;
+                    if (sessionData?['expiresIn'] != null) {
+                      expiresIn = int.tryParse(sessionData!['expiresIn'].toString()) ?? 3600;
+                    }
+
+                    DateTime expiresAt = DateTime.now().add(Duration(seconds: expiresIn));
+                    if (sessionData?['expiresAt'] is Timestamp) {
+                      expiresAt = (sessionData!['expiresAt'] as Timestamp).toDate();
+                    }
+
+                    // Recupera il refreshToken esistente per non cancellarlo se la risposta non lo include
+                    String finalRefreshToken = newRefreshToken;
+                    if (finalRefreshToken.isEmpty) {
+                      try {
+                        final userSnap = await currentUserReference!.get();
+                        final userData = userSnap.data() as Map<String, dynamic>?;
+                        final existingRefreshToken =
+                            (userData?['spotify_refresh_token'] as String? ?? '').trim();
+                        if (existingRefreshToken.isNotEmpty) {
+                          finalRefreshToken = existingRefreshToken;
+                        }
+                      } catch (_) {}
+                    }
+
+                    final updateMap = <String, dynamic>{
                       'spotify_access_token': accessToken,
-                      'spotify_refresh_token': refreshToken,
                       'spotify_token_expires_at': expiresAt,
-                    });
+                    };
+                    if (finalRefreshToken.isNotEmpty) {
+                      updateMap['spotify_refresh_token'] = finalRefreshToken;
+                    }
+
+                    await currentUserReference!.update(updateMap);
 
                     if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(

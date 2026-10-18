@@ -198,11 +198,12 @@
         const accessToken = tokens.access_token;
         const refreshToken = tokens.refresh_token || '';
         const expiresIn = tokens.expires_in || 3600;
+        const expiresAtIso = new Date(Date.now() + expiresIn * 1000).toISOString();
 
         titleEl.textContent = 'Sincronizzazione finale...';
 
         // 3. Aggiorna lo stato della sessione su Firestore affinché l'app mobile rilevi il successo immediato
-        const updateSessionUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/spotify_auth_sessions/${state}?updateMask.fieldPaths=status&updateMask.fieldPaths=accessToken&updateMask.fieldPaths=refreshToken&updateMask.fieldPaths=expiresIn&key=${FIREBASE_API_KEY}`;
+        const updateSessionUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/spotify_auth_sessions/${state}?updateMask.fieldPaths=status&updateMask.fieldPaths=accessToken&updateMask.fieldPaths=refreshToken&updateMask.fieldPaths=expiresIn&updateMask.fieldPaths=expiresAt&key=${FIREBASE_API_KEY}`;
         
         await fetch(updateSessionUrl, {
           method: 'PATCH',
@@ -214,7 +215,8 @@
               status: { stringValue: 'completed' },
               accessToken: { stringValue: accessToken },
               refreshToken: { stringValue: refreshToken },
-              expiresIn: { integerValue: expiresIn }
+              expiresIn: { integerValue: expiresIn },
+              expiresAt: { timestampValue: expiresAtIso }
             }
           })
         });
@@ -222,14 +224,15 @@
         // 4. Se presente userId, tenta anche l'aggiornamento diretto del documento utente
         if (userId) {
           try {
-            const updateUserUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/users/${userId}?updateMask.fieldPaths=spotify_access_token&updateMask.fieldPaths=spotify_refresh_token&key=${FIREBASE_API_KEY}`;
+            const updateUserUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/users/${userId}?updateMask.fieldPaths=spotify_access_token&updateMask.fieldPaths=spotify_refresh_token&updateMask.fieldPaths=spotify_token_expires_at&key=${FIREBASE_API_KEY}`;
             await fetch(updateUserUrl, {
               method: 'PATCH',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 fields: {
                   spotify_access_token: { stringValue: accessToken },
-                  spotify_refresh_token: { stringValue: refreshToken }
+                  spotify_refresh_token: { stringValue: refreshToken },
+                  spotify_token_expires_at: { timestampValue: expiresAtIso }
                 }
               })
             });

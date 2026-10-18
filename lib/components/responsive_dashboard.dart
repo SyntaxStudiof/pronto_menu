@@ -5,6 +5,7 @@ import '/backend/backend.dart';
 import '/dashboard_ristorante/desktop_orders_table_view.dart';
 import '/dashboard_ristorante/desktop_menu_view.dart';
 import '/dashboard_ristorante/desktop_client_preview_view.dart';
+import '/dashboard_ristorante/desktop_archive_view.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/theme_provider.dart';
 import '/index.dart';
@@ -94,7 +95,7 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
   static const List<String> _viewIds = [
     'menu',
     'ordini',
-    'storico',
+    'archivio',
     'anteprima_cliente',
     'qr_code',
     'personalizzazione',
@@ -109,6 +110,7 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
   late String _currentViewId;
   final Set<String> _visitedViews = {};
   bool _forceMobilePreview = false;
+  bool _sidebarCollapsed = false;
   late Stream<List<OrdersRecord>> _badgeCountStream;
 
   void _switchView(String newId) {
@@ -128,7 +130,7 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
         _currentViewId = 'ordini';
         break;
       case 2:
-        _currentViewId = 'storico';
+        _currentViewId = 'archivio';
         break;
       default:
         _currentViewId = 'menu';
@@ -152,12 +154,13 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
           subtitle: 'Comande in cucina in tempo reale',
           icon: Icons.soup_kitchen_rounded,
         );
+      case 'archivio':
       case 'storico':
         return const _SidebarSection(
-          id: 'storico',
-          title: 'Storico & Cassa',
-          subtitle: 'Comande completate e riepilogo vendite',
-          icon: Icons.receipt_long_rounded,
+          id: 'archivio',
+          title: 'Archivio Ordini',
+          subtitle: 'Comande archiviate, statistiche e report CSV',
+          icon: Icons.inventory_2_rounded,
         );
       case 'anteprima_cliente':
         return const _SidebarSection(
@@ -274,92 +277,117 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
           // ═════════════════════════════════════════════════════════════════
           // 1. SIDEBAR LATERALE A SINISTRA (Desktop PC)
           // ═════════════════════════════════════════════════════════════════
-          Container(
-            width: 270.0,
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1E293B) : Colors.white,
-              border: Border(
-                right: BorderSide(
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.08)
-                      : const Color(0xFFE2E8F0),
-                  width: 1.0,
-                ),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.03),
-                  blurRadius: 10.0,
-                  offset: const Offset(2, 0),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                // Header Logo & Brand
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20.0, 24.0, 20.0, 16.0),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 42.0,
-                        height: 42.0,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              colorScheme.primary,
-                              colorScheme.primary.withValues(alpha: 0.8),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(12.0),
-                          boxShadow: [
-                            BoxShadow(
-                              color: colorScheme.primary.withValues(alpha: 0.25),
-                              blurRadius: 8.0,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        alignment: Alignment.center,
-                        child: const Icon(
-                          Icons.restaurant_rounded,
-                          color: Colors.white,
-                          size: 24.0,
-                        ),
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeInOutCubic,
+            width: _sidebarCollapsed ? 0.0 : 270.0,
+            child: ClipRect(
+              child: OverflowBox(
+                minWidth: 270.0,
+                maxWidth: 270.0,
+                alignment: Alignment.topLeft,
+                child: Container(
+                  width: 270.0,
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                    border: Border(
+                      right: BorderSide(
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.08)
+                            : const Color(0xFFE2E8F0),
+                        width: 1.0,
                       ),
-                      const SizedBox(width: 12.0),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'ProntoMenu',
-                              style: TextStyle(
-                                fontSize: 17.0,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: -0.4,
-                                color: isDark ? Colors.white : const Color(0xFF0F172A),
-                              ),
-                            ),
-                            Text(
-                              'Dashboard Ristoratore',
-                              style: TextStyle(
-                                fontSize: 11.5,
-                                fontWeight: FontWeight.w500,
-                                color: isDark
-                                    ? const Color(0xFF94A3B8)
-                                    : const Color(0xFF64748B),
-                              ),
-                            ),
-                          ],
-                        ),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.03),
+                        blurRadius: 10.0,
+                        offset: const Offset(2, 0),
                       ),
                     ],
                   ),
-                ),
+                  child: Column(
+                    children: [
+                      // Header Logo & Brand con pulsante di compressione
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16.0, 20.0, 12.0, 14.0),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 38.0,
+                              height: 38.0,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    colorScheme.primary,
+                                    colorScheme.primary.withValues(alpha: 0.8),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(10.0),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: colorScheme.primary.withValues(alpha: 0.25),
+                                    blurRadius: 8.0,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              alignment: Alignment.center,
+                              child: const Icon(
+                                Icons.restaurant_rounded,
+                                color: Colors.white,
+                                size: 22.0,
+                              ),
+                            ),
+                            const SizedBox(width: 10.0),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    'ProntoMenu',
+                                    style: TextStyle(
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: -0.4,
+                                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                    ),
+                                  ),
+                                  Text(
+                                    'Dashboard Ristoratore',
+                                    style: TextStyle(
+                                      fontSize: 11.0,
+                                      fontWeight: FontWeight.w500,
+                                      color: isDark
+                                          ? const Color(0xFF94A3B8)
+                                          : const Color(0xFF64748B),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  _sidebarCollapsed = true;
+                                });
+                              },
+                              tooltip: 'Comprimi barra laterale',
+                              icon: Icon(
+                                Icons.menu_open_rounded,
+                                size: 20.0,
+                                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                              ),
+                              hoverColor: colorScheme.primary.withValues(alpha: 0.08),
+                              splashRadius: 20.0,
+                              padding: const EdgeInsets.all(6.0),
+                            ),
+                          ],
+                        ),
+                      ),
 
                 // Card Ristorante Connesso
                 Padding(
@@ -459,12 +487,13 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
                         onTap: () => _switchView('ordini'),
                       ),
                       _buildSidebarItem(
-                        icon: Icons.receipt_long_rounded,
-                        title: 'Storico & Cassa',
-                        isSelected: _currentViewId == 'storico',
+                        icon: Icons.inventory_2_rounded,
+                        title: 'Archivio Ordini',
+                        isSelected: _currentViewId == 'archivio',
                         colorScheme: colorScheme,
                         isDark: isDark,
-                        onTap: () => _switchView('storico'),
+                        iconColor: const Color(0xFF6366F1),
+                        onTap: () => _switchView('archivio'),
                       ),
 
                       const SizedBox(height: 14.0),
@@ -549,11 +578,11 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
                         _buildSidebarItem(
                           icon: Icons.admin_panel_settings_rounded,
                           title: 'Admin Dashboard',
-                          isSelected: _currentViewId == 'admin',
+                          isSelected: false,
                           colorScheme: colorScheme,
                           isDark: isDark,
                           iconColor: const Color(0xFFDC2626),
-                          onTap: () => _switchView('admin'),
+                          onTap: () => context.goNamed(AdminDashboardWidget.routeName),
                         ),
                     ],
                   ),
@@ -677,6 +706,9 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
               ],
             ),
           ),
+        ),
+      ),
+    ),
 
           // ═════════════════════════════════════════════════════════════════
           // 2. AREA CONTENUTO PRINCIPALE (A destra della Sidebar)
@@ -687,7 +719,7 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
                 // TopBar Superiore
                 Container(
                   height: 64.0,
-                  padding: const EdgeInsets.symmetric(horizontal: 28.0),
+                  padding: EdgeInsets.symmetric(horizontal: _sidebarCollapsed ? 18.0 : 28.0),
                   decoration: BoxDecoration(
                     color: isDark ? const Color(0xFF1E293B) : Colors.white,
                     border: Border(
@@ -701,6 +733,37 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
                   ),
                   child: Row(
                     children: [
+                      // Pulsante Riapri Barra Laterale (visibile quando compressa)
+                      if (_sidebarCollapsed) ...[
+                        Tooltip(
+                          message: 'Espandi barra laterale',
+                          child: InkWell(
+                            onTap: () {
+                              setState(() {
+                                _sidebarCollapsed = false;
+                              });
+                            },
+                            borderRadius: BorderRadius.circular(8.0),
+                            child: Container(
+                              padding: const EdgeInsets.all(8.0),
+                              decoration: BoxDecoration(
+                                color: colorScheme.primary.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(8.0),
+                                border: Border.all(
+                                  color: colorScheme.primary.withValues(alpha: 0.25),
+                                ),
+                              ),
+                              child: Icon(
+                                Icons.menu_rounded,
+                                size: 20.0,
+                                color: colorScheme.primary,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16.0),
+                      ],
+
                       // Titolo Sezione Corrente
                       Icon(
                         activeSection.icon,
@@ -827,11 +890,11 @@ class _DashboardDesktopShellState extends State<DashboardDesktopShell> {
               ristoranteRef: targetRef,
               initialStatusFilter: 'all',
             );
+          case 'archivio':
           case 'storico':
-            return DesktopOrdersTableView(
-              key: const PageStorageKey('tab_view_storico'),
+            return DesktopArchiveView(
+              key: const PageStorageKey('tab_view_archivio'),
               ristoranteRef: targetRef,
-              initialStatusFilter: 'Completato',
             );
           case 'anteprima_cliente':
             return DesktopClientPreviewView(

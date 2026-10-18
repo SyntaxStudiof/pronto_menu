@@ -450,6 +450,7 @@ class _JukeboxModalWidgetState extends State<JukeboxModalWidget>
           await JukeboxService.enqueueOrPlayTrackOnSpotify(
             accessToken: validToken,
             trackId: track.id,
+            ristorante: freshRistorante,
           );
         }
       }

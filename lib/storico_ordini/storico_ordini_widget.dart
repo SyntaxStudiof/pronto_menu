@@ -2,7 +2,6 @@ import '/backend/backend.dart';
 import '/components/nav_bar_dinamica_widget.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/custom_functions.dart' as functions;
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
@@ -89,15 +88,15 @@ class _StoricoOrdiniWidgetState extends State<StoricoOrdiniWidget> {
                             ),
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: theme.colorScheme.error,
-                                foregroundColor: theme.colorScheme.onError,
+                                backgroundColor: const Color(0xFF6366F1),
+                                foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10.0),
                                 ),
                               ),
                               onPressed: () =>
                                   Navigator.pop(alertDialogContext, true),
-                              child: const Text('Elimina tutti'),
+                              child: const Text('Archivia tutti'),
                             ),
                           ],
                         );
@@ -105,36 +104,30 @@ class _StoricoOrdiniWidgetState extends State<StoricoOrdiniWidget> {
                     ) ??
                     false;
                 if (confirmDialogResponse) {
-                  _model.ordiniDaEliminare = await queryOrdersRecordOnce(
+                  final ordini = await queryOrdersRecordOnce(
                     queryBuilder: (ordersRecord) => ordersRecord.where(
                       'stato_ordine',
                       isEqualTo: 'Completato',
                     ),
                   );
-                  _model.indiceLoop = 0;
-                  safeSetState(() {});
-                  while (
-                      _model.indiceLoop! < _model.ordiniDaEliminare!.length) {
-                    await _model.ordiniDaEliminare!
-                        .elementAtOrNull(_model.indiceLoop!)!
-                        .reference
-                        .delete();
-                    _model.indiceLoop = _model.indiceLoop! + 1;
-                    safeSetState(() {});
+                  for (var ord in ordini) {
+                    await ord.reference.update(createOrdersRecordData(
+                      statoOrdine: 'archiviato',
+                    ));
                   }
                 }
 
                 safeSetState(() {});
               },
-              backgroundColor: theme.colorScheme.error,
-              foregroundColor: theme.colorScheme.onError,
+              backgroundColor: const Color(0xFF6366F1),
+              foregroundColor: Colors.white,
               elevation: 4.0,
               icon: const Icon(
-                Icons.delete_sweep_rounded,
+                Icons.archive_rounded,
                 size: 20.0,
               ),
               label: const Text(
-                'Svuota storico',
+                'Archivia storico',
               ),
             ),
           ),
@@ -593,7 +586,7 @@ class _StoricoOrdiniWidgetState extends State<StoricoOrdiniWidget> {
                                                     ),
                                                     const SizedBox(width: 14.0),
                                                     IconButton(
-                                                      tooltip: 'Elimina ordine',
+                                                      tooltip: 'Archivia ordine',
                                                       onPressed: () async {
                                                         var confirmDialogResponse = await showDialog<bool>(
                                                               context: context,
@@ -604,13 +597,13 @@ class _StoricoOrdiniWidgetState extends State<StoricoOrdiniWidget> {
                                                                     borderRadius: BorderRadius.circular(20.0),
                                                                   ),
                                                                   title: Text(
-                                                                    'Elimina ordine',
+                                                                    'Archivia ordine',
                                                                     style: theme.textTheme.titleMedium?.copyWith(
                                                                       fontWeight: FontWeight.bold,
                                                                     ),
                                                                   ),
                                                                   content: Text(
-                                                                    'Vuoi davvero eliminare questo ordine dallo storico?',
+                                                                    'Vuoi archiviare questo ordine? Sarà sempre consultabile nell\'Archivio Storico da Desktop.',
                                                                     style: theme.textTheme.bodyMedium,
                                                                   ),
                                                                   actions: [
@@ -621,15 +614,15 @@ class _StoricoOrdiniWidgetState extends State<StoricoOrdiniWidget> {
                                                                     ),
                                                                     ElevatedButton(
                                                                       style: ElevatedButton.styleFrom(
-                                                                        backgroundColor: theme.colorScheme.error,
-                                                                        foregroundColor: theme.colorScheme.onError,
+                                                                        backgroundColor: theme.colorScheme.primary,
+                                                                        foregroundColor: theme.colorScheme.onPrimary,
                                                                         shape: RoundedRectangleBorder(
                                                                           borderRadius: BorderRadius.circular(10.0),
                                                                         ),
                                                                       ),
                                                                       onPressed: () =>
                                                                           Navigator.pop(alertDialogContext, true),
-                                                                      child: const Text('Elimina'),
+                                                                      child: const Text('Archivia'),
                                                                     ),
                                                                   ],
                                                                 );
@@ -637,6 +630,64 @@ class _StoricoOrdiniWidgetState extends State<StoricoOrdiniWidget> {
                                                             ) ??
                                                             false;
                                                         if (confirmDialogResponse) {
+                                                          await listViewOrdersRecord.reference.update(createOrdersRecordData(
+                                                            statoOrdine: 'archiviato',
+                                                          ));
+                                                        }
+                                                      },
+                                                      icon: Icon(
+                                                        Icons.archive_outlined,
+                                                        color: theme.colorScheme.primary,
+                                                        size: 20.0,
+                                                      ),
+                                                      style: IconButton.styleFrom(
+                                                        backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.12),
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius: BorderRadius.circular(10.0),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 8.0),
+                                                    IconButton(
+                                                      tooltip: 'Elimina ordine',
+                                                      onPressed: () async {
+                                                        final confirm = await showDialog<bool>(
+                                                          context: context,
+                                                          builder: (alertDialogContext) => AlertDialog(
+                                                            backgroundColor: theme.cardColor,
+                                                            shape: RoundedRectangleBorder(
+                                                              borderRadius: BorderRadius.circular(20.0),
+                                                            ),
+                                                            title: Text(
+                                                              'Elimina ordine',
+                                                              style: theme.textTheme.titleMedium?.copyWith(
+                                                                fontWeight: FontWeight.bold,
+                                                              ),
+                                                            ),
+                                                            content: Text(
+                                                              'Vuoi davvero eliminare definitivamente questo ordine del Tavolo ${listViewOrdersRecord.tavolo}? L\'azione è irreversibile.',
+                                                              style: theme.textTheme.bodyMedium,
+                                                            ),
+                                                            actions: [
+                                                              TextButton(
+                                                                onPressed: () => Navigator.pop(alertDialogContext, false),
+                                                                child: const Text('Annulla'),
+                                                              ),
+                                                              ElevatedButton(
+                                                                style: ElevatedButton.styleFrom(
+                                                                  backgroundColor: theme.colorScheme.error,
+                                                                  foregroundColor: theme.colorScheme.onError,
+                                                                  shape: RoundedRectangleBorder(
+                                                                    borderRadius: BorderRadius.circular(10.0),
+                                                                  ),
+                                                                ),
+                                                                onPressed: () => Navigator.pop(alertDialogContext, true),
+                                                                child: const Text('Elimina'),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ) ?? false;
+                                                        if (confirm) {
                                                           await listViewOrdersRecord.reference.delete();
                                                         }
                                                       },

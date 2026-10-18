@@ -13,6 +13,7 @@
     "rules": "firebase/storage.rules"
   },
   "hosting": {
+    "site": "prontomenu-6d485",
     "public": "build/web",
     "ignore": [
       "firebase.json",

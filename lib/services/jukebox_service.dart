@@ -511,6 +511,7 @@ class JukeboxService {
       'state': state,
       'code_challenge_method': 'S256',
       'code_challenge': challenge,
+      'show_dialog': 'true',
     };
     return Uri.https('accounts.spotify.com', '/authorize', params).toString();
   }
@@ -584,52 +585,116 @@ class JukeboxService {
     return null;
   }
 
-  /// Restituisce un token di accesso valido per il ristorante (rinfrescandolo su Firestore se scaduto)
-  static Future<String?> getValidAccessToken(UsersRecord ristorante) async {
-    if (ristorante.spotifyAccessToken.isEmpty) return null;
+  /// Restituisce un token di accesso valido per il ristorante (rinfrescandolo su Firestore se scaduto o se richiesto)
+  static Future<String?> getValidAccessToken(
+    UsersRecord ristorante, {
+    bool forceRefresh = false,
+  }) async {
+    // 1. Legge anzitutto dal documento utente su Firestore per ottenere lo stato più aggiornato in tempo reale
+    String accessToken = ristorante.spotifyAccessToken;
+    String refreshToken = ristorante.spotifyRefreshToken;
+    DateTime? expiresAt = ristorante.spotifyTokenExpiresAt;
+    String? clientId = ristorante.spotifyClientId.isNotEmpty
+        ? ristorante.spotifyClientId
+        : null;
 
-    final expiresAt = ristorante.spotifyTokenExpiresAt;
-    final isExpired = expiresAt != null &&
+    try {
+      final docSnap = await ristorante.reference.get();
+      if (docSnap.exists) {
+        final data = docSnap.data() as Map<String, dynamic>? ?? {};
+        final dbAccessToken = data['spotify_access_token'] as String?;
+        final dbRefreshToken = data['spotify_refresh_token'] as String?;
+        final dbExpiresAt = data['spotify_token_expires_at'];
+
+        if (dbAccessToken != null && dbAccessToken.isNotEmpty) {
+          accessToken = dbAccessToken;
+        }
+        if (dbRefreshToken != null && dbRefreshToken.isNotEmpty) {
+          refreshToken = dbRefreshToken;
+        }
+        if (dbExpiresAt is Timestamp) {
+          expiresAt = dbExpiresAt.toDate();
+        } else if (dbExpiresAt is DateTime) {
+          expiresAt = dbExpiresAt;
+        }
+        final dbClientId = data['spotify_client_id'] as String?;
+        if (dbClientId != null && dbClientId.isNotEmpty) {
+          clientId = dbClientId;
+        }
+      }
+    } catch (e) {
+      debugPrint('Errore lettura documento utente per Spotify: $e');
+    }
+
+    if (accessToken.isEmpty && refreshToken.isEmpty) return null;
+
+    // Se non abbiamo un refresh token, possiamo restituire solo l'access token
+    if (refreshToken.isEmpty) {
+      return accessToken.isNotEmpty ? accessToken : null;
+    }
+
+    // Se la scadenza è sconosciuta (null) o mancano meno di 5 minuti, o è forzato, esegui il refresh
+    final bool isExpiredOrMissing = expiresAt == null ||
         DateTime.now().isAfter(expiresAt.subtract(const Duration(minutes: 5)));
 
-    if (isExpired && ristorante.spotifyRefreshToken.isNotEmpty) {
+    if (forceRefresh || isExpiredOrMissing || accessToken.isEmpty) {
       final refreshed = await refreshAccessToken(
-        refreshToken: ristorante.spotifyRefreshToken,
-        clientId: ristorante.spotifyClientId.isNotEmpty
-            ? ristorante.spotifyClientId
-            : null,
+        refreshToken: refreshToken,
+        clientId: clientId,
       );
 
       if (refreshed != null && refreshed['access_token'] != null) {
         final newAccessToken = refreshed['access_token'] as String;
-        final newRefreshToken = refreshed['refresh_token'] as String? ??
-            ristorante.spotifyRefreshToken;
+        final newRefreshToken =
+            (refreshed['refresh_token'] as String?)?.isNotEmpty == true
+                ? (refreshed['refresh_token'] as String)
+                : refreshToken;
         final expiresIn = refreshed['expires_in'] as int? ?? 3600;
+        final newExpiresAt = DateTime.now().add(Duration(seconds: expiresIn));
 
-        await ristorante.reference.update({
-          'spotify_access_token': newAccessToken,
-          'spotify_refresh_token': newRefreshToken,
-          'spotify_token_expires_at':
-              DateTime.now().add(Duration(seconds: expiresIn)),
-        });
+        try {
+          await ristorante.reference.update({
+            'spotify_access_token': newAccessToken,
+            'spotify_refresh_token': newRefreshToken,
+            'spotify_token_expires_at': newExpiresAt,
+          });
+        } catch (e) {
+          debugPrint('Errore aggiornamento token rinfrescati su Firestore: $e');
+        }
 
         return newAccessToken;
+      } else {
+        debugPrint('Tentativo di refresh token non riuscito con Spotify.');
+        if (forceRefresh) return null;
       }
     }
 
-    return ristorante.spotifyAccessToken;
+    return accessToken;
   }
 
   /// Recupera il brano attualmente in riproduzione dal vivo su Spotify del locale
   static Future<SpotifyTrack?> getCurrentlyPlaying(UsersRecord ristorante) async {
     try {
-      final token = await getValidAccessToken(ristorante);
+      String? token = await getValidAccessToken(ristorante);
       if (token == null || token.isEmpty) return null;
 
-      final res = await http.get(
+      var res = await http.get(
         Uri.parse('https://api.spotify.com/v1/me/player/currently-playing'),
         headers: {'Authorization': 'Bearer $token'},
       ).timeout(const Duration(seconds: 4));
+
+      // Se il token è scaduto (401), tentiamo subito un refresh forzato e riproviamo
+      if (res.statusCode == 401) {
+        final refreshedToken =
+            await getValidAccessToken(ristorante, forceRefresh: true);
+        if (refreshedToken != null && refreshedToken.isNotEmpty) {
+          token = refreshedToken;
+          res = await http.get(
+            Uri.parse('https://api.spotify.com/v1/me/player/currently-playing'),
+            headers: {'Authorization': 'Bearer $token'},
+          ).timeout(const Duration(seconds: 4));
+        }
+      }
 
       if (res.statusCode == 200 && res.body.isNotEmpty) {
         final data = jsonDecode(res.body);
@@ -668,17 +733,32 @@ class JukeboxService {
   static Future<bool> enqueueOrPlayTrackOnSpotify({
     required String accessToken,
     required String trackId,
+    UsersRecord? ristorante,
   }) async {
     try {
+      String currentToken = accessToken;
       final cleanTrackId = trackId.startsWith('spotify:track:')
           ? trackId.replaceFirst('spotify:track:', '')
           : trackId;
 
       // 1. Controlla lo stato attuale del player
-      final playerRes = await http.get(
+      var playerRes = await http.get(
         Uri.parse('https://api.spotify.com/v1/me/player'),
-        headers: {'Authorization': 'Bearer $accessToken'},
+        headers: {'Authorization': 'Bearer $currentToken'},
       ).timeout(const Duration(seconds: 5));
+
+      // Se il token è scaduto (401) e abbiamo il record ristorante, rinfreschiamo subito
+      if (playerRes.statusCode == 401 && ristorante != null) {
+        final refreshedToken =
+            await getValidAccessToken(ristorante, forceRefresh: true);
+        if (refreshedToken != null && refreshedToken.isNotEmpty) {
+          currentToken = refreshedToken;
+          playerRes = await http.get(
+            Uri.parse('https://api.spotify.com/v1/me/player'),
+            headers: {'Authorization': 'Bearer $currentToken'},
+          ).timeout(const Duration(seconds: 5));
+        }
+      }
 
       if (playerRes.statusCode == 200 && playerRes.body.isNotEmpty) {
         final playerData = jsonDecode(playerRes.body);
@@ -690,7 +770,7 @@ class JukeboxService {
             Uri.parse(
               'https://api.spotify.com/v1/me/player/queue?uri=spotify:track:$cleanTrackId',
             ),
-            headers: {'Authorization': 'Bearer $accessToken'},
+            headers: {'Authorization': 'Bearer $currentToken'},
           ).timeout(const Duration(seconds: 5));
 
           if (queueRes.statusCode == 200 || queueRes.statusCode == 204) {
@@ -705,7 +785,7 @@ class JukeboxService {
       try {
         final devicesRes = await http.get(
           Uri.parse('https://api.spotify.com/v1/me/player/devices'),
-          headers: {'Authorization': 'Bearer $accessToken'},
+          headers: {'Authorization': 'Bearer $currentToken'},
         ).timeout(const Duration(seconds: 5));
 
         if (devicesRes.statusCode == 200 && devicesRes.body.isNotEmpty) {
@@ -733,7 +813,7 @@ class JukeboxService {
       final playRes = await http.put(
         playUri,
         headers: {
-          'Authorization': 'Bearer $accessToken',
+          'Authorization': 'Bearer $currentToken',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
@@ -757,7 +837,7 @@ class JukeboxService {
   static Future<({bool success, String message})> testSpotifyPlayer({
     required UsersRecord user,
   }) async {
-    final token = await getValidAccessToken(user);
+    String? token = await getValidAccessToken(user);
     if (token == null || token.isEmpty) {
       return (
         success: false,
@@ -766,16 +846,29 @@ class JukeboxService {
     }
 
     try {
-      final devicesRes = await http.get(
+      var devicesRes = await http.get(
         Uri.parse('https://api.spotify.com/v1/me/player/devices'),
         headers: {'Authorization': 'Bearer $token'},
       ).timeout(const Duration(seconds: 5));
+
+      // Se Spotify risponde 401 (token scaduto o invalidato), tentiamo un refresh forzato automatico
+      if (devicesRes.statusCode == 401) {
+        debugPrint('Token Spotify 401 su testSpotifyPlayer: eseguo refresh automatico...');
+        final refreshedToken = await getValidAccessToken(user, forceRefresh: true);
+        if (refreshedToken != null && refreshedToken.isNotEmpty) {
+          token = refreshedToken;
+          devicesRes = await http.get(
+            Uri.parse('https://api.spotify.com/v1/me/player/devices'),
+            headers: {'Authorization': 'Bearer $token'},
+          ).timeout(const Duration(seconds: 5));
+        }
+      }
 
       if (devicesRes.statusCode == 401) {
         return (
           success: false,
           message:
-              'Token Spotify scaduto o non valido. Prova a ricollegare l\'account.',
+              'Sessione Spotify scaduta o non valida. Prova a ricollegare l\'account dalle impostazioni.',
         );
       }
 

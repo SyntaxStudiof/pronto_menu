@@ -39,7 +39,9 @@ class _CestinoVuotoWidgetState extends State<CestinoVuotoWidget> {
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
+    final primaryColor = colorScheme.primary;
 
     return Center(
       child: Container(
@@ -48,7 +50,7 @@ class _CestinoVuotoWidgetState extends State<CestinoVuotoWidget> {
         margin: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
         padding: const EdgeInsets.all(32.0),
         decoration: BoxDecoration(
-          color: theme.cardColor,
+          color: isDark ? const Color(0xFF1E293B) : Colors.white,
           borderRadius: BorderRadius.circular(24.0),
           border: Border.all(
             color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
@@ -70,10 +72,10 @@ class _CestinoVuotoWidgetState extends State<CestinoVuotoWidget> {
               width: 84.0,
               height: 84.0,
               decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withValues(alpha: 0.10),
+                color: primaryColor.withValues(alpha: 0.10),
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.25),
+                  color: primaryColor.withValues(alpha: 0.25),
                   width: 2.0,
                 ),
               ),
@@ -82,13 +84,13 @@ class _CestinoVuotoWidgetState extends State<CestinoVuotoWidget> {
                 width: 62.0,
                 height: 62.0,
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                  color: primaryColor.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                 ),
                 alignment: Alignment.center,
                 child: Icon(
                   Icons.delete_sweep_rounded,
-                  color: theme.colorScheme.primary,
+                  color: primaryColor,
                   size: 34.0,
                 ),
               ),
@@ -99,10 +101,10 @@ class _CestinoVuotoWidgetState extends State<CestinoVuotoWidget> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.5),
               decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                color: primaryColor.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(20.0),
                 border: Border.all(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.25),
+                  color: primaryColor.withValues(alpha: 0.25),
                   width: 1.0,
                 ),
               ),
@@ -112,7 +114,7 @@ class _CestinoVuotoWidgetState extends State<CestinoVuotoWidget> {
                   Icon(
                     Icons.check_circle_outline_rounded,
                     size: 14.0,
-                    color: theme.colorScheme.primary,
+                    color: primaryColor,
                   ),
                   const SizedBox(width: 6.0),
                   Text(
@@ -121,7 +123,7 @@ class _CestinoVuotoWidgetState extends State<CestinoVuotoWidget> {
                       fontSize: 11.0,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 0.6,
-                      color: theme.colorScheme.primary,
+                      color: primaryColor,
                     ),
                   ),
                 ],
@@ -133,10 +135,11 @@ class _CestinoVuotoWidgetState extends State<CestinoVuotoWidget> {
             Text(
               'Il cestino è vuoto',
               textAlign: TextAlign.center,
-              style: theme.textTheme.headlineSmall?.copyWith(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
                 letterSpacing: -0.4,
                 fontSize: 22.0,
+                color: isDark ? Colors.white : const Color(0xFF0F172A),
               ),
             ),
             const SizedBox(height: 8.0),

@@ -3,7 +3,6 @@ import '/components/nav_bar_dinamica_widget.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/custom_functions.dart' as functions;
 import '/index.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
@@ -30,6 +29,7 @@ class DashboardRistoranteWidget extends StatefulWidget {
 
 class _DashboardRistoranteWidgetState extends State<DashboardRistoranteWidget> {
   late DashboardRistoranteModel _model;
+  String _selectedPhase = 'in_attesa'; // 'in_attesa' o 'in_preparazione'
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -67,7 +67,8 @@ class _DashboardRistoranteWidgetState extends State<DashboardRistoranteWidget> {
             padding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 24.0, 85.0),
             child: FloatingActionButton.extended(
               onPressed: () async {
-                var confirmDialogResponse = await showDialog<bool>(
+                final isPrep = _selectedPhase == 'in_preparazione';
+                final confirmDialogResponse = await showDialog<bool>(
                       context: context,
                       builder: (alertDialogContext) {
                         return AlertDialog(
@@ -76,14 +77,16 @@ class _DashboardRistoranteWidgetState extends State<DashboardRistoranteWidget> {
                             borderRadius: BorderRadius.circular(20.0),
                           ),
                           title: Text(
-                            'Completa tutti gli ordini',
+                            isPrep ? 'Completa tutti gli ordini' : 'Inizia preparazione per tutti',
                             style: theme.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                               fontSize: 18.0,
                             ),
                           ),
                           content: Text(
-                            'Sei sicuro di voler completare tutti gli ordini in attesa? L\'azione è irreversibile.',
+                            isPrep
+                                ? 'Sei sicuro di voler completare tutte le comande in preparazione?'
+                                : 'Vuoi spostare tutte le comande in attesa su "In Preparazione"?',
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: theme.textTheme.bodySmall?.color,
                             ),
@@ -102,8 +105,8 @@ class _DashboardRistoranteWidgetState extends State<DashboardRistoranteWidget> {
                             ),
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: theme.colorScheme.primary,
-                                foregroundColor: theme.colorScheme.onPrimary,
+                                backgroundColor: isPrep ? const Color(0xFF10B981) : const Color(0xFF3B82F6),
+                                foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10.0),
                                 ),
@@ -111,9 +114,9 @@ class _DashboardRistoranteWidgetState extends State<DashboardRistoranteWidget> {
                               onPressed: () =>
                                   Navigator.pop(alertDialogContext, true),
                               child: Text(
-                                'Completa tutti',
+                                isPrep ? 'Completa tutti' : 'Inizia tutti',
                                 style: theme.textTheme.labelLarge?.copyWith(
-                                  color: theme.colorScheme.onPrimary,
+                                  color: Colors.white,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -124,41 +127,35 @@ class _DashboardRistoranteWidgetState extends State<DashboardRistoranteWidget> {
                     ) ??
                     false;
                 if (confirmDialogResponse) {
-                  _model.ordiniDaCompletare = await queryOrdersRecordOnce(
+                  final targetStatus = isPrep ? 'Completato' : 'in_preparazione';
+                  final sourceStatus = _selectedPhase;
+                  final ordini = await queryOrdersRecordOnce(
                     queryBuilder: (ordersRecord) => ordersRecord.where(
                       'stato_ordine',
-                      isEqualTo: 'in_attesa',
+                      isEqualTo: sourceStatus,
                     ),
                   );
-                  _model.indiceLoop = 0;
-                  safeSetState(() {});
-                  while (
-                      _model.indiceLoop! < _model.ordiniDaCompletare!.length) {
-                    await _model.ordiniDaCompletare!
-                        .elementAtOrNull(_model.indiceLoop!)!
-                        .reference
-                        .update(createOrdersRecordData(
-                          statoOrdine: 'Completato',
-                        ));
-                    _model.indiceLoop = _model.indiceLoop! + 1;
-                    safeSetState(() {});
+                  for (var ord in ordini) {
+                    await ord.reference.update(createOrdersRecordData(
+                      statoOrdine: targetStatus,
+                      visto: isPrep ? false : ord.visto,
+                    ));
                   }
+                  safeSetState(() {});
                 }
-
-                safeSetState(() {});
               },
-              backgroundColor: theme.colorScheme.primary,
-              foregroundColor: theme.colorScheme.onPrimary,
+              backgroundColor: _selectedPhase == 'in_preparazione' ? const Color(0xFF10B981) : const Color(0xFF3B82F6),
+              foregroundColor: Colors.white,
               elevation: 4.0,
               icon: Icon(
-                Icons.done_all_rounded,
-                color: theme.colorScheme.onPrimary,
+                _selectedPhase == 'in_preparazione' ? Icons.done_all_rounded : Icons.soup_kitchen_rounded,
+                color: Colors.white,
                 size: 20.0,
               ),
               label: Text(
-                'Completa tutti',
+                _selectedPhase == 'in_preparazione' ? 'Completa tutti' : 'Inizia tutti',
                 style: theme.textTheme.labelLarge?.copyWith(
-                  color: theme.colorScheme.onPrimary,
+                  color: Colors.white,
                   fontWeight: FontWeight.w600,
                   fontSize: 14.0,
                 ),
@@ -254,24 +251,29 @@ class _DashboardRistoranteWidgetState extends State<DashboardRistoranteWidget> {
                           stream: queryOrdersRecord(
                             queryBuilder: (ordersRecord) => ordersRecord.where(
                               'stato_ordine',
-                              isEqualTo: 'in_attesa',
+                              isEqualTo: _selectedPhase,
                             ),
                           ),
                           builder: (context, snapshot) {
                             final count =
                                 snapshot.hasData ? snapshot.data!.length : 0;
+                            final isPrep = _selectedPhase == 'in_preparazione';
+                            final mainColor = isPrep ? const Color(0xFF3B82F6) : const Color(0xFFF59E0B);
+                            final textColor = isPrep ? const Color(0xFF2563EB) : const Color(0xFFD97706);
+                            final label = isPrep ? 'in prep.' : 'in attesa';
+
                             return Container(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 12.0, vertical: 6.0),
                               decoration: BoxDecoration(
                                 color: (count > 0
-                                        ? const Color(0xFFF59E0B)
+                                        ? mainColor
                                         : theme.hintColor)
                                     .withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(20.0),
                                 border: Border.all(
                                   color: (count > 0
-                                          ? const Color(0xFFF59E0B)
+                                          ? mainColor
                                           : theme.dividerColor)
                                       .withValues(alpha: 0.35),
                                 ),
@@ -284,17 +286,17 @@ class _DashboardRistoranteWidgetState extends State<DashboardRistoranteWidget> {
                                     height: 8.0,
                                     decoration: BoxDecoration(
                                       color: count > 0
-                                          ? const Color(0xFFF59E0B)
+                                          ? mainColor
                                           : theme.hintColor,
                                       shape: BoxShape.circle,
                                     ),
                                   ),
                                   const SizedBox(width: 8.0),
                                   Text(
-                                    '$count in attesa',
+                                    '$count $label',
                                     style: theme.textTheme.labelMedium?.copyWith(
                                       color: count > 0
-                                          ? const Color(0xFFD97706)
+                                          ? textColor
                                           : theme.hintColor,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 13.0,
@@ -385,7 +387,131 @@ class _DashboardRistoranteWidgetState extends State<DashboardRistoranteWidget> {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 24.0),
+                        // Segmented Switch per le due fasi della cucina: In Attesa & In Preparazione
+                        Container(
+                          padding: const EdgeInsets.all(4.0),
+                          decoration: BoxDecoration(
+                            color: theme.cardColor,
+                            borderRadius: BorderRadius.circular(14.0),
+                            border: Border.all(
+                              color: theme.dividerColor.withValues(alpha: 0.5),
+                              width: 1.0,
+                            ),
+                          ),
+                          child: StreamBuilder<List<OrdersRecord>>(
+                            stream: queryOrdersRecord(
+                              queryBuilder: (q) => q.orderBy('data_creazione'),
+                            ),
+                            builder: (context, allOrdersSnapshot) {
+                              final allOrders = allOrdersSnapshot.data ?? [];
+                              final countAttesa = allOrders.where((o) => o.statoOrdine.toLowerCase() == 'in_attesa').length;
+                              final countPrep = allOrders.where((o) => o.statoOrdine.toLowerCase() == 'in_preparazione').length;
+
+                              return Row(
+                                children: [
+                                  // Tab In Attesa
+                                  Expanded(
+                                    child: InkWell(
+                                      onTap: () => setState(() => _selectedPhase = 'in_attesa'),
+                                      borderRadius: BorderRadius.circular(10.0),
+                                      child: AnimatedContainer(
+                                        duration: const Duration(milliseconds: 200),
+                                        padding: const EdgeInsets.symmetric(vertical: 10.0),
+                                        decoration: BoxDecoration(
+                                          color: _selectedPhase == 'in_attesa'
+                                              ? const Color(0xFFF59E0B).withValues(alpha: 0.15)
+                                              : Colors.transparent,
+                                          borderRadius: BorderRadius.circular(10.0),
+                                          border: Border.all(
+                                            color: _selectedPhase == 'in_attesa'
+                                                ? const Color(0xFFF59E0B)
+                                                : Colors.transparent,
+                                            width: 1.2,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.hourglass_top_rounded,
+                                              size: 16.0,
+                                              color: _selectedPhase == 'in_attesa'
+                                                  ? const Color(0xFFD97706)
+                                                  : theme.textTheme.bodyMedium?.color,
+                                            ),
+                                            const SizedBox(width: 6.0),
+                                            Text(
+                                              'In Attesa ($countAttesa)',
+                                              style: TextStyle(
+                                                fontSize: 13.0,
+                                                fontWeight: _selectedPhase == 'in_attesa'
+                                                    ? FontWeight.bold
+                                                    : FontWeight.w500,
+                                                color: _selectedPhase == 'in_attesa'
+                                                    ? const Color(0xFFD97706)
+                                                    : theme.textTheme.bodyMedium?.color,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6.0),
+                                  // Tab In Preparazione
+                                  Expanded(
+                                    child: InkWell(
+                                      onTap: () => setState(() => _selectedPhase = 'in_preparazione'),
+                                      borderRadius: BorderRadius.circular(10.0),
+                                      child: AnimatedContainer(
+                                        duration: const Duration(milliseconds: 200),
+                                        padding: const EdgeInsets.symmetric(vertical: 10.0),
+                                        decoration: BoxDecoration(
+                                          color: _selectedPhase == 'in_preparazione'
+                                              ? const Color(0xFF3B82F6).withValues(alpha: 0.15)
+                                              : Colors.transparent,
+                                          borderRadius: BorderRadius.circular(10.0),
+                                          border: Border.all(
+                                            color: _selectedPhase == 'in_preparazione'
+                                                ? const Color(0xFF3B82F6)
+                                                : Colors.transparent,
+                                            width: 1.2,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.soup_kitchen_rounded,
+                                              size: 16.0,
+                                              color: _selectedPhase == 'in_preparazione'
+                                                  ? const Color(0xFF2563EB)
+                                                  : theme.textTheme.bodyMedium?.color,
+                                            ),
+                                            const SizedBox(width: 6.0),
+                                            Text(
+                                              'In Prep. ($countPrep)',
+                                              style: TextStyle(
+                                                fontSize: 13.0,
+                                                fontWeight: _selectedPhase == 'in_preparazione'
+                                                    ? FontWeight.bold
+                                                    : FontWeight.w500,
+                                                color: _selectedPhase == 'in_preparazione'
+                                                    ? const Color(0xFF2563EB)
+                                                    : theme.textTheme.bodyMedium?.color,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 18.0),
 
                         // Orders StreamBuilder
                         StreamBuilder<List<OrdersRecord>>(
@@ -393,7 +519,7 @@ class _DashboardRistoranteWidgetState extends State<DashboardRistoranteWidget> {
                             queryBuilder: (ordersRecord) => ordersRecord
                                 .where(
                                   'stato_ordine',
-                                  isEqualTo: 'in_attesa',
+                                  isEqualTo: _selectedPhase,
                                 )
                                 .orderBy('data_creazione'),
                           ),
@@ -448,14 +574,18 @@ class _DashboardRistoranteWidgetState extends State<DashboardRistoranteWidget> {
                                     ),
                                     const SizedBox(height: 14.0),
                                     Text(
-                                      'Nessun ordine in attesa',
+                                      _selectedPhase == 'in_attesa'
+                                          ? 'Nessun ordine in attesa'
+                                          : 'Nessun ordine in preparazione',
                                       style: theme.textTheme.titleMedium?.copyWith(
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                     const SizedBox(height: 6.0),
                                     Text(
-                                      'I nuovi ordini inviati dai tavoli appariranno qui in tempo reale.',
+                                      _selectedPhase == 'in_attesa'
+                                          ? 'I nuovi ordini inviati dai tavoli appariranno qui in tempo reale.'
+                                          : 'Sposta gli ordini dalla fase "In attesa" quando inizi a prepararli.',
                                       textAlign: TextAlign.center,
                                       style: theme.textTheme.bodyMedium?.copyWith(
                                         color: theme.hintColor,
@@ -747,53 +877,124 @@ class _DashboardRistoranteWidgetState extends State<DashboardRistoranteWidget> {
                                               ),
                                              ),
                                               const SizedBox(height: 14.0),
-                                              SizedBox(
-                                                width: double.infinity,
-                                                child: ElevatedButton.icon(
-                                                  onPressed: () async {
-                                                    await listViewOrdersRecord
-                                                        .reference
-                                                        .update(
-                                                            createOrdersRecordData(
-                                                      statoOrdine:
-                                                          'Completato',
-                                                      visto: false,
-                                                    ));
-                                                  },
-                                                  icon: const Icon(
-                                                    Icons.check_rounded,
-                                                    color: Colors.white,
-                                                    size: 18.0,
-                                                  ),
-                                                  label: Text(
-                                                    'Pronto',
-                                                    style: theme.textTheme.labelMedium?.copyWith(
-                                                      color: Colors.white,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 14.0,
+                                              if (_selectedPhase == 'in_attesa')
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: ElevatedButton.icon(
+                                                        onPressed: () async {
+                                                          await listViewOrdersRecord
+                                                              .reference
+                                                              .update(
+                                                                  createOrdersRecordData(
+                                                            statoOrdine: 'in_preparazione',
+                                                          ));
+                                                        },
+                                                        icon: const Icon(
+                                                          Icons.soup_kitchen_rounded,
+                                                          color: Colors.white,
+                                                          size: 18.0,
+                                                        ),
+                                                        label: Text(
+                                                          'Inizia preparazione',
+                                                          style: theme.textTheme.labelMedium?.copyWith(
+                                                            color: Colors.white,
+                                                            fontWeight: FontWeight.bold,
+                                                            fontSize: 13.5,
+                                                          ),
+                                                        ),
+                                                        style: ElevatedButton.styleFrom(
+                                                          backgroundColor: const Color(0xFF3B82F6),
+                                                          elevation: 0.0,
+                                                          padding: const EdgeInsets.symmetric(vertical: 10.0),
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.circular(10.0),
+                                                          ),
+                                                        ),
+                                                      ),
                                                     ),
-                                                  ),
-                                                  style: ElevatedButton
-                                                      .styleFrom(
-                                                    backgroundColor:
-                                                        const Color(
-                                                            0xFF10B981),
-                                                    elevation: 0.0,
-                                                    padding:
-                                                        const EdgeInsets
-                                                            .symmetric(
-                                                            vertical: 10.0),
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius
-                                                              .circular(
-                                                                  10.0),
+                                                    const SizedBox(width: 8.0),
+                                                    ElevatedButton(
+                                                      onPressed: () async {
+                                                        await listViewOrdersRecord
+                                                            .reference
+                                                            .update(
+                                                                createOrdersRecordData(
+                                                          statoOrdine: 'Completato',
+                                                          visto: false,
+                                                        ));
+                                                      },
+                                                      style: ElevatedButton.styleFrom(
+                                                        backgroundColor: const Color(0xFF10B981),
+                                                        foregroundColor: Colors.white,
+                                                        elevation: 0.0,
+                                                        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius: BorderRadius.circular(10.0),
+                                                        ),
+                                                      ),
+                                                      child: const Icon(Icons.check_rounded, size: 18.0),
                                                     ),
-                                                  ),
+                                                  ],
+                                                )
+                                              else
+                                                Row(
+                                                  children: [
+                                                    OutlinedButton.icon(
+                                                      onPressed: () async {
+                                                        await listViewOrdersRecord
+                                                            .reference
+                                                            .update(
+                                                                createOrdersRecordData(
+                                                          statoOrdine: 'in_attesa',
+                                                        ));
+                                                      },
+                                                      icon: const Icon(Icons.replay_rounded, size: 16.0),
+                                                      label: const Text('In attesa', style: TextStyle(fontSize: 12.0)),
+                                                      style: OutlinedButton.styleFrom(
+                                                        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius: BorderRadius.circular(10.0),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 8.0),
+                                                    Expanded(
+                                                      child: ElevatedButton.icon(
+                                                        onPressed: () async {
+                                                          await listViewOrdersRecord
+                                                              .reference
+                                                              .update(
+                                                                  createOrdersRecordData(
+                                                            statoOrdine: 'Completato',
+                                                            visto: false,
+                                                          ));
+                                                        },
+                                                        icon: const Icon(
+                                                          Icons.check_rounded,
+                                                          color: Colors.white,
+                                                          size: 18.0,
+                                                        ),
+                                                        label: Text(
+                                                          'Pronto / Completa',
+                                                          style: theme.textTheme.labelMedium?.copyWith(
+                                                            color: Colors.white,
+                                                            fontWeight: FontWeight.bold,
+                                                            fontSize: 13.5,
+                                                          ),
+                                                        ),
+                                                        style: ElevatedButton.styleFrom(
+                                                          backgroundColor: const Color(0xFF10B981),
+                                                          elevation: 0.0,
+                                                          padding: const EdgeInsets.symmetric(vertical: 10.0),
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.circular(10.0),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
-                                              ),
                                           ],
                                         ),
                                       ),

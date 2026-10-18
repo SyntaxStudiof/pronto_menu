@@ -3,11 +3,44 @@ import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
+import '/cliente/giochi/quiz_game_widget.dart';
+import '/cliente/giochi/tris_game_widget.dart';
 import '/cliente/hub_cliente/hub_cliente_widget.dart';
+import '/cliente/menu_cliente/menu_cliente_widget.dart';
+import '/cliente/menu_disattivati/menu_disattivati_widget.dart';
+import '/cliente/riepilogo_finale/riepilogo_finale_widget.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 
-/// Vista Desktop per l'Anteprima del Menu Cliente in formato smartphone
-class DesktopClientPreviewView extends StatelessWidget {
+/// Provider di route locale che sopprime gli aggiornamenti alla barra degli URL
+/// del browser, isolando la navigazione del simulatore smartphone all'interno del frame.
+class _SimulatorRouteInformationProvider extends RouteInformationProvider
+    with ChangeNotifier {
+  _SimulatorRouteInformationProvider(this._delegate) {
+    _delegate.addListener(notifyListeners);
+  }
+
+  final RouteInformationProvider _delegate;
+
+  @override
+  RouteInformation get value => _delegate.value;
+
+  @override
+  void routerReportsNewRouteInformation(
+    RouteInformation routeInformation, {
+    RouteInformationReportingType type = RouteInformationReportingType.none,
+  }) {
+    // Non propagare a SystemNavigator per evitare di modificare l'URL globale del browser.
+  }
+
+  @override
+  void dispose() {
+    _delegate.removeListener(notifyListeners);
+    super.dispose();
+  }
+}
+
+/// Vista Desktop per l'Anteprima del Menu Cliente in formato smartphone interattivo
+class DesktopClientPreviewView extends StatefulWidget {
   const DesktopClientPreviewView({
     super.key,
     required this.ristoranteRef,
@@ -18,14 +51,187 @@ class DesktopClientPreviewView extends StatelessWidget {
   final VoidCallback? onNavigateToQR;
 
   @override
+  State<DesktopClientPreviewView> createState() =>
+      _DesktopClientPreviewViewState();
+}
+
+class _DesktopClientPreviewViewState extends State<DesktopClientPreviewView> {
+  late GoRouter _simulatorRouter;
+  late _SimulatorRouteInformationProvider _simulatorRouteInfoProvider;
+  final GlobalKey<NavigatorState> _simulatorNavigatorKey =
+      GlobalKey<NavigatorState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _initSimulatorRouter();
+  }
+
+  @override
+  void didUpdateWidget(covariant DesktopClientPreviewView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.ristoranteRef?.id != widget.ristoranteRef?.id) {
+      _simulatorRouteInfoProvider.dispose();
+      _simulatorRouter.dispose();
+      _initSimulatorRouter();
+    }
+  }
+
+  @override
+  void dispose() {
+    _simulatorRouteInfoProvider.dispose();
+    _simulatorRouter.dispose();
+    super.dispose();
+  }
+
+  void _initSimulatorRouter() {
+    final docRef = widget.ristoranteRef ?? currentUserReference;
+
+    _simulatorRouter = GoRouter(
+      navigatorKey: _simulatorNavigatorKey,
+      initialLocation: HubClienteWidget.routePath,
+      overridePlatformDefaultLocation: true,
+      routes: [
+        GoRoute(
+          name: '_sim_initial',
+          path: '/',
+          builder: (context, state) => HubClienteWidget(
+            ristoranteRef: docRef,
+            isAnteprima: true,
+          ),
+        ),
+        GoRoute(
+          name: HubClienteWidget.routeName,
+          path: HubClienteWidget.routePath,
+          builder: (context, state) => HubClienteWidget(
+            ristoranteRef: docRef,
+            isAnteprima: true,
+          ),
+        ),
+        GoRoute(
+          name: MenuClienteWidget.routeName,
+          path: MenuClienteWidget.routePath,
+          builder: (context, state) {
+            final params = FFParameters(state);
+            return MenuClienteWidget(
+              ristoranteRef: params.getParam(
+                    'ristoranteRef',
+                    ParamType.DocumentReference,
+                    isList: false,
+                    collectionNamePath: ['users'],
+                  ) ??
+                  docRef,
+              isAnteprima: true,
+              fasciaId: params.getParam(
+                'fasciaId',
+                ParamType.String,
+              ),
+              solaConsultazione: params.getParam(
+                    'solaConsultazione',
+                    ParamType.bool,
+                  ) ??
+                  false,
+            );
+          },
+        ),
+        GoRoute(
+          name: MenuDisattivatiWidget.routeName,
+          path: MenuDisattivatiWidget.routePath,
+          builder: (context, state) {
+            final params = FFParameters(state);
+            return MenuDisattivatiWidget(
+              ristoranteRef: params.getParam(
+                    'ristoranteRef',
+                    ParamType.DocumentReference,
+                    isList: false,
+                    collectionNamePath: ['users'],
+                  ) ??
+                  docRef,
+            );
+          },
+        ),
+        GoRoute(
+          name: TrisGameWidget.routeName,
+          path: TrisGameWidget.routePath,
+          builder: (context, state) {
+            final params = FFParameters(state);
+            return TrisGameWidget(
+              ristoranteRef: params.getParam(
+                    'ristoranteRef',
+                    ParamType.DocumentReference,
+                    isList: false,
+                    collectionNamePath: ['users'],
+                  ) ??
+                  docRef,
+              tavoloPreimpostato: params.getParam(
+                'tavoloPreimpostato',
+                ParamType.String,
+              ),
+            );
+          },
+        ),
+        GoRoute(
+          name: QuizGameWidget.routeName,
+          path: QuizGameWidget.routePath,
+          builder: (context, state) {
+            final params = FFParameters(state);
+            return QuizGameWidget(
+              ristoranteRef: params.getParam(
+                    'ristoranteRef',
+                    ParamType.DocumentReference,
+                    isList: false,
+                    collectionNamePath: ['users'],
+                  ) ??
+                  docRef,
+              tavoloPreimpostato: params.getParam(
+                'tavoloPreimpostato',
+                ParamType.String,
+              ),
+            );
+          },
+        ),
+        GoRoute(
+          name: RiepilogoFinaleWidget.routeName,
+          path: RiepilogoFinaleWidget.routePath,
+          builder: (context, state) {
+            final params = FFParameters(state);
+            return RiepilogoFinaleWidget(
+              ristoranteRef: params.getParam(
+                    'ristoranteRef',
+                    ParamType.DocumentReference,
+                    isList: false,
+                    collectionNamePath: ['users'],
+                  ) ??
+                  docRef,
+            );
+          },
+        ),
+      ],
+      errorBuilder: (context, state) => HubClienteWidget(
+        ristoranteRef: docRef,
+        isAnteprima: true,
+      ),
+    );
+
+    _simulatorRouteInfoProvider = _SimulatorRouteInformationProvider(
+      _simulatorRouter.routeInformationProvider,
+    );
+  }
+
+  void _resetSimulatorToHub() {
+    _simulatorRouter.go(HubClienteWidget.routePath);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
 
-    final docRef = ristoranteRef ?? currentUserReference;
+    final docRef = widget.ristoranteRef ?? currentUserReference;
     final uid = docRef?.id ?? currentUserUid;
-    final menuWebUrl = 'https://prontomenu-6d485.web.app/loaderMenu?ristoranteRef=$uid';
+    final menuWebUrl =
+        'https://prontomenu-6d485.web.app/loaderMenu?ristoranteRef=$uid';
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -79,14 +285,18 @@ class DesktopClientPreviewView extends StatelessWidget {
                               fontSize: 18.0,
                               fontWeight: FontWeight.bold,
                               letterSpacing: -0.3,
-                              color: isDark ? Colors.white : const Color(0xFF0F172A),
+                              color: isDark
+                                  ? Colors.white
+                                  : const Color(0xFF0F172A),
                             ),
                           ),
                           Text(
                             'Esperienza dal vivo su smartphone',
                             style: TextStyle(
                               fontSize: 12.0,
-                              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                              color: isDark
+                                  ? const Color(0xFF94A3B8)
+                                  : const Color(0xFF64748B),
                             ),
                           ),
                         ],
@@ -110,19 +320,48 @@ class DesktopClientPreviewView extends StatelessWidget {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.touch_app_rounded, color: colorScheme.primary, size: 20.0),
+                      Icon(Icons.touch_app_rounded,
+                          color: colorScheme.primary, size: 20.0),
                       const SizedBox(width: 10.0),
                       Expanded(
                         child: Text(
-                          'Il simulatore a destra è completamente interattivo! Puoi toccare i piatti, simulare ordini, visualizzare allergeni e testare il menu prima che i clienti lo vedano.',
+                          'Il simulatore a destra è completamente interattivo e isolato! Puoi navigare tra le sezioni (Menù, Giochi, Jukebox), toccare i piatti, simulare ordini e testare il tutto senza lasciare questa schermata.',
                           style: TextStyle(
                             fontSize: 12.5,
                             height: 1.45,
-                            color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
+                            color: isDark
+                                ? const Color(0xFFCBD5E1)
+                                : const Color(0xFF334155),
                           ),
                         ),
                       ),
                     ],
+                  ),
+                ),
+
+                const SizedBox(height: 14.0),
+
+                // Pulsante Reset Simulatore all'Hub
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: _resetSimulatorToHub,
+                    icon: const Icon(Icons.restart_alt_rounded, size: 18.0),
+                    label: const Text('Riavvia Simulatore (Torna all\'Hub)'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: isDark
+                          ? const Color(0xFF93C5FD)
+                          : const Color(0xFF2563EB),
+                      side: BorderSide(
+                        color: isDark
+                            ? const Color(0xFF3B82F6).withValues(alpha: 0.4)
+                            : const Color(0xFF93C5FD),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 11.0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
                   ),
                 ),
 
@@ -135,17 +374,24 @@ class DesktopClientPreviewView extends StatelessWidget {
                     fontSize: 11.0,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.8,
-                    color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                    color: isDark
+                        ? const Color(0xFF64748B)
+                        : const Color(0xFF94A3B8),
                   ),
                 ),
                 const SizedBox(height: 8.0),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12.0, vertical: 10.0),
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
+                    color: isDark
+                        ? const Color(0xFF0F172A)
+                        : const Color(0xFFF1F5F9),
                     borderRadius: BorderRadius.circular(10.0),
                     border: Border.all(
-                      color: isDark ? Colors.white.withValues(alpha: 0.1) : const Color(0xFFCBD5E1),
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.1)
+                          : const Color(0xFFCBD5E1),
                     ),
                   ),
                   child: Row(
@@ -158,7 +404,9 @@ class DesktopClientPreviewView extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 12.0,
                             fontFamily: 'monospace',
-                            color: isDark ? const Color(0xFF93C5FD) : const Color(0xFF1D4ED8),
+                            color: isDark
+                                ? const Color(0xFF93C5FD)
+                                : const Color(0xFF1D4ED8),
                           ),
                         ),
                       ),
@@ -169,7 +417,8 @@ class DesktopClientPreviewView extends StatelessWidget {
                           Clipboard.setData(ClipboardData(text: menuWebUrl));
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Link del menu copiato negli appunti!'),
+                              content:
+                                  Text('Link del menu copiato negli appunti!'),
                               backgroundColor: Color(0xFF10B981),
                               duration: Duration(seconds: 2),
                               behavior: SnackBarBehavior.floating,
@@ -194,7 +443,9 @@ class DesktopClientPreviewView extends StatelessWidget {
                       backgroundColor: colorScheme.primary,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 12.0),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
                     ),
                   ),
                 ),
@@ -249,7 +500,9 @@ class DesktopClientPreviewView extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13.0,
                           fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : const Color(0xFF0F172A),
+                          color: isDark
+                              ? Colors.white
+                              : const Color(0xFF0F172A),
                         ),
                       ),
                       const SizedBox(height: 4.0),
@@ -258,18 +511,24 @@ class DesktopClientPreviewView extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 11.5,
-                          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                          color: isDark
+                              ? const Color(0xFF94A3B8)
+                              : const Color(0xFF64748B),
                         ),
                       ),
-                      if (onNavigateToQR != null) ...[
+                      if (widget.onNavigateToQR != null) ...[
                         const SizedBox(height: 12.0),
                         OutlinedButton.icon(
-                          onPressed: onNavigateToQR,
+                          onPressed: widget.onNavigateToQR,
                           icon: const Icon(Icons.qr_code_2_rounded, size: 16.0),
-                          label: const Text('Configura & Stampa QR', style: TextStyle(fontSize: 12.0)),
+                          label: const Text('Configura & Stampa QR',
+                              style: TextStyle(fontSize: 12.0)),
                           style: OutlinedButton.styleFrom(
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-                            padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 14.0, vertical: 8.0),
                           ),
                         ),
                       ],
@@ -286,8 +545,11 @@ class DesktopClientPreviewView extends StatelessWidget {
         // ═════════════════════════════════════════════════════════════════
         Expanded(
           child: Container(
-            color: isDark ? const Color(0xFF0B132B) : const Color(0xFFE2E8F0).withValues(alpha: 0.6),
-            padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 24.0),
+            color: isDark
+                ? const Color(0xFF0B132B)
+                : const Color(0xFFE2E8F0).withValues(alpha: 0.6),
+            padding:
+                const EdgeInsets.symmetric(vertical: 20.0, horizontal: 24.0),
             child: Center(
               child: Container(
                 width: 390.0,
@@ -296,12 +558,15 @@ class DesktopClientPreviewView extends StatelessWidget {
                   color: isDark ? const Color(0xFF1E293B) : Colors.white,
                   borderRadius: BorderRadius.circular(44.0),
                   border: Border.all(
-                    color: isDark ? const Color(0xFF334155) : const Color(0xFF0F172A),
+                    color: isDark
+                        ? const Color(0xFF334155)
+                        : const Color(0xFF0F172A),
                     width: 9.0,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: isDark ? 0.6 : 0.25),
+                      color:
+                          Colors.black.withValues(alpha: isDark ? 0.6 : 0.25),
                       blurRadius: 36.0,
                       spreadRadius: 4.0,
                       offset: const Offset(0, 14),
@@ -312,65 +577,85 @@ class DesktopClientPreviewView extends StatelessWidget {
                   borderRadius: BorderRadius.circular(35.0),
                   child: Stack(
                     children: [
-                      // Pagina Hub Cliente
+                      // Sub-Router isolato per la navigazione interna al telefono
                       Positioned.fill(
-                        child: HubClienteWidget(
-                          ristoranteRef: docRef,
-                          isAnteprima: true,
+                        child: MediaQuery(
+                          data: MediaQuery.of(context).copyWith(
+                            size: const Size(390.0, 800.0),
+                            padding:
+                                const EdgeInsets.only(top: 44.0, bottom: 34.0),
+                            viewPadding:
+                                const EdgeInsets.only(top: 44.0, bottom: 34.0),
+                          ),
+                          child: Router(
+                            routerDelegate: _simulatorRouter.routerDelegate,
+                            routeInformationParser:
+                                _simulatorRouter.routeInformationParser,
+                            routeInformationProvider:
+                                _simulatorRouteInfoProvider,
+                          ),
                         ),
                       ),
 
-                      // Dynamic Island / Notch Superiore dello Smartphone
+                      // Dynamic Island / Notch Superiore dello Smartphone (non intercetta i click)
                       Positioned(
                         top: 8.0,
                         left: 0.0,
                         right: 0.0,
-                        child: Center(
-                          child: Container(
-                            width: 100.0,
-                            height: 24.0,
-                            decoration: BoxDecoration(
-                              color: Colors.black,
-                              borderRadius: BorderRadius.circular(14.0),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  width: 9.0,
-                                  height: 9.0,
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFF1E293B),
-                                    shape: BoxShape.circle,
+                        child: IgnorePointer(
+                          child: Center(
+                            child: Container(
+                              width: 100.0,
+                              height: 24.0,
+                              decoration: BoxDecoration(
+                                color: Colors.black,
+                                borderRadius: BorderRadius.circular(14.0),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width: 9.0,
+                                    height: 9.0,
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFF1E293B),
+                                      shape: BoxShape.circle,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(width: 8.0),
-                                Container(
-                                  width: 6.0,
-                                  height: 6.0,
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFF0EA5E9),
-                                    shape: BoxShape.circle,
+                                  const SizedBox(width: 8.0),
+                                  Container(
+                                    width: 6.0,
+                                    height: 6.0,
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFF0EA5E9),
+                                      shape: BoxShape.circle,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
 
-                      // Home indicator pillola inferiore dello Smartphone
+                      // Home indicator pillola inferiore dello Smartphone (tocco -> torna all'Hub)
                       Positioned(
                         bottom: 6.0,
                         left: 0.0,
                         right: 0.0,
                         child: Center(
-                          child: Container(
-                            width: 120.0,
-                            height: 4.0,
-                            decoration: BoxDecoration(
-                              color: isDark ? Colors.white.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.3),
-                              borderRadius: BorderRadius.circular(3.0),
+                          child: InkWell(
+                            onTap: _resetSimulatorToHub,
+                            borderRadius: BorderRadius.circular(3.0),
+                            child: Container(
+                              width: 120.0,
+                              height: 6.0,
+                              decoration: BoxDecoration(
+                                color: isDark
+                                    ? Colors.white.withValues(alpha: 0.35)
+                                    : Colors.black.withValues(alpha: 0.35),
+                                borderRadius: BorderRadius.circular(3.0),
+                              ),
                             ),
                           ),
                         ),

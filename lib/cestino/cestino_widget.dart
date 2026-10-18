@@ -57,10 +57,17 @@ class _CestinoWidgetState extends State<CestinoWidget> {
   }
 
   Future<void> _confermaSvuotaTutto(ThemeData theme) async {
+    final isDark = theme.brightness == Brightness.dark;
     final confirm = await showDialog<bool>(
           context: context,
           builder: (ctx) => AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+            backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.0),
+              side: BorderSide(
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+              ),
+            ),
             title: Row(
               children: [
                 Container(
@@ -72,17 +79,33 @@ class _CestinoWidgetState extends State<CestinoWidget> {
                   child: Icon(Icons.delete_sweep_rounded, color: theme.colorScheme.error, size: 24.0),
                 ),
                 const SizedBox(width: 12.0),
-                const Text('Svuota intero cestino?', style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+                Text(
+                  'Svuota intero cestino?',
+                  style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  ),
+                ),
               ],
             ),
-            content: const Text(
+            content: Text(
               'Tutti i piatti presenti nel cestino e le relative foto verranno eliminati per sempre dal database.\n\nQuesta azione è irreversibile. Vuoi procedere?',
-              style: TextStyle(fontSize: 13.5, height: 1.4),
+              style: TextStyle(
+                fontSize: 13.5,
+                height: 1.4,
+                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+              ),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('Annulla'),
+                child: Text(
+                  'Annulla',
+                  style: TextStyle(
+                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                  ),
+                ),
               ),
               ElevatedButton.icon(
                 icon: const Icon(Icons.delete_forever_rounded, size: 16.0),
@@ -158,25 +181,48 @@ class _CestinoWidgetState extends State<CestinoWidget> {
 
   Future<void> _eliminaDefinitivamente(PiattiRecord dish, ThemeData theme) async {
     final dishName = dish.nome;
+    final isDark = theme.brightness == Brightness.dark;
     final confirm = await showDialog<bool>(
           context: context,
           builder: (ctx) => AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+            backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.0),
+              side: BorderSide(
+                color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+              ),
+            ),
             title: Row(
               children: [
                 Icon(Icons.warning_amber_rounded, color: theme.colorScheme.error, size: 24.0),
                 const SizedBox(width: 10.0),
-                const Text('Elimina definitivamente', style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+                Text(
+                  'Elimina definitivamente',
+                  style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                  ),
+                ),
               ],
             ),
             content: Text(
               'Sei sicuro di voler eliminare per sempre "$dishName"?\nIl piatto e la sua foto verranno cancellati in modo permanente e non potranno più essere recuperati.',
-              style: const TextStyle(fontSize: 13.5, height: 1.4),
+              style: TextStyle(
+                fontSize: 13.5,
+                height: 1.4,
+                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+              ),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('Annulla'),
+                child: Text(
+                  'Annulla',
+                  style: TextStyle(
+                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                  ),
+                ),
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -231,9 +277,11 @@ class _CestinoWidgetState extends State<CestinoWidget> {
       },
       child: Scaffold(
         key: scaffoldKey,
+        backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
         appBar: widget.embedded
             ? null
             : AppBar(
+                backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
                 automaticallyImplyLeading: false,
                 elevation: 0.0,
                 centerTitle: true,
@@ -244,7 +292,7 @@ class _CestinoWidgetState extends State<CestinoWidget> {
                   buttonSize: 40.0,
                   icon: Icon(
                     Icons.arrow_back_rounded,
-                    color: theme.colorScheme.onSurface,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
                     size: 24.0,
                   ),
                   onPressed: () async {
@@ -276,7 +324,7 @@ class _CestinoWidgetState extends State<CestinoWidget> {
                             fontWeight: FontWeight.bold,
                             fontSize: 19.0,
                             letterSpacing: -0.4,
-                            color: theme.colorScheme.onSurface,
+                            color: isDark ? Colors.white : const Color(0xFF0F172A),
                           ),
                     ),
                   ],
@@ -528,18 +576,52 @@ class _CestinoWidgetState extends State<CestinoWidget> {
                               TextField(
                                 controller: _searchController,
                                 onChanged: (val) => safeSetState(() => _searchQuery = val),
-                                style: const TextStyle(fontSize: 13.0),
+                                style: TextStyle(
+                                  fontSize: 13.0,
+                                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                ),
                                 decoration: InputDecoration(
                                   hintText: 'Cerca piatto nel cestino...',
-                                  hintStyle: const TextStyle(fontSize: 12.5),
-                                  prefixIcon: const Icon(Icons.search_rounded, size: 18.0),
+                                  hintStyle: TextStyle(
+                                    fontSize: 12.5,
+                                    color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                                  ),
+                                  prefixIcon: Icon(
+                                    Icons.search_rounded,
+                                    size: 18.0,
+                                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                                  ),
+                                  suffixIcon: _searchQuery.isNotEmpty
+                                      ? IconButton(
+                                          icon: const Icon(Icons.close_rounded, size: 16.0),
+                                          onPressed: () {
+                                            _searchController.clear();
+                                            safeSetState(() => _searchQuery = '');
+                                          },
+                                        )
+                                      : null,
                                   isDense: true,
                                   contentPadding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
                                   filled: true,
-                                  fillColor: theme.cardColor,
+                                  fillColor: isDark ? const Color(0xFF1E293B) : Colors.white,
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10.0),
-                                    borderSide: BorderSide(color: theme.dividerColor.withValues(alpha: 0.2)),
+                                    borderSide: BorderSide(
+                                      color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
+                                    ),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    borderSide: BorderSide(
+                                      color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    borderSide: BorderSide(
+                                      color: theme.colorScheme.primary,
+                                      width: 1.5,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -645,7 +727,7 @@ class _CestinoWidgetState extends State<CestinoWidget> {
 
     return Container(
       decoration: BoxDecoration(
-        color: theme.cardColor,
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(14.0),
         border: Border.all(
           color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),

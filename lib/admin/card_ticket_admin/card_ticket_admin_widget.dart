@@ -133,7 +133,14 @@ class _CardTicketAdminWidgetState extends State<CardTicketAdminWidget> {
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
+    final cardBg = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final cardBorder = isDark ? Colors.white.withValues(alpha: 0.08) : const Color(0xFFE2E8F0);
+    final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
+    final textSecondary = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+    final innerInputBg = isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9);
+    const purpleAccent = Color(0xFF7C3AED);
 
     final isAperto = widget.ticketCorrente?.stato == 'Aperto';
     final dataCreazione = widget.ticketCorrente?.dataCreazione;
@@ -143,19 +150,19 @@ class _CardTicketAdminWidgetState extends State<CardTicketAdminWidget> {
 
     return Container(
       decoration: BoxDecoration(
-        color: theme.cardColor,
-        borderRadius: BorderRadius.circular(20.0),
+        color: cardBg,
+        borderRadius: BorderRadius.circular(16.0),
         border: Border.all(
           color: isAperto
-              ? Colors.orange.withValues(alpha: 0.35)
-              : theme.dividerColor.withValues(alpha: 0.12),
-          width: isAperto ? 1.3 : 1.0,
+              ? const Color(0xFFF59E0B).withValues(alpha: 0.35)
+              : cardBorder,
+          width: isAperto ? 1.4 : 1.0,
         ),
         boxShadow: [
           BoxShadow(
-            blurRadius: 16.0,
-            color: Colors.black.withValues(alpha: 0.04),
-            offset: const Offset(0.0, 4.0),
+            blurRadius: 10.0,
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
+            offset: const Offset(0.0, 3.0),
           ),
         ],
       ),
@@ -177,14 +184,15 @@ class _CardTicketAdminWidgetState extends State<CardTicketAdminWidget> {
                           Icon(
                             Icons.access_time_rounded,
                             size: 13.0,
-                            color: theme.hintColor,
+                            color: textSecondary,
                           ),
                           const SizedBox(width: 4.0),
                           Text(
                             dataStr,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.hintColor,
+                            style: TextStyle(
+                              color: textSecondary,
                               fontSize: 11.5,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ],
@@ -195,10 +203,11 @@ class _CardTicketAdminWidgetState extends State<CardTicketAdminWidget> {
                         widget.ticketCorrente?.titolo,
                         'Richiesta senza titolo',
                       ),
-                      style: theme.textTheme.titleMedium?.copyWith(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 17.5,
                         letterSpacing: -0.3,
+                        color: textPrimary,
                       ),
                     ),
                   ],
@@ -209,11 +218,11 @@ class _CardTicketAdminWidgetState extends State<CardTicketAdminWidget> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.5),
                 decoration: BoxDecoration(
-                  color: (isAperto ? Colors.orange : const Color(0xFF10B981))
+                  color: (isAperto ? const Color(0xFFF59E0B) : const Color(0xFF10B981))
                       .withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(10.0),
+                  borderRadius: BorderRadius.circular(8.0),
                   border: Border.all(
-                    color: (isAperto ? Colors.orange : const Color(0xFF10B981))
+                    color: (isAperto ? const Color(0xFFF59E0B) : const Color(0xFF10B981))
                         .withValues(alpha: 0.30),
                     width: 1.0,
                   ),
@@ -226,7 +235,7 @@ class _CardTicketAdminWidgetState extends State<CardTicketAdminWidget> {
                       height: 7.0,
                       decoration: BoxDecoration(
                         color: isAperto
-                            ? Colors.orange.shade700
+                            ? const Color(0xFFF59E0B)
                             : const Color(0xFF10B981),
                         shape: BoxShape.circle,
                       ),
@@ -238,9 +247,9 @@ class _CardTicketAdminWidgetState extends State<CardTicketAdminWidget> {
                         fontSize: 11.0,
                         fontWeight: FontWeight.bold,
                         color: isAperto
-                            ? Colors.orange.shade800
-                            : const Color(0xFF047857),
-                        letterSpacing: 0.3,
+                            ? const Color(0xFFF59E0B)
+                            : const Color(0xFF10B981),
+                        letterSpacing: 0.4,
                       ),
                     ),
                   ],
@@ -264,21 +273,19 @@ class _CardTicketAdminWidgetState extends State<CardTicketAdminWidget> {
 
                 return Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 12.0, vertical: 8.0),
+                      horizontal: 12.0, vertical: 10.0),
                   decoration: BoxDecoration(
-                    color: colorScheme.primary.withValues(alpha: 0.06),
+                    color: innerInputBg,
                     borderRadius: BorderRadius.circular(12.0),
-                    border: Border.all(
-                      color: colorScheme.primary.withValues(alpha: 0.15),
-                    ),
+                    border: Border.all(color: cardBorder),
                   ),
                   child: Row(
                     children: [
                       Container(
-                        width: 32.0,
-                        height: 32.0,
+                        width: 34.0,
+                        height: 34.0,
                         decoration: BoxDecoration(
-                          color: colorScheme.primary.withValues(alpha: 0.15),
+                          color: purpleAccent.withValues(alpha: 0.12),
                           shape: BoxShape.circle,
                         ),
                         alignment: Alignment.center,
@@ -286,20 +293,20 @@ class _CardTicketAdminWidgetState extends State<CardTicketAdminWidget> {
                             ? ClipOval(
                                 child: Image.network(
                                   rest.photoUrl,
-                                  width: 32.0,
-                                  height: 32.0,
+                                  width: 34.0,
+                                  height: 34.0,
                                   fit: BoxFit.cover,
                                   errorBuilder: (_, __, ___) => Icon(
                                     Icons.restaurant_rounded,
                                     size: 16.0,
-                                    color: colorScheme.primary,
+                                    color: purpleAccent,
                                   ),
                                 ),
                               )
                             : Icon(
                                 Icons.restaurant_rounded,
                                 size: 16.0,
-                                color: colorScheme.primary,
+                                color: purpleAccent,
                               ),
                       ),
                       const SizedBox(width: 10.0),
@@ -309,15 +316,16 @@ class _CardTicketAdminWidgetState extends State<CardTicketAdminWidget> {
                           children: [
                             Text(
                               restNome,
-                              style: theme.textTheme.bodySmall?.copyWith(
+                              style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 13.0,
+                                color: textPrimary,
                               ),
                             ),
                             Text(
                               rest.email,
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.hintColor,
+                              style: TextStyle(
+                                color: textSecondary,
                                 fontSize: 11.5,
                               ),
                             ),
@@ -329,14 +337,15 @@ class _CardTicketAdminWidgetState extends State<CardTicketAdminWidget> {
                         Icon(
                           Icons.phone_rounded,
                           size: 14.0,
-                          color: theme.hintColor,
+                          color: textSecondary,
                         ),
                         const SizedBox(width: 4.0),
                         Text(
                           rest.phoneNumber,
-                          style: theme.textTheme.bodySmall?.copyWith(
+                          style: TextStyle(
                             fontSize: 11.5,
                             fontWeight: FontWeight.w500,
+                            color: textSecondary,
                           ),
                         ),
                       ],
@@ -352,8 +361,9 @@ class _CardTicketAdminWidgetState extends State<CardTicketAdminWidget> {
             width: double.infinity,
             padding: const EdgeInsets.all(14.0),
             decoration: BoxDecoration(
-              color: theme.scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(14.0),
+              color: innerInputBg,
+              borderRadius: BorderRadius.circular(12.0),
+              border: Border.all(color: cardBorder),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -363,13 +373,13 @@ class _CardTicketAdminWidgetState extends State<CardTicketAdminWidget> {
                     Icon(
                       Icons.help_outline_rounded,
                       size: 14.0,
-                      color: theme.hintColor,
+                      color: textSecondary,
                     ),
                     const SizedBox(width: 6.0),
                     Text(
                       'SEGNALAZIONE DEL CLIENTE',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.hintColor,
+                      style: TextStyle(
+                        color: textSecondary,
                         fontSize: 10.5,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.6,
@@ -383,9 +393,10 @@ class _CardTicketAdminWidgetState extends State<CardTicketAdminWidget> {
                     widget.ticketCorrente?.descrizione,
                     'Nessuna descrizione fornita',
                   ),
-                  style: theme.textTheme.bodyMedium?.copyWith(
+                  style: TextStyle(
                     fontSize: 14.0,
                     height: 1.45,
+                    color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
                   ),
                 ),
               ],
@@ -397,44 +408,47 @@ class _CardTicketAdminWidgetState extends State<CardTicketAdminWidget> {
           if (isAperto) ...[
             Text(
               'Risposte rapide:',
-              style: theme.textTheme.bodySmall?.copyWith(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 11.5,
-                color: theme.hintColor,
+                color: textSecondary,
               ),
             ),
-            const SizedBox(height: 6.0),
+            const SizedBox(height: 8.0),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: _risposteRapide.map((r) {
                   return Padding(
                     padding: const EdgeInsets.only(right: 6.0),
-                    child: ActionChip(
-                      label: Text(r),
-                      labelStyle: TextStyle(
-                        fontSize: 11.0,
-                        color: colorScheme.onSurface,
-                      ),
-                      backgroundColor:
-                          colorScheme.primary.withValues(alpha: 0.08),
-                      side: BorderSide(
-                        color: colorScheme.primary.withValues(alpha: 0.20),
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      onPressed: () {
+                    child: InkWell(
+                      onTap: () {
                         setState(() {
                           _model.testoRispostaTextController.text = r;
                         });
                       },
+                      borderRadius: BorderRadius.circular(8.0),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
+                        decoration: BoxDecoration(
+                          color: innerInputBg,
+                          borderRadius: BorderRadius.circular(8.0),
+                          border: Border.all(color: cardBorder),
+                        ),
+                        child: Text(
+                          r,
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            color: textPrimary,
+                          ),
+                        ),
+                      ),
                     ),
                   );
                 }).toList(),
               ),
             ),
-            const SizedBox(height: 10.0),
+            const SizedBox(height: 12.0),
             TextFormField(
               controller: _model.testoRispostaTextController,
               focusNode: _model.testoRispostaFocusNode,
@@ -444,34 +458,33 @@ class _CardTicketAdminWidgetState extends State<CardTicketAdminWidget> {
               decoration: InputDecoration(
                 contentPadding: const EdgeInsets.all(14.0),
                 hintText: 'Scrivi qui la risposta per il ristoratore...',
-                hintStyle: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.hintColor,
+                hintStyle: TextStyle(
+                  color: textSecondary,
                   fontSize: 13.5,
                 ),
                 filled: true,
-                fillColor: theme.scaffoldBackgroundColor,
+                fillColor: innerInputBg,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14.0),
-                  borderSide: BorderSide(
-                    color: theme.dividerColor.withValues(alpha: 0.15),
-                  ),
+                  borderRadius: BorderRadius.circular(12.0),
+                  borderSide: BorderSide(color: cardBorder),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14.0),
-                  borderSide: BorderSide(
-                    color: theme.dividerColor.withValues(alpha: 0.15),
-                  ),
+                  borderRadius: BorderRadius.circular(12.0),
+                  borderSide: BorderSide(color: cardBorder),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14.0),
+                  borderRadius: BorderRadius.circular(12.0),
                   borderSide: BorderSide(
-                    color: colorScheme.primary,
+                    color: purpleAccent,
                     width: 1.5,
                   ),
                 ),
               ),
-              style: theme.textTheme.bodyMedium?.copyWith(fontSize: 14.0),
-              cursorColor: colorScheme.primary,
+              style: TextStyle(
+                fontSize: 14.0,
+                color: textPrimary,
+              ),
+              cursorColor: purpleAccent,
             ),
             const SizedBox(height: 12.0),
             Align(
@@ -491,14 +504,14 @@ class _CardTicketAdminWidgetState extends State<CardTicketAdminWidget> {
                 options: FFButtonOptions(
                   height: 42.0,
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  color: colorScheme.primary,
+                  color: purpleAccent,
                   textStyle: const TextStyle(
                     color: Colors.white,
                     fontSize: 13.5,
                     fontWeight: FontWeight.bold,
                   ),
                   elevation: 0.0,
-                  borderRadius: BorderRadius.circular(12.0),
+                  borderRadius: BorderRadius.circular(10.0),
                 ),
               ),
             ),
@@ -507,8 +520,8 @@ class _CardTicketAdminWidgetState extends State<CardTicketAdminWidget> {
               width: double.infinity,
               padding: const EdgeInsets.all(14.0),
               decoration: BoxDecoration(
-                color: const Color(0xFF10B981).withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(14.0),
+                color: const Color(0xFF10B981).withValues(alpha: isDark ? 0.12 : 0.08),
+                borderRadius: BorderRadius.circular(12.0),
                 border: Border.all(
                   color: const Color(0xFF10B981).withValues(alpha: 0.25),
                   width: 1.0,
@@ -520,18 +533,18 @@ class _CardTicketAdminWidgetState extends State<CardTicketAdminWidget> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Row(
+                      Row(
                         children: [
                           Icon(
                             Icons.check_circle_rounded,
-                            color: Color(0xFF047857),
+                            color: isDark ? const Color(0xFF34D399) : const Color(0xFF047857),
                             size: 15.0,
                           ),
-                          SizedBox(width: 6.0),
+                          const SizedBox(width: 6.0),
                           Text(
                             'RISPOSTA FORNITA DALL\'ADMIN',
                             style: TextStyle(
-                              color: Color(0xFF047857),
+                              color: isDark ? const Color(0xFF34D399) : const Color(0xFF047857),
                               fontSize: 10.5,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 0.5,
@@ -542,15 +555,15 @@ class _CardTicketAdminWidgetState extends State<CardTicketAdminWidget> {
                       InkWell(
                         onTap: _riapriTicket,
                         borderRadius: BorderRadius.circular(6.0),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(
                               horizontal: 6.0, vertical: 2.0),
                           child: Text(
                             'Riapri ticket',
                             style: TextStyle(
                               fontSize: 11.0,
                               fontWeight: FontWeight.bold,
-                              color: Colors.orange.shade800,
+                              color: Color(0xFFF59E0B),
                               decoration: TextDecoration.underline,
                             ),
                           ),
@@ -564,8 +577,8 @@ class _CardTicketAdminWidgetState extends State<CardTicketAdminWidget> {
                       widget.ticketCorrente?.rispostaAdmin,
                       'Nessun messaggio di risposta registrato.',
                     ),
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: const Color(0xFF064E3B),
+                    style: TextStyle(
+                      color: isDark ? const Color(0xFFD1FAE5) : const Color(0xFF064E3B),
                       fontSize: 14.0,
                       height: 1.4,
                     ),

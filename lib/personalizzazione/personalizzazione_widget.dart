@@ -330,7 +330,8 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     final colorScheme = theme.colorScheme;
     final customTheme = theme.appCustomTheme;
     final currentStyle = themeProvider.designStyle;
-    final primaryColor = themeProvider.primaryColor;
+    final brandColor = themeProvider.primaryColor;
+    final primaryColor = colorScheme.primary;
     final isDark = theme.brightness == Brightness.dark;
 
     return GestureDetector(
@@ -340,7 +341,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
       },
       child: Scaffold(
         key: scaffoldKey,
-        backgroundColor: colorScheme.surfaceContainerLowest,
+        backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
         appBar: widget.embedded
             ? null
             : AppBar(
@@ -435,6 +436,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                       themeProvider: themeProvider,
                       currentStyle: currentStyle,
                       primaryColor: primaryColor,
+                      brandColor: brandColor,
                       isDark: isDark,
                       colorScheme: colorScheme,
                     ),
@@ -475,6 +477,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                                             themeProvider: themeProvider,
                                             currentStyle: currentStyle,
                                             primaryColor: primaryColor,
+                                            brandColor: brandColor,
                                             isDark: isDark,
                                             isDesktop: true,
                                           ),
@@ -513,7 +516,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                             width: 1.0,
                             thickness: 1.0,
                             color: isDark
-                                ? Colors.white.withValues(alpha: 0.08)
+                                ? const Color(0xFF334155)
                                 : const Color(0xFFE2E8F0),
                           ),
 
@@ -587,6 +590,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                                   themeProvider: themeProvider,
                                   currentStyle: currentStyle,
                                   primaryColor: primaryColor,
+                                  brandColor: brandColor,
                                   isDark: isDark,
                                 ),
                               1 => _buildDishesAndBadgesTab(
@@ -716,6 +720,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     required Color primaryColor,
   }) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.only(top: 4.0, bottom: 8.0),
       child: Row(
@@ -735,16 +740,18 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
               children: [
                 Text(
                   title,
-                  style: theme.textTheme.titleSmall?.copyWith(
+                  style: TextStyle(
+                    fontSize: 14.5,
                     fontWeight: FontWeight.bold,
                     letterSpacing: -0.2,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
                   ),
                 ),
                 Text(
                   subtitle,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+                  style: TextStyle(
                     fontSize: 11.5,
+                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                   ),
                 ),
               ],
@@ -764,12 +771,16 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     required ThemeProvider themeProvider,
     required AppDesignStyle currentStyle,
     required Color primaryColor,
+    required Color brandColor,
     required bool isDark,
     required ColorScheme colorScheme,
   }) {
-    final hexCode = '#${primaryColor.toARGB32().toRadixString(16).substring(2).toUpperCase()}';
+    final hexCode = '#${brandColor.toARGB32().toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}';
     final layoutName = themeProvider.dishCardLayout.displayName.split(' ').first;
     final badgeName = themeProvider.badgeStyle.displayName;
+    final moodColor = isDark
+        ? AppThemes.ensureContrastOnDark(currentStyle.defaultPrimaryColor)
+        : currentStyle.defaultPrimaryColor;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(28.0, 16.0, 28.0, 12.0),
@@ -781,7 +792,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
               value: currentStyle.displayName,
               subtitle: currentStyle.targetAudience,
               icon: currentStyle.defaultIcon,
-              color: currentStyle.defaultPrimaryColor,
+              color: moodColor,
               isDark: isDark,
             ),
           ),
@@ -790,11 +801,11 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
             child: _buildStudioKpiCard(
               title: 'Colore Brand',
               value: hexCode,
-              subtitle: primaryColor.computeLuminance() > 0.4 ? 'Tonalità Chiara' : 'Tonalità Intensa',
+              subtitle: brandColor.computeLuminance() > 0.4 ? 'Tonalità Chiara' : 'Tonalità Intensa',
               icon: Icons.palette_rounded,
-              color: primaryColor,
+              color: brandColor,
               isDark: isDark,
-              swatchColor: primaryColor,
+              swatchColor: brandColor,
             ),
           ),
           const SizedBox(width: 14.0),
@@ -804,7 +815,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
               value: layoutName,
               subtitle: '${themeProvider.titleFont} • ${themeProvider.bodyFont}',
               icon: Icons.auto_awesome_mosaic_rounded,
-              color: const Color(0xFF3B82F6),
+              color: primaryColor,
               isDark: isDark,
             ),
           ),
@@ -948,7 +959,9 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     final bodyFont = themeProvider.bodyFont;
 
     return Container(
-      color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+      color: isDark
+          ? const Color(0xFF0B132B)
+          : const Color(0xFFE2E8F0).withValues(alpha: 0.6),
       padding: const EdgeInsets.fromLTRB(24.0, 8.0, 28.0, 20.0),
       child: Column(
         children: [
@@ -1141,15 +1154,15 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                   color: clientDark ? const Color(0xFF0B1120) : const Color(0xFFF8FAFC),
                   borderRadius: BorderRadius.circular(38.0),
                   border: Border.all(
-                    color: isDark ? const Color(0xFF334155) : const Color(0xFF94A3B8),
-                    width: 7.0,
+                    color: isDark ? const Color(0xFF334155) : const Color(0xFF0F172A),
+                    width: 8.0,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: isDark ? 0.6 : 0.16),
-                      blurRadius: 26.0,
-                      spreadRadius: 2.0,
-                      offset: const Offset(0, 8),
+                      color: Colors.black.withValues(alpha: isDark ? 0.6 : 0.22),
+                      blurRadius: 32.0,
+                      spreadRadius: 3.0,
+                      offset: const Offset(0, 10),
                     ),
                   ],
                 ),
@@ -3284,15 +3297,15 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     required Color primaryColor,
     required bool isDark,
   }) {
-    final theme = Theme.of(context);
-    final cardBg = theme.colorScheme.surface;
-    final barBg = theme.colorScheme.surfaceContainerHigh;
+    final barBg = isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9);
+    final barBorder = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
 
     return Container(
-      padding: const EdgeInsets.all(3.0),
+      padding: const EdgeInsets.all(4.0),
       decoration: BoxDecoration(
         color: barBg,
         borderRadius: BorderRadius.circular(14.0),
+        border: Border.all(color: barBorder, width: 1.0),
       ),
       child: Row(
         children: [
@@ -3302,7 +3315,6 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
               icon: Icons.palette_rounded,
               isSelected: _mainTab == 0,
               primaryColor: primaryColor,
-              activeBg: cardBg,
               isDark: isDark,
               onTap: () {
                 if (_mainTab != 0) setState(() => _mainTab = 0);
@@ -3316,7 +3328,6 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
               icon: Icons.restaurant_rounded,
               isSelected: _mainTab == 1,
               primaryColor: primaryColor,
-              activeBg: cardBg,
               isDark: isDark,
               onTap: () {
                 if (_mainTab != 1) setState(() => _mainTab = 1);
@@ -3330,7 +3341,6 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
               icon: Icons.wallpaper_rounded,
               isSelected: _mainTab == 2,
               primaryColor: primaryColor,
-              activeBg: cardBg,
               isDark: isDark,
               onTap: () {
                 if (_mainTab != 2) setState(() => _mainTab = 2);
@@ -3347,7 +3357,6 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     required IconData icon,
     required bool isSelected,
     required Color primaryColor,
-    required Color activeBg,
     required bool isDark,
     required VoidCallback onTap,
   }) {
@@ -3356,16 +3365,24 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
       borderRadius: BorderRadius.circular(11.0),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 7.0),
+        padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
         decoration: BoxDecoration(
-          color: isSelected ? activeBg : Colors.transparent,
+          color: isSelected
+              ? (isDark ? primaryColor.withValues(alpha: 0.22) : Colors.white)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(11.0),
+          border: isSelected
+              ? Border.all(
+                  color: primaryColor.withValues(alpha: isDark ? 0.40 : 0.25),
+                  width: 1.0,
+                )
+              : Border.all(color: Colors.transparent, width: 1.0),
           boxShadow: isSelected
               ? [
                   BoxShadow(
                     color: isDark
-                        ? Colors.black.withValues(alpha: 0.3)
-                        : Colors.black.withValues(alpha: 0.05),
+                        ? primaryColor.withValues(alpha: 0.15)
+                        : Colors.black.withValues(alpha: 0.06),
                     blurRadius: 4.0,
                     offset: const Offset(0, 1),
                   )
@@ -3377,18 +3394,12 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
           children: [
             Icon(
               icon,
-              size: 14.5,
+              size: 15.0,
               color: isSelected
-                  ? (isDark
-                      ? (primaryColor.computeLuminance() < 0.40
-                          ? HSLColor.fromColor(primaryColor).withLightness(0.68).toColor()
-                          : primaryColor)
-                      : (primaryColor.computeLuminance() > 0.25
-                          ? HSLColor.fromColor(primaryColor).withLightness(0.35).toColor()
-                          : primaryColor))
-                  : (isDark ? const Color(0xFFB0B0B0) : const Color(0xFF475569)),
+                  ? (isDark ? Colors.white : primaryColor)
+                  : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
             ),
-            const SizedBox(width: 4.0),
+            const SizedBox(width: 5.0),
             Flexible(
               child: FittedBox(
                 fit: BoxFit.scaleDown,
@@ -3396,11 +3407,11 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                   title,
                   maxLines: 1,
                   style: TextStyle(
-                    fontSize: 11.5,
+                    fontSize: 12.0,
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
                     color: isSelected
-                        ? (isDark ? Colors.white : Colors.black87)
-                        : (isDark ? const Color(0xFFB0B0B0) : const Color(0xFF475569)),
+                        ? (isDark ? Colors.white : primaryColor)
+                        : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
                   ),
                 ),
               ),
@@ -3421,10 +3432,11 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     required ThemeProvider themeProvider,
     required AppDesignStyle currentStyle,
     required Color primaryColor,
+    required Color brandColor,
     required bool isDark,
     bool isDesktop = false,
   }) {
-    final dividerColor = Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.35);
+    final dividerColor = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
 
     return Column(
       key: key,
@@ -3458,6 +3470,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
           context: context,
           themeProvider: themeProvider,
           primaryColor: primaryColor,
+          brandColor: brandColor,
           isDark: isDark,
         ),
         const SizedBox(height: 12.0),
@@ -3487,7 +3500,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     required Color primaryColor,
     required bool isDark,
   }) {
-    final dividerColor = Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.35);
+    final dividerColor = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
 
     return Column(
       key: key,
@@ -3722,18 +3735,21 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
   }) {
     final theme = Theme.of(context);
     final isSelected = currentStyle == preset;
-    final presetColor = preset.defaultPrimaryColor;
-    final cardBg = theme.colorScheme.surface;
+    final presetBaseColor = preset.defaultPrimaryColor;
+    final presetColor = isDark
+        ? AppThemes.ensureContrastOnDark(presetBaseColor)
+        : presetBaseColor;
+    final cardBg = isDark ? const Color(0xFF1E293B) : Colors.white;
     final Color selectedBg = isSelected
         ? presetColor.withValues(alpha: isDark ? 0.16 : 0.08)
-        : (isDark ? const Color(0xFF1E293B) : cardBg);
+        : cardBg;
 
     // Mini palette dots per preview istantanea del preset
     final List<Color> paletteDots = switch (preset) {
       AppDesignStyle.premium => const [Color(0xFFC5A059), Color(0xFF0F172A), Color(0xFFE2E8F0)],
       AppDesignStyle.pub => const [Color(0xFFD97706), Color(0xFF78350F), Color(0xFFFEF3C7)],
       AppDesignStyle.minimal => const [Color(0xFF0F172A), Color(0xFF64748B), Color(0xFFF8FAFC)],
-      AppDesignStyle.tradizionale => const [Color(0xFFB71C1C), Color(0xFFEA580C), Color(0xFFFEE2E2)],
+      AppDesignStyle.tradizionale => const [Color(0xFFB71C1C), Color(0xFFEA580C), Color(0xFFFEE2E8)],
     };
 
     return Card(
@@ -3782,7 +3798,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                               style: TextStyle(
                                 fontSize: 15.0,
                                 fontWeight: FontWeight.bold,
-                                color: theme.colorScheme.onSurface,
+                                color: isDark ? Colors.white : const Color(0xFF0F172A),
                               ),
                             ),
                             const SizedBox(width: 7.0),
@@ -3803,7 +3819,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 11.0,
-                            color: theme.colorScheme.onSurfaceVariant,
+                            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                           ),
                         ),
                       ],
@@ -3818,7 +3834,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                       shape: BoxShape.circle,
                       color: isSelected
                           ? presetColor
-                          : theme.colorScheme.surfaceContainerHigh,
+                          : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
                     ),
                     child: Center(
                       child: isSelected
@@ -3840,7 +3856,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                 style: TextStyle(
                   fontSize: 12.0,
                   height: 1.35,
-                  color: theme.colorScheme.onSurfaceVariant,
+                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                 ),
               ),
               const SizedBox(height: 10.0),
@@ -3891,8 +3907,6 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     required Color primaryColor,
     required bool isDark,
   }) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final currentBadgeStyle = themeProvider.badgeStyle;
 
     return Column(
@@ -3909,7 +3923,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                 style: TextStyle(
                   fontSize: 15.0,
                   fontWeight: FontWeight.w700,
-                  color: colorScheme.onSurface,
+                  color: isDark ? Colors.white : const Color(0xFF0F172A),
                 ),
               ),
               const SizedBox(height: 2.0),
@@ -3917,7 +3931,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                 'Personalizza la forma e lo stile di prezzi, allergeni e tag nel menù cliente.',
                 style: TextStyle(
                   fontSize: 12.0,
-                  color: colorScheme.onSurfaceVariant,
+                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                 ),
               ),
             ],
@@ -3969,19 +3983,19 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
           return Padding(
             padding: const EdgeInsets.only(bottom: 10.0),
             child: Card(
-              elevation: isSelected ? 2.0 : 0.5,
+              elevation: isSelected ? 2.5 : 0.5,
               shadowColor: isSelected
                   ? primaryColor.withValues(alpha: isDark ? 0.35 : 0.15)
-                  : Colors.transparent,
+                  : Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
               color: isSelected
-                  ? primaryColor.withValues(alpha: isDark ? 0.15 : 0.06)
-                  : colorScheme.surface,
+                  ? (isDark ? primaryColor.withValues(alpha: 0.15) : primaryColor.withValues(alpha: 0.06))
+                  : (isDark ? const Color(0xFF1E293B) : Colors.white),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14.0),
                 side: BorderSide(
                   color: isSelected
                       ? primaryColor
-                      : colorScheme.outlineVariant.withValues(alpha: 0.35),
+                      : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
                   width: isSelected ? 1.8 : 1.0,
                 ),
               ),
@@ -4010,15 +4024,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                             alignment: Alignment.center,
                             child: Icon(
                               bStyle.icon,
-                              color: isSelected
-                                  ? (primaryColor.computeLuminance() > 0.55 ? Colors.black87 : Colors.white)
-                                  : (isDark
-                                      ? (primaryColor.computeLuminance() < 0.40
-                                          ? HSLColor.fromColor(primaryColor).withLightness(0.68).toColor()
-                                          : primaryColor)
-                                      : (primaryColor.computeLuminance() > 0.25
-                                          ? HSLColor.fromColor(primaryColor).withLightness(0.35).toColor()
-                                          : primaryColor)),
+                              color: isSelected ? Colors.white : primaryColor,
                               size: 19.0,
                             ),
                           ),
@@ -4035,7 +4041,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                                         style: TextStyle(
                                           fontSize: 14.5,
                                           fontWeight: FontWeight.bold,
-                                          color: colorScheme.onSurface,
+                                          color: isDark ? Colors.white : const Color(0xFF0F172A),
                                         ),
                                       ),
                                     ),
@@ -4079,7 +4085,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                                   bStyle.description,
                                   style: TextStyle(
                                     fontSize: 11.5,
-                                    color: colorScheme.onSurfaceVariant,
+                                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                                   ),
                                 ),
                               ],
@@ -4094,18 +4100,18 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                             horizontal: 10.0, vertical: 8.0),
                         decoration: BoxDecoration(
                           color: isDark
-                              ? Colors.black.withValues(alpha: 0.25)
-                              : Colors.grey.shade100.withValues(alpha: 0.7),
+                              ? const Color(0xFF0F172A)
+                              : const Color(0xFFF1F5F9),
                           borderRadius: BorderRadius.circular(10.0),
                         ),
                         child: Row(
                           children: [
-                            const Text(
+                            Text(
                               'Esempi:',
                               style: TextStyle(
                                 fontSize: 10.5,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.grey,
+                                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                               ),
                             ),
                             const SizedBox(width: 8.0),
@@ -4205,7 +4211,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                         style: TextStyle(
                           fontSize: 13.5,
                           fontWeight: FontWeight.bold,
-                          color: colorScheme.onSurface,
+                          color: isDark ? Colors.white : const Color(0xFF0F172A),
                         ),
                       ),
                       const SizedBox(height: 2.0),
@@ -4213,7 +4219,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                         'Apri il simulatore per provare la navigazione del cliente a schermo intero.',
                         style: TextStyle(
                           fontSize: 11.5,
-                          color: colorScheme.onSurfaceVariant,
+                          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                         ),
                       ),
                     ],
@@ -4254,8 +4260,6 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     required Color primaryColor,
     required bool isDark,
   }) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final currentTitleFont = themeProvider.titleFont;
     final currentBodyFont = themeProvider.bodyFont;
 
@@ -4275,14 +4279,14 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                   style: TextStyle(
                     fontSize: 14.5,
                     fontWeight: FontWeight.w700,
-                    color: colorScheme.onSurface,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
                   ),
                 ),
                 Text(
                   'Scegli i caratteri per il tuo menu',
                   style: TextStyle(
                     fontSize: 11.5,
-                    color: colorScheme.onSurfaceVariant,
+                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                   ),
                 ),
               ],
@@ -4306,10 +4310,13 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
 
         // Sub-switcher per selezionare se personalizzare Titoli o Body
         Container(
-          padding: const EdgeInsets.all(3.0),
+          padding: const EdgeInsets.all(4.0),
           decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerHigh,
+            color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
             borderRadius: BorderRadius.circular(12.0),
+            border: Border.all(
+              color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+            ),
           ),
           child: Row(
             children: [
@@ -4320,7 +4327,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                   icon: Icons.title_rounded,
                   isSelected: _fontTargetTab == 0,
                   primaryColor: primaryColor,
-                  colorScheme: colorScheme,
+                  isDark: isDark,
                   onTap: () => setState(() => _fontTargetTab = 0),
                 ),
               ),
@@ -4332,7 +4339,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                   icon: Icons.notes_rounded,
                   isSelected: _fontTargetTab == 1,
                   primaryColor: primaryColor,
-                  colorScheme: colorScheme,
+                  isDark: isDark,
                   onTap: () => setState(() => _fontTargetTab = 1),
                 ),
               ),
@@ -4351,7 +4358,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w600,
-                color: colorScheme.onSurfaceVariant,
+                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
               ),
             ),
           ),
@@ -4365,7 +4372,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                 description: opt.description,
                 isSelected: isSelected,
                 primaryColor: primaryColor,
-                colorScheme: colorScheme,
+                isDark: isDark,
                 onTap: () {
                   themeProvider.setTitleFont(opt.family);
                   _markChangesUnpublished();
@@ -4381,7 +4388,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w600,
-                color: colorScheme.onSurfaceVariant,
+                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
               ),
             ),
           ),
@@ -4395,7 +4402,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                 description: opt.description,
                 isSelected: isSelected,
                 primaryColor: primaryColor,
-                colorScheme: colorScheme,
+                isDark: isDark,
                 onTap: () {
                   themeProvider.setBodyFont(opt.family);
                   _markChangesUnpublished();
@@ -4416,7 +4423,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     required IconData icon,
     required bool isSelected,
     required Color primaryColor,
-    required ColorScheme colorScheme,
+    required bool isDark,
     required VoidCallback onTap,
   }) {
     return InkWell(
@@ -4426,8 +4433,27 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 10.0),
         decoration: BoxDecoration(
-          color: isSelected ? colorScheme.surface : Colors.transparent,
+          color: isSelected
+              ? (isDark ? primaryColor.withValues(alpha: 0.22) : Colors.white)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(10.0),
+          border: isSelected
+              ? Border.all(
+                  color: primaryColor.withValues(alpha: isDark ? 0.40 : 0.25),
+                  width: 1.0,
+                )
+              : Border.all(color: Colors.transparent, width: 1.0),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: isDark
+                        ? primaryColor.withValues(alpha: 0.15)
+                        : Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 4.0,
+                    offset: const Offset(0, 1),
+                  ),
+                ]
+              : null,
         ),
         child: Column(
           children: [
@@ -4437,7 +4463,9 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                 Icon(
                   icon,
                   size: 15.0,
-                  color: isSelected ? primaryColor : colorScheme.onSurfaceVariant,
+                  color: isSelected
+                      ? (isDark ? Colors.white : primaryColor)
+                      : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
                 ),
                 const SizedBox(width: 5.0),
                 Text(
@@ -4445,7 +4473,9 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                   style: TextStyle(
                     fontSize: 12.0,
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                    color: isSelected ? colorScheme.onSurface : colorScheme.onSurfaceVariant,
+                    color: isSelected
+                        ? (isDark ? Colors.white : primaryColor)
+                        : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
                   ),
                 ),
               ],
@@ -4458,7 +4488,9 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
               style: TextStyle(
                 fontSize: 10.5,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                color: isSelected ? primaryColor : colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+                color: isSelected
+                    ? (isDark ? Colors.white.withValues(alpha: 0.85) : primaryColor)
+                    : (isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8)),
               ),
             ),
           ],
@@ -4473,21 +4505,26 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     required String description,
     required bool isSelected,
     required Color primaryColor,
-    required ColorScheme colorScheme,
+    required bool isDark,
     required VoidCallback onTap,
   }) {
     return Card(
-      elevation: isSelected ? 2.0 : 0.5,
+      elevation: isSelected ? 2.5 : 0.5,
       shadowColor: isSelected
-          ? primaryColor.withValues(alpha: 0.25)
-          : Colors.black.withValues(alpha: 0.05),
+          ? primaryColor.withValues(alpha: isDark ? 0.35 : 0.18)
+          : Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14.0),
-        side: BorderSide.none,
+        side: BorderSide(
+          color: isSelected
+              ? primaryColor
+              : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+          width: isSelected ? 1.8 : 1.0,
+        ),
       ),
       color: isSelected
-          ? primaryColor.withValues(alpha: 0.08)
-          : colorScheme.surface,
+          ? (isDark ? primaryColor.withValues(alpha: 0.15) : primaryColor.withValues(alpha: 0.06))
+          : (isDark ? const Color(0xFF1E293B) : Colors.white),
       margin: EdgeInsets.zero,
       child: InkWell(
         onTap: onTap,
@@ -4502,8 +4539,8 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                 height: 44.0,
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? primaryColor.withValues(alpha: 0.16)
-                      : colorScheme.surfaceContainerHigh,
+                      ? primaryColor.withValues(alpha: 0.18)
+                      : (isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9)),
                   borderRadius: BorderRadius.circular(10.0),
                 ),
                 child: Center(
@@ -4514,7 +4551,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                       textStyle: TextStyle(
                         fontSize: 20.0,
                         fontWeight: FontWeight.w700,
-                        color: isSelected ? primaryColor : colorScheme.onSurface,
+                        color: isSelected ? primaryColor : (isDark ? Colors.white : const Color(0xFF0F172A)),
                       ),
                     ),
                   ),
@@ -4540,7 +4577,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                               textStyle: TextStyle(
                                 fontSize: 16.0,
                                 fontWeight: FontWeight.bold,
-                                color: colorScheme.onSurface,
+                                color: isDark ? Colors.white : const Color(0xFF0F172A),
                               ),
                             ),
                           ),
@@ -4550,15 +4587,19 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                           padding: const EdgeInsets.symmetric(
                               horizontal: 6.0, vertical: 2.0),
                           decoration: BoxDecoration(
-                            color: colorScheme.surfaceContainerHigh,
+                            color: isSelected
+                                ? primaryColor.withValues(alpha: 0.15)
+                                : (isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9)),
                             borderRadius: BorderRadius.circular(6.0),
                           ),
                           child: Text(
                             genre,
                             style: TextStyle(
                               fontSize: 9.5,
-                              color: colorScheme.onSurfaceVariant,
-                              fontWeight: FontWeight.w500,
+                              color: isSelected
+                                  ? primaryColor
+                                  : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
@@ -4569,7 +4610,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                       description,
                       style: TextStyle(
                         fontSize: 11.5,
-                        color: colorScheme.onSurfaceVariant,
+                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                       ),
                     ),
                   ],
@@ -4587,7 +4628,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                   shape: BoxShape.circle,
                   color: isSelected
                       ? primaryColor
-                      : colorScheme.surfaceContainerHigh,
+                      : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
                 ),
                 child: Center(
                   child: isSelected
@@ -4615,10 +4656,9 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     required BuildContext context,
     required ThemeProvider themeProvider,
     required Color primaryColor,
+    required Color brandColor,
     required bool isDark,
   }) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final currentStyle = themeProvider.designStyle;
 
     return Column(
@@ -4629,10 +4669,10 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
         Container(
           padding: const EdgeInsets.all(14.0),
           decoration: BoxDecoration(
-            color: primaryColor.withValues(alpha: isDark ? 0.18 : 0.08),
+            color: isDark ? const Color(0xFF1E293B) : Colors.white,
             borderRadius: BorderRadius.circular(14.0),
             border: Border.all(
-              color: primaryColor.withValues(alpha: 0.25),
+              color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
               width: 1.0,
             ),
           ),
@@ -4642,7 +4682,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
               Container(
                 padding: const EdgeInsets.all(8.0),
                 decoration: BoxDecoration(
-                  color: primaryColor.withValues(alpha: 0.2),
+                  color: primaryColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10.0),
                 ),
                 child: Icon(
@@ -4661,7 +4701,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                       style: TextStyle(
                         fontSize: 14.5,
                         fontWeight: FontWeight.w700,
-                        color: colorScheme.onSurface,
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
                     ),
                     const SizedBox(height: 3.0),
@@ -4670,7 +4710,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                       style: TextStyle(
                         fontSize: 12.0,
                         height: 1.35,
-                        color: colorScheme.onSurfaceVariant,
+                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                       ),
                     ),
                   ],
@@ -4687,6 +4727,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
           context: context,
           themeProvider: themeProvider,
           primaryColor: primaryColor,
+          brandColor: brandColor,
           currentStyle: currentStyle,
           isDark: isDark,
         ),
@@ -4702,14 +4743,14 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
               style: TextStyle(
                 fontSize: 14.0,
                 fontWeight: FontWeight.w700,
-                color: colorScheme.onSurface,
+                color: isDark ? Colors.white : const Color(0xFF0F172A),
               ),
             ),
             Text(
               '12 tonalità studiate',
               style: TextStyle(
                 fontSize: 11.5,
-                color: colorScheme.onSurfaceVariant,
+                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
               ),
             ),
           ],
@@ -4724,7 +4765,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
           separatorBuilder: (_, __) => const SizedBox(height: 8.0),
           itemBuilder: (context, index) {
             final opt = _gourmetColors[index];
-            final isSelected = primaryColor.toARGB32() == opt.color.toARGB32();
+            final isSelected = brandColor.toARGB32() == opt.color.toARGB32();
 
             return InkWell(
               onTap: () {
@@ -4744,12 +4785,12 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                 decoration: BoxDecoration(
                   color: isSelected
                       ? opt.color.withValues(alpha: isDark ? 0.22 : 0.08)
-                      : colorScheme.surface,
+                      : (isDark ? const Color(0xFF1E293B) : Colors.white),
                   borderRadius: BorderRadius.circular(14.0),
                   border: Border.all(
                     color: isSelected
                         ? opt.color
-                        : colorScheme.outlineVariant.withValues(alpha: 0.5),
+                        : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
                     width: isSelected ? 2.0 : 1.0,
                   ),
                   boxShadow: isSelected
@@ -4801,7 +4842,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                                   style: TextStyle(
                                     fontSize: 14.0,
                                     fontWeight: FontWeight.w700,
-                                    color: colorScheme.onSurface,
+                                    color: isDark ? Colors.white : const Color(0xFF0F172A),
                                   ),
                                 ),
                               ),
@@ -4828,7 +4869,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                             opt.recommendedFor,
                             style: TextStyle(
                               fontSize: 12.0,
-                              color: colorScheme.onSurfaceVariant,
+                              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                             ),
                           ),
                         ],
@@ -4839,7 +4880,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                       decoration: BoxDecoration(
-                        color: colorScheme.surfaceContainerHigh,
+                        color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                       child: Text(
@@ -4848,7 +4889,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                           fontSize: 11.0,
                           fontWeight: FontWeight.w600,
                           fontFamily: 'monospace',
-                          color: colorScheme.onSurface,
+                          color: isDark ? Colors.white : const Color(0xFF0F172A),
                         ),
                       ),
                     ),
@@ -4868,19 +4909,17 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     required BuildContext context,
     required ThemeProvider themeProvider,
     required Color primaryColor,
+    required Color brandColor,
     required AppDesignStyle currentStyle,
     required bool isDark,
   }) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
     return Container(
       padding: const EdgeInsets.all(14.0),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(14.0),
         border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.6),
+          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
           width: 1.0,
         ),
       ),
@@ -4903,7 +4942,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                         style: TextStyle(
                           fontSize: 13.0,
                           fontWeight: FontWeight.w700,
-                          color: colorScheme.onSurface,
+                          color: isDark ? Colors.white : const Color(0xFF0F172A),
                         ),
                       ),
                     ),
@@ -4944,7 +4983,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                 width: 44.0,
                 height: 44.0,
                 decoration: BoxDecoration(
-                  color: primaryColor,
+                  color: brandColor,
                   borderRadius: BorderRadius.circular(10.0),
                   border: Border.all(
                     color: Colors.white.withValues(alpha: 0.8),
@@ -4952,7 +4991,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: primaryColor.withValues(alpha: 0.35),
+                      color: brandColor.withValues(alpha: 0.35),
                       blurRadius: 6.0,
                       offset: const Offset(0, 2),
                     ),
@@ -4973,7 +5012,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                       fontWeight: FontWeight.w700,
                       fontSize: 15.0,
                       letterSpacing: 2.0,
-                      color: colorScheme.onSurface,
+                      color: isDark ? Colors.white : const Color(0xFF0F172A),
                     ),
                     decoration: InputDecoration(
                       prefixText: '# ',
@@ -4981,14 +5020,20 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                         fontFamily: 'monospace',
                         fontWeight: FontWeight.w700,
                         fontSize: 15.0,
-                        color: colorScheme.onSurfaceVariant,
+                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                       ),
                       counterText: '',
                       contentPadding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10.0),
                         borderSide: BorderSide(
-                          color: colorScheme.outlineVariant,
+                          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide(
+                          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
@@ -5001,7 +5046,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                       hintText: 'E63946',
                       hintStyle: TextStyle(
                         fontFamily: 'monospace',
-                        color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                        color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
                       ),
                     ),
                     onSubmitted: (val) => _applyHexColor(val, themeProvider),
@@ -5068,8 +5113,6 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     required Color primaryColor,
     required bool isDark,
   }) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final currentLayout = themeProvider.dishCardLayout;
 
     return Column(
@@ -5086,7 +5129,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                 style: TextStyle(
                   fontSize: 15.0,
                   fontWeight: FontWeight.w700,
-                  color: colorScheme.onSurface,
+                  color: isDark ? Colors.white : const Color(0xFF0F172A),
                 ),
               ),
               const SizedBox(height: 2.0),
@@ -5094,7 +5137,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                 'Scegli come visualizzare i piatti nel menù per i tuoi clienti.',
                 style: TextStyle(
                   fontSize: 12.0,
-                  color: colorScheme.onSurfaceVariant,
+                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                 ),
               ),
             ],
@@ -5106,19 +5149,19 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
           return Padding(
             padding: const EdgeInsets.only(bottom: 10.0),
             child: Card(
-              elevation: isSelected ? 2.0 : 0.5,
+              elevation: isSelected ? 2.5 : 0.5,
               shadowColor: isSelected
                   ? primaryColor.withValues(alpha: isDark ? 0.35 : 0.15)
-                  : Colors.transparent,
+                  : Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
               color: isSelected
-                  ? primaryColor.withValues(alpha: isDark ? 0.15 : 0.06)
-                  : colorScheme.surface,
+                  ? (isDark ? primaryColor.withValues(alpha: 0.15) : primaryColor.withValues(alpha: 0.06))
+                  : (isDark ? const Color(0xFF1E293B) : Colors.white),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14.0),
                 side: BorderSide(
                   color: isSelected
                       ? primaryColor
-                      : colorScheme.outlineVariant.withValues(alpha: 0.35),
+                      : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
                   width: isSelected ? 1.8 : 1.0,
                 ),
               ),
@@ -5162,7 +5205,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                                     style: TextStyle(
                                       fontSize: 14.5,
                                       fontWeight: FontWeight.bold,
-                                      color: colorScheme.onSurface,
+                                      color: isDark ? Colors.white : const Color(0xFF0F172A),
                                     ),
                                   ),
                                 ),
@@ -5206,7 +5249,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                               style: TextStyle(
                                 fontSize: 12.0,
                                 height: 1.35,
-                                color: colorScheme.onSurfaceVariant,
+                                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                               ),
                             ),
                           ],
@@ -5259,7 +5302,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                       style: TextStyle(
                         fontSize: 15.0,
                         fontWeight: FontWeight.w700,
-                        color: colorScheme.onSurface,
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
                     ),
                     const SizedBox(height: 2.0),
@@ -5267,7 +5310,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                       'Hero header mostrato in cima al menù digitale.',
                       style: TextStyle(
                         fontSize: 12.0,
-                        color: colorScheme.onSurfaceVariant,
+                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                       ),
                     ),
                   ],
@@ -5298,16 +5341,16 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
 
         // Opzione: Nessun banner
         Card(
-          elevation: currentBanner.isEmpty ? 2.0 : 0.5,
+          elevation: currentBanner.isEmpty ? 2.5 : 0.5,
           color: currentBanner.isEmpty
-              ? primaryColor.withValues(alpha: isDark ? 0.15 : 0.06)
-              : colorScheme.surface,
+              ? (isDark ? primaryColor.withValues(alpha: 0.15) : primaryColor.withValues(alpha: 0.06))
+              : (isDark ? const Color(0xFF1E293B) : Colors.white),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.0),
             side: BorderSide(
               color: currentBanner.isEmpty
                   ? primaryColor
-                  : colorScheme.outlineVariant.withValues(alpha: 0.35),
+                  : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
               width: currentBanner.isEmpty ? 1.8 : 1.0,
             ),
           ),
@@ -5324,7 +5367,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                 children: [
                   Icon(
                     Icons.hide_image_outlined,
-                    color: currentBanner.isEmpty ? primaryColor : colorScheme.onSurfaceVariant,
+                    color: currentBanner.isEmpty ? primaryColor : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
                     size: 20.0,
                   ),
                   const SizedBox(width: 10.0),
@@ -5334,7 +5377,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                       style: TextStyle(
                         fontSize: 13.5,
                         fontWeight: currentBanner.isEmpty ? FontWeight.bold : FontWeight.w500,
-                        color: colorScheme.onSurface,
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
                     ),
                   ),
@@ -5355,7 +5398,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
             fontSize: 12.5,
             fontWeight: FontWeight.w700,
             letterSpacing: 0.3,
-            color: colorScheme.onSurface,
+            color: isDark ? Colors.white : const Color(0xFF0F172A),
           ),
         ),
         const SizedBox(height: 8.0),
@@ -5463,10 +5506,10 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
         Container(
           padding: const EdgeInsets.all(12.0),
           decoration: BoxDecoration(
-            color: colorScheme.surface,
+            color: isDark ? const Color(0xFF1E293B) : Colors.white,
             borderRadius: BorderRadius.circular(12.0),
             border: Border.all(
-              color: colorScheme.outlineVariant.withValues(alpha: 0.4),
+              color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
               width: 1.0,
             ),
           ),
@@ -5478,7 +5521,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                 style: TextStyle(
                   fontSize: 12.0,
                   fontWeight: FontWeight.w600,
-                  color: colorScheme.onSurface,
+                  color: isDark ? Colors.white : const Color(0xFF0F172A),
                 ),
               ),
               const SizedBox(height: 8.0),
@@ -5487,15 +5530,23 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                   Expanded(
                     child: TextField(
                       controller: _bannerUrlController,
-                      style: TextStyle(fontSize: 12.5, color: colorScheme.onSurface),
+                      style: TextStyle(fontSize: 12.5, color: isDark ? Colors.white : const Color(0xFF0F172A)),
                       decoration: InputDecoration(
                         hintText: 'https://images.unsplash.com/...',
-                        hintStyle: TextStyle(fontSize: 12.0, color: colorScheme.onSurfaceVariant),
+                        hintStyle: TextStyle(fontSize: 12.0, color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8)),
                         isDense: true,
                         contentPadding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8.0),
-                          borderSide: BorderSide(color: colorScheme.outlineVariant),
+                          borderSide: BorderSide(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: BorderSide(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: BorderSide(color: primaryColor, width: 2.0),
                         ),
                       ),
                     ),
@@ -5525,7 +5576,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
         ),
 
         const SizedBox(height: 20.0),
-        Divider(color: colorScheme.outlineVariant.withValues(alpha: 0.3)),
+        Divider(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
         const SizedBox(height: 12.0),
 
         // ─── SEZIONE 2: TEXTURE DI SFONDO ───
@@ -5539,7 +5590,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                 style: TextStyle(
                   fontSize: 15.0,
                   fontWeight: FontWeight.w700,
-                  color: colorScheme.onSurface,
+                  color: isDark ? Colors.white : const Color(0xFF0F172A),
                 ),
               ),
               const SizedBox(height: 2.0),
@@ -5547,7 +5598,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                 'Personalizza l\'atmosfera materica dello sfondo del tuo menù.',
                 style: TextStyle(
                   fontSize: 12.0,
-                  color: colorScheme.onSurfaceVariant,
+                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                 ),
               ),
             ],
@@ -5566,16 +5617,16 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
           return Padding(
             padding: const EdgeInsets.only(bottom: 8.0),
             child: Card(
-              elevation: isSelected ? 2.0 : 0.5,
+              elevation: isSelected ? 2.5 : 0.5,
               color: isSelected
-                  ? primaryColor.withValues(alpha: isDark ? 0.15 : 0.06)
-                  : colorScheme.surface,
+                  ? (isDark ? primaryColor.withValues(alpha: 0.15) : primaryColor.withValues(alpha: 0.06))
+                  : (isDark ? const Color(0xFF1E293B) : Colors.white),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12.0),
                 side: BorderSide(
                   color: isSelected
                       ? primaryColor
-                      : colorScheme.outlineVariant.withValues(alpha: 0.35),
+                      : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
                   width: isSelected ? 1.8 : 1.0,
                 ),
               ),
@@ -5598,7 +5649,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                           border: Border.all(
                             color: isSelected
                                 ? primaryColor
-                                : colorScheme.outlineVariant.withValues(alpha: 0.5),
+                                : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
                             width: 1.0,
                           ),
                         ),
@@ -5606,7 +5657,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                         child: Icon(
                           texture.icon,
                           size: 20.0,
-                          color: isSelected ? primaryColor : colorScheme.onSurfaceVariant,
+                          color: isSelected ? primaryColor : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
                         ),
                       ),
                       const SizedBox(width: 12.0),
@@ -5620,7 +5671,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                               style: TextStyle(
                                 fontSize: 13.5,
                                 fontWeight: FontWeight.bold,
-                                color: colorScheme.onSurface,
+                                color: isDark ? Colors.white : const Color(0xFF0F172A),
                               ),
                             ),
                             const SizedBox(height: 2.0),
@@ -5630,7 +5681,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: 11.0,
-                                color: colorScheme.onSurfaceVariant,
+                                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                               ),
                             ),
                           ],
@@ -5660,22 +5711,19 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     required Color primaryColor,
     required bool isDark,
   }) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
         border: Border(
           top: BorderSide(
-            color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+            color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
             width: 1.0,
           ),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.06),
+            color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.06),
             blurRadius: 10.0,
             offset: const Offset(0, -3),
           ),
@@ -5858,14 +5906,17 @@ class _AnimatedPresetBadgeState extends State<_AnimatedPresetBadge>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final effectiveColor = widget.isDark
+        ? AppThemes.ensureContrastOnDark(widget.presetColor)
+        : widget.presetColor;
+
     final Color badgeBg = widget.isSelected
-        ? widget.presetColor.withValues(alpha: widget.isDark ? 0.25 : 0.15)
-        : theme.colorScheme.surfaceContainerHigh;
+        ? effectiveColor.withValues(alpha: widget.isDark ? 0.25 : 0.15)
+        : (widget.isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9));
 
     final Color iconColor = widget.isSelected
-        ? widget.presetColor
-        : theme.colorScheme.onSurfaceVariant;
+        ? effectiveColor
+        : (widget.isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B));
 
     return AnimatedBuilder(
       animation: _animController,

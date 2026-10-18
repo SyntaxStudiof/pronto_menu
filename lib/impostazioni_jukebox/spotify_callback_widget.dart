@@ -108,29 +108,49 @@ class _SpotifyCallbackWidgetState extends State<SpotifyCallbackWidget> {
       }
 
       final accessToken = tokens['access_token'] as String;
-      final refreshToken = tokens['refresh_token'] as String? ?? '';
+      final newRefreshToken = (tokens['refresh_token'] as String? ?? '').trim();
       final expiresIn = tokens['expires_in'] as int? ?? 3600;
       final expiryDate = DateTime.now().add(Duration(seconds: expiresIn));
 
+      String finalRefreshToken = newRefreshToken;
+      if (finalRefreshToken.isEmpty && userId != null && userId.isNotEmpty) {
+        try {
+          final userSnap = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+          final userData = userSnap.data();
+          final existingRefreshToken = (userData?['spotify_refresh_token'] as String? ?? '').trim();
+          if (existingRefreshToken.isNotEmpty) {
+            finalRefreshToken = existingRefreshToken;
+          }
+        } catch (_) {}
+      }
+
       // 3. Notifica la sessione Firestore affinché l'app aperta su mobile/desktop rilevi subito il successo
+      final sessionUpdate = <String, dynamic>{
+        'status': 'completed',
+        'accessToken': accessToken,
+        'expiresAt': expiryDate,
+        'expiresIn': expiresIn,
+      };
+      if (finalRefreshToken.isNotEmpty) {
+        sessionUpdate['refreshToken'] = finalRefreshToken;
+      }
+
       await FirebaseFirestore.instance
           .collection('spotify_auth_sessions')
           .doc(sessionId)
-          .update({
-        'status': 'completed',
-        'accessToken': accessToken,
-        'refreshToken': refreshToken,
-        'expiresAt': expiryDate,
-      });
+          .update(sessionUpdate);
 
       // 4. Se presente lo userId, aggiorna anche direttamente il documento utente
       if (userId != null && userId.isNotEmpty) {
         try {
-          await FirebaseFirestore.instance.collection('users').doc(userId).update({
+          final userUpdate = <String, dynamic>{
             'spotify_access_token': accessToken,
-            'spotify_refresh_token': refreshToken,
             'spotify_token_expires_at': expiryDate,
-          });
+          };
+          if (finalRefreshToken.isNotEmpty) {
+            userUpdate['spotify_refresh_token'] = finalRefreshToken;
+          }
+          await FirebaseFirestore.instance.collection('users').doc(userId).update(userUpdate);
         } catch (e) {
           debugPrint('Aggiornamento diretto utente non riuscito (gestito dall\'app): $e');
         }
