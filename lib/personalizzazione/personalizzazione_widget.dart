@@ -1525,13 +1525,20 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     required String titleFont,
     required bool clientDark,
   }) {
-    final categories = ['🍕 Pizze', '🥗 Antipasti', '🍺 Birre', '🍰 Dolci'];
+    final categories = [
+      (name: 'Panoramica', icon: Icons.restaurant_menu_rounded),
+      (name: 'Pizze', icon: Icons.local_pizza_rounded),
+      (name: 'Antipasti', icon: Icons.tapas_rounded),
+      (name: 'Birre', icon: Icons.sports_bar_rounded),
+      (name: 'Dolci', icon: Icons.cake_rounded),
+    ];
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: categories.asMap().entries.map((entry) {
           final isFirst = entry.key == 0;
+          final cat = entry.value;
           return Padding(
             padding: const EdgeInsets.only(right: 6.0),
             child: Container(
@@ -1563,18 +1570,31 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                         ),
                       ],
               ),
-              child: Text(
-                entry.value,
-                style: GoogleFonts.getFont(
-                  titleFont,
-                  textStyle: TextStyle(
-                    fontSize: 10.5,
-                    fontWeight: isFirst ? FontWeight.bold : FontWeight.w600,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    cat.icon,
+                    size: 13.5,
                     color: isFirst
                         ? Colors.white
-                        : (clientDark ? const Color(0xFF94A3B8) : const Color(0xFF475569)),
+                        : primaryColor,
                   ),
-                ),
+                  const SizedBox(width: 5.0),
+                  Text(
+                    cat.name,
+                    style: GoogleFonts.getFont(
+                      titleFont,
+                      textStyle: TextStyle(
+                        fontSize: 10.5,
+                        fontWeight: isFirst ? FontWeight.bold : FontWeight.w600,
+                        color: isFirst
+                            ? Colors.white
+                            : (clientDark ? const Color(0xFF94A3B8) : const Color(0xFF475569)),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           );
