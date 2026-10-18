@@ -1,4 +1,7 @@
 import '/services/translation_service.dart';
+import '/services/category_icon_helper.dart';
+import '/app_themes.dart';
+import '/theme_provider.dart';
 import '/backend/backend.dart';
 import '/cliente/popup_tavolo/popup_tavolo_widget.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
@@ -30,6 +33,8 @@ class RiepilogoFinaleWidget extends StatefulWidget {
 class _RiepilogoFinaleWidgetState extends State<RiepilogoFinaleWidget> {
   late RiepilogoFinaleModel _model;
   String _currentLang = 'it';
+  Stream<UsersRecord>? _ristoranteStream;
+  Stream<List<CategoriesRecord>>? _categoriesStream;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -37,6 +42,14 @@ class _RiepilogoFinaleWidgetState extends State<RiepilogoFinaleWidget> {
   void initState() {
     super.initState();
     _model = createModel(context, () => RiepilogoFinaleModel());
+
+    if (widget.ristoranteRef != null) {
+      _ristoranteStream = UsersRecord.getDocument(widget.ristoranteRef!);
+      _categoriesStream = queryCategoriesRecord(
+        queryBuilder: (q) =>
+            q.where('proprietario', isEqualTo: widget.ristoranteRef),
+      );
+    }
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final l = await TranslationService.getSavedLanguage();
@@ -174,15 +187,69 @@ class _RiepilogoFinaleWidgetState extends State<RiepilogoFinaleWidget> {
   @override
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
-    final theme = Theme.of(context);
+    final baseTheme = Theme.of(context);
     final itemCarrello = FFAppState().Carrello.toList();
 
-    return GestureDetector(
-      onTap: () {
-        FocusScope.of(context).unfocus();
-        FocusManager.instance.primaryFocus?.unfocus();
-      },
-      child: Scaffold(
+    Widget buildContent({
+      UsersRecord? usersRecord,
+      List<CategoriesRecord>? categories,
+    }) {
+      ThemeData theme = baseTheme;
+      if (usersRecord != null) {
+        final AppDesignStyle clientStyle = switch (usersRecord.temaScelto) {
+          'pub' => AppDesignStyle.pub,
+          'minimal' => AppDesignStyle.minimal,
+          'tradizionale' => AppDesignStyle.tradizionale,
+          _ => AppDesignStyle.premium,
+        };
+
+        Color? clientColor;
+        if (usersRecord.colorePrimario.isNotEmpty) {
+          try {
+            final hex = usersRecord.colorePrimario;
+            final clean = hex.replaceAll('#', '').trim();
+            if (clean.length == 6) {
+              clientColor = Color(int.parse('FF$clean', radix: 16));
+            } else if (clean.length == 8) {
+              clientColor = Color(int.parse(clean, radix: 16));
+            }
+          } catch (_) {}
+        }
+
+        theme = AppThemes.buildTheme(
+          designStyle: clientStyle,
+          primaryColor: clientColor ?? clientStyle.defaultPrimaryColor,
+          brightness: baseTheme.brightness,
+          titleFont: usersRecord.fontTitoli.isNotEmpty
+              ? usersRecord.fontTitoli
+              : clientStyle.defaultTitleFont,
+          bodyFont: usersRecord.fontTesti.isNotEmpty
+              ? usersRecord.fontTesti
+              : clientStyle.defaultBodyFont,
+        );
+      }
+
+      final DishCardLayout clientLayout = (usersRecord != null)
+          ? DishCardLayoutExtension.fromString(usersRecord.layoutPiatti)
+          : DishCardLayout.classico;
+      final bool layoutPrevedeImmagine =
+          clientLayout != DishCardLayout.minimale;
+
+      final Map<String, String> categoryNames = {};
+      if (categories != null) {
+        for (final cat in categories) {
+          categoryNames[cat.reference.id] = cat.name;
+        }
+      }
+
+      return Theme(
+        data: theme,
+        child: GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+            FocusManager.instance.primaryFocus?.unfocus();
+          },
+          child: Scaffold(
         key: scaffoldKey,
         backgroundColor: theme.scaffoldBackgroundColor,
         appBar: AppBar(
@@ -363,6 +430,15 @@ class _RiepilogoFinaleWidgetState extends State<RiepilogoFinaleWidget> {
                               final isCustomized =
                                   nomeVisualizzato != rowPiattiRecord.nome;
 
+                              final catId = rowPiattiRecord.categoria;
+                              final catName = categoryNames[catId] ?? catId;
+                              final catIcon =
+                                  CategoryIconHelper.getCategoryIcon(catName);
+                              final bool hasFoto =
+                                  rowPiattiRecord.foto.isNotEmpty;
+                              final bool mostraFoto =
+                                  layoutPrevedeImmagine && hasFoto;
+
                               return Container(
                                 decoration: BoxDecoration(
                                   color: theme.cardColor,
@@ -384,11 +460,11 @@ class _RiepilogoFinaleWidgetState extends State<RiepilogoFinaleWidget> {
                                   padding: const EdgeInsets.all(12.0),
                                   child: Row(
                                     children: [
-                                      // Foto del piatto con fallback raffinato
+                                      // Foto del piatto con fallback raffinato o icona monocromatica categoria
                                       ClipRRect(
                                         borderRadius:
                                             BorderRadius.circular(12.0),
-                                        child: (rowPiattiRecord.foto.isNotEmpty)
+                                        child: mostraFoto
                                             ? CachedNetworkImage(
                                                 imageUrl: rowPiattiRecord.foto,
                                                 width: 64.0,
@@ -404,9 +480,10 @@ class _RiepilogoFinaleWidgetState extends State<RiepilogoFinaleWidget> {
                                                 errorWidget:
                                                     (context, url, error) =>
                                                         _buildDishIconPlaceholder(
-                                                            theme),
+                                                            theme, catIcon),
                                               )
-                                            : _buildDishIconPlaceholder(theme),
+                                            : _buildDishIconPlaceholder(
+                                                theme, catIcon),
                                       ),
                                       const SizedBox(width: 14.0),
                                       // Informazioni Piatto
@@ -518,12 +595,33 @@ class _RiepilogoFinaleWidgetState extends State<RiepilogoFinaleWidget> {
                     _buildBottomCheckoutBar(theme, itemCarrello),
                   ],
                 ),
+          ),
         ),
-      ),
+        ),
+      );
+    }
+
+    if (widget.ristoranteRef == null) {
+      return buildContent();
+    }
+
+    return StreamBuilder<UsersRecord>(
+      stream: _ristoranteStream,
+      builder: (context, userSnapshot) {
+        return StreamBuilder<List<CategoriesRecord>>(
+          stream: _categoriesStream,
+          builder: (context, catSnapshot) {
+            return buildContent(
+              usersRecord: userSnapshot.data,
+              categories: catSnapshot.data,
+            );
+          },
+        );
+      },
     );
   }
 
-  Widget _buildDishIconPlaceholder(ThemeData theme) {
+  Widget _buildDishIconPlaceholder(ThemeData theme, IconData icon) {
     return Container(
       width: 64.0,
       height: 64.0,
@@ -533,7 +631,7 @@ class _RiepilogoFinaleWidgetState extends State<RiepilogoFinaleWidget> {
       ),
       alignment: Alignment.center,
       child: Icon(
-        Icons.restaurant_rounded,
+        icon,
         color: theme.colorScheme.primary,
         size: 28.0,
       ),

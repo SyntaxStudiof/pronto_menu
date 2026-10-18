@@ -141,8 +141,7 @@ class _PannelloModificaPiattoWidgetState
       DocumentReference? sottocategoriaRefFinale;
       if (_selezionataSottocategoria != null &&
           _selezionataSottocategoria!.isNotEmpty) {
-        sottocategoriaRefFinale = FirebaseFirestore.instance
-            .collection('sottocategorie')
+        sottocategoriaRefFinale = SottocategorieRecord.collection
             .doc(_selezionataSottocategoria);
       }
 

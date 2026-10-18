@@ -2026,11 +2026,6 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                                       isEqualTo: false,
                                     )
                                     .where(
-                                      'sottocategoria_ref',
-                                      isEqualTo:
-                                          _model.sottocategoriaSelezionata,
-                                    )
-                                    .where(
                                       'Categoria',
                                       isEqualTo:
                                           _model.categoriaSelezionata != ''
@@ -2047,6 +2042,13 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                                     rawNomePiattiRecordList = snapshot.data!;
                                 final listViewNomePiattiRecordList =
                                     rawNomePiattiRecordList.where((p) {
+                                  if (_model.sottocategoriaSelezionata != null) {
+                                    if (p.sottocategoriaRef == null ||
+                                        p.sottocategoriaRef!.id !=
+                                            _model.sottocategoriaSelezionata!.id) {
+                                      return false;
+                                    }
+                                  }
                                   return AllergeniData.dishMatchesFilters(
                                     dish: p,
                                     filtriMagici: _model.filtriMagiciAttivi,
@@ -2147,11 +2149,6 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                                       isEqualTo: false,
                                     )
                                     .where(
-                                      'sottocategoria_ref',
-                                      isEqualTo:
-                                          _model.sottocategoriaSelezionata,
-                                    )
-                                    .where(
                                       'Categoria',
                                       isEqualTo:
                                           _model.categoriaSelezionata != ''
@@ -2169,6 +2166,13 @@ class _MenuClienteWidgetState extends State<MenuClienteWidget>
                                     rawPrezzoPiattiRecordList = snapshot.data!;
                                 final listViewPrezzoPiattiRecordList =
                                     rawPrezzoPiattiRecordList.where((p) {
+                                  if (_model.sottocategoriaSelezionata != null) {
+                                    if (p.sottocategoriaRef == null ||
+                                        p.sottocategoriaRef!.id !=
+                                            _model.sottocategoriaSelezionata!.id) {
+                                      return false;
+                                    }
+                                  }
                                   return AllergeniData.dishMatchesFilters(
                                     dish: p,
                                     filtriMagici: _model.filtriMagiciAttivi,
