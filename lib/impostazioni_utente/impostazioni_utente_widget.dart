@@ -48,6 +48,12 @@ class _ImpostazioniUtenteWidgetState extends State<ImpostazioniUtenteWidget> {
     context.watch<FFAppState>();
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
+    // Palette fedele al design system della Dashboard
+    final bgCanvas = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
+    final textPrimary = isDark ? Colors.white : const Color(0xFF0F172A);
+    final textSecondary = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
 
     return GestureDetector(
       onTap: () {
@@ -56,62 +62,63 @@ class _ImpostazioniUtenteWidgetState extends State<ImpostazioniUtenteWidget> {
       },
       child: Scaffold(
         key: scaffoldKey,
-        backgroundColor: colorScheme.surfaceContainerLowest,
+        backgroundColor: bgCanvas,
         appBar: widget.embedded
             ? null
             : AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0.0,
-          scrolledUnderElevation: 0.0,
-          automaticallyImplyLeading: false,
-          leading: FlutterFlowIconButton(
-            borderRadius: 30.0,
-            borderWidth: 0.0,
-            buttonSize: 40.0,
-            icon: Icon(
-              Icons.arrow_back_rounded,
-              color: colorScheme.onSurface,
-              size: 24.0,
-            ),
-            onPressed: () async {
-              context.safePop();
-            },
-          ),
-          title: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 36.0,
-                height: 36.0,
-                decoration: BoxDecoration(
-                  color: colorScheme.primary.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(10.0),
+                backgroundColor: bgCanvas,
+                elevation: 0.0,
+                scrolledUnderElevation: 0.0,
+                automaticallyImplyLeading: false,
+                leading: FlutterFlowIconButton(
+                  borderColor: Colors.transparent,
+                  borderRadius: 24.0,
+                  borderWidth: 1.0,
+                  buttonSize: 40.0,
+                  icon: Icon(
+                    Icons.arrow_back_rounded,
+                    color: colorScheme.onSurface,
+                    size: 24.0,
+                  ),
+                  onPressed: () async {
+                    context.safePop();
+                  },
                 ),
-                alignment: Alignment.center,
-                child: Icon(
-                  Icons.settings_rounded,
-                  color: colorScheme.primary,
-                  size: 20.0,
-                ),
-              ),
-              const SizedBox(width: 10.0),
-              Text(
-                'Impostazioni',
-                style: theme.appBarTheme.titleTextStyle ??
-                    theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20.0,
-                      letterSpacing: -0.4,
-                      color: colorScheme.onSurface,
+                title: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 36.0,
+                      height: 36.0,
+                      decoration: BoxDecoration(
+                        color: colorScheme.primary.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      alignment: Alignment.center,
+                      child: Icon(
+                        Icons.settings_rounded,
+                        color: colorScheme.primary,
+                        size: 20.0,
+                      ),
                     ),
+                    const SizedBox(width: 10.0),
+                    Text(
+                      'Impostazioni',
+                      style: theme.appBarTheme.titleTextStyle ??
+                          theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 19.0,
+                            letterSpacing: -0.4,
+                            color: colorScheme.onSurface,
+                          ),
+                    ),
+                  ],
+                ),
+                actions: const [
+                  SizedBox(width: 48.0),
+                ],
+                centerTitle: true,
               ),
-            ],
-          ),
-          actions: const [
-            SizedBox(width: 48.0),
-          ],
-          centerTitle: true,
-        ),
         body: SafeArea(
           top: true,
           child: Align(
@@ -124,30 +131,34 @@ class _ImpostazioniUtenteWidgetState extends State<ImpostazioniUtenteWidget> {
                   constraints: BoxConstraints(maxWidth: isDesktop ? 1200.0 : 680.0),
                   child: SingleChildScrollView(
                     padding: EdgeInsets.symmetric(
-                      horizontal: isDesktop ? 24.0 : 18.0,
-                      vertical: 16.0,
+                      horizontal: isDesktop ? 28.0 : 18.0,
+                      vertical: 20.0,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         // ── Header intro ──────────────────────────────────────────
                         Padding(
-                          padding: const EdgeInsets.only(left: 4.0, bottom: 20.0),
+                          padding: const EdgeInsets.only(left: 4.0, bottom: 24.0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 'Preferenze & Configurazione',
-                                style: theme.textTheme.headlineSmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: colorScheme.onSurface,
+                                style: TextStyle(
+                                  fontSize: 22.0,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: -0.5,
+                                  color: textPrimary,
                                 ),
                               ),
-                              const SizedBox(height: 4.0),
+                              const SizedBox(height: 6.0),
                               Text(
-                                'Gestisci l\'aspetto visivo, l\'ordinamento del menu e le impostazioni del tuo locale.',
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: colorScheme.onSurfaceVariant,
+                                'Gestisci le preferenze del menu, le opzioni di ordinazione dei clienti e le impostazioni del locale.',
+                                style: TextStyle(
+                                  fontSize: 14.0,
+                                  color: textSecondary,
+                                  height: 1.35,
                                 ),
                               ),
                             ],
@@ -158,50 +169,54 @@ class _ImpostazioniUtenteWidgetState extends State<ImpostazioniUtenteWidget> {
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Colonna Sinistra (Aspetto, Mutaforma, Jukebox)
+                              // ═════════════════════════════════════════════════════
+                              // COLONNA SINISTRA: Menù & Ordini
+                              // ═════════════════════════════════════════════════════
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.stretch,
                                   children: [
-                                    _buildAspettoMenuSection(context, colorScheme),
+                                    _buildStrutturaMenuSection(context, isDark, colorScheme),
                                     const SizedBox(height: 24.0),
-                                    _buildMutaformaSection(context, colorScheme),
+                                    _buildRegoleOrdiniDispensaSection(context, isDark, colorScheme),
                                     const SizedBox(height: 24.0),
-                                    _buildJukeboxSection(context, colorScheme),
+                                    _buildMutaformaSection(context, isDark, colorScheme),
                                   ],
                                 ),
                               ),
                               const SizedBox(width: 24.0),
-                              // Colonna Destra (Dispensa, Account, Info/Privacy)
+                              // ═════════════════════════════════════════════════════
+                              // COLONNA DESTRA: Account, Servizi & Privacy
+                              // ═════════════════════════════════════════════════════
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.stretch,
                                   children: [
-                                    _buildDispensaSection(context, colorScheme),
+                                    _buildAccountSection(context, isDark, colorScheme),
                                     const SizedBox(height: 24.0),
-                                    _buildAccountSection(context, colorScheme),
+                                    _buildJukeboxSection(context, isDark, colorScheme),
                                     const SizedBox(height: 24.0),
-                                    _buildPrivacySection(context, colorScheme),
+                                    _buildPrivacySection(context, isDark, colorScheme),
                                   ],
                                 ),
                               ),
                             ],
                           )
                         else ...[
-                          _buildAspettoMenuSection(context, colorScheme),
-                          const SizedBox(height: 24.0),
-                          _buildMutaformaSection(context, colorScheme),
-                          const SizedBox(height: 24.0),
-                          _buildJukeboxSection(context, colorScheme),
-                          const SizedBox(height: 24.0),
-                          _buildDispensaSection(context, colorScheme),
-                          const SizedBox(height: 24.0),
-                          _buildAccountSection(context, colorScheme),
-                          const SizedBox(height: 24.0),
-                          _buildPrivacySection(context, colorScheme),
+                          _buildStrutturaMenuSection(context, isDark, colorScheme),
+                          const SizedBox(height: 22.0),
+                          _buildRegoleOrdiniDispensaSection(context, isDark, colorScheme),
+                          const SizedBox(height: 22.0),
+                          _buildMutaformaSection(context, isDark, colorScheme),
+                          const SizedBox(height: 22.0),
+                          _buildAccountSection(context, isDark, colorScheme),
+                          const SizedBox(height: 22.0),
+                          _buildJukeboxSection(context, isDark, colorScheme),
+                          const SizedBox(height: 22.0),
+                          _buildPrivacySection(context, isDark, colorScheme),
                         ],
 
-                        const SizedBox(height: 36.0),
+                        const SizedBox(height: 40.0),
                       ],
                     ),
                   ),
@@ -214,62 +229,32 @@ class _ImpostazioniUtenteWidgetState extends State<ImpostazioniUtenteWidget> {
     );
   }
 
-  Widget _buildAspettoMenuSection(BuildContext context, ColorScheme colorScheme) {
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 1. STRUTTURA & PORTATE DEL MENÙ
+  // (Nota: "Personalizzazione" rimossa perché già presente nel menù laterale)
+  // ═══════════════════════════════════════════════════════════════════════════
+  Widget _buildStrutturaMenuSection(BuildContext context, bool isDark, ColorScheme colorScheme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _buildSectionHeader(
           context: context,
-          title: 'ASPETTO & MENU',
+          title: 'Struttura & Portate',
+          icon: Icons.format_list_bulleted_rounded,
+          color: const Color(0xFF3B82F6),
         ),
         const SizedBox(height: 8.0),
         _buildSettingsCard(
           context: context,
+          isDark: isDark,
           children: [
             _buildSettingsTile(
               context: context,
-              icon: Icons.palette_rounded,
-              iconBgColor: colorScheme.primary.withValues(alpha: 0.15),
-              iconColor: colorScheme.primary,
-              title: 'Personalizzazione',
-              subtitle: 'Preset di design, stile grafico e tema',
-              trailingBadge: (currentUserDocument != null && !currentUserDocument!.hasPlus)
-                  ? _buildTierBadge('PLUS', colorScheme.primary)
-                  : null,
-              onTap: () {
-                if (currentUserDocument != null && !currentUserDocument!.hasPlus) {
-                  _mostraUpgradePrompt(
-                    context,
-                    requiredPlan: 'Plus',
-                    featureName: 'La personalizzazione grafica e del tema',
-                  );
-                  return;
-                }
-                context.pushNamed(
-                  PersonalizzazioneWidget.routeName,
-                  queryParameters: {
-                    'ristoranteRef': serializeParam(
-                      widget.ristoranteRef,
-                      ParamType.DocumentReference,
-                    ),
-                  }.withoutNulls,
-                  extra: <String, dynamic>{
-                    '__transition_info__': const TransitionInfo(
-                      hasTransition: true,
-                      transitionType: PageTransitionType.rightToLeft,
-                    ),
-                  },
-                );
-              },
-            ),
-            _buildDivider(colorScheme),
-            _buildSettingsTile(
-              context: context,
-              icon: Icons.format_list_bulleted_rounded,
-              iconBgColor: const Color(0xFF3B82F6).withValues(alpha: 0.15),
+              icon: Icons.sort_rounded,
+              iconBgColor: const Color(0xFF3B82F6).withValues(alpha: 0.12),
               iconColor: const Color(0xFF3B82F6),
               title: 'Ordina categorie',
-              subtitle: 'Organizza la sequenza delle portate nel menu',
+              subtitle: 'Organizza la sequenza di visualizzazione delle portate',
               onTap: () {
                 context.pushNamed(
                   ImpostazioniCategorieWidget.routeName,
@@ -282,11 +267,11 @@ class _ImpostazioniUtenteWidgetState extends State<ImpostazioniUtenteWidget> {
                 );
               },
             ),
-            _buildDivider(colorScheme),
+            _buildDivider(isDark),
             _buildSettingsTile(
               context: context,
               icon: Icons.account_tree_rounded,
-              iconBgColor: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
+              iconBgColor: const Color(0xFF8B5CF6).withValues(alpha: 0.12),
               iconColor: const Color(0xFF8B5CF6),
               title: 'Gestione sottocategorie',
               subtitle: 'Modifica, crea o elimina le sottocategorie del menu',
@@ -308,32 +293,116 @@ class _ImpostazioniUtenteWidgetState extends State<ImpostazioniUtenteWidget> {
     );
   }
 
-  Widget _buildMutaformaSection(BuildContext context, ColorScheme colorScheme) {
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 2. DISPENSA & ORDINAZIONI CLIENTI
+  // (Nota: "Apri Dispensa" rimosso perché già presente nel menù laterale)
+  // ═══════════════════════════════════════════════════════════════════════════
+  Widget _buildRegoleOrdiniDispensaSection(BuildContext context, bool isDark, ColorScheme colorScheme) {
+    final dispensaAttiva = valueOrDefault<bool>(currentUserDocument?.dispensaAttiva, false);
+    final modificheAttive = valueOrDefault<bool>(currentUserDocument?.modifichePiattiAttive, true);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _buildSectionHeader(
           context: context,
-          title: 'MENÙ MUTAFORMA (FASCE ORARIE)',
+          title: 'Dispensa & Regole Ordini',
+          icon: Icons.kitchen_rounded,
+          color: const Color(0xFFF97316),
         ),
         const SizedBox(height: 8.0),
         _buildSettingsCard(
           context: context,
+          isDark: isDark,
+          children: [
+            _buildSettingsSwitchTile(
+              context: context,
+              icon: Icons.kitchen_rounded,
+              iconBgColor: const Color(0xFFF97316).withValues(alpha: 0.12),
+              iconColor: const Color(0xFFF97316),
+              title: 'Modulo Dispensa',
+              subtitle:
+                  'Traccia scorte, autocompleta ingredienti dei piatti e sbarra quelli esauriti nel menu cliente',
+              value: dispensaAttiva,
+              onChanged: (val) async {
+                await currentUserReference?.update({
+                  'dispensa_attiva': val,
+                });
+                safeSetState(() {});
+              },
+            ),
+            _buildDivider(isDark),
+            _buildSettingsSwitchTile(
+              context: context,
+              icon: Icons.tune_rounded,
+              iconBgColor: const Color(0xFF10B981).withValues(alpha: 0.12),
+              iconColor: const Color(0xFF10B981),
+              title: 'Personalizzazione Piatti dai Clienti',
+              subtitle: dispensaAttiva
+                  ? 'I clienti possono aggiungere ingredienti abilitati nella dispensa o toglierne dai piatti'
+                  : 'I clienti possono scrivere a mano libera le aggiunte desiderate o togliere ingredienti',
+              value: modificheAttive,
+              onChanged: (val) async {
+                await currentUserReference?.update({
+                  'modifiche_piatti_attive': val,
+                });
+                safeSetState(() {});
+              },
+            ),
+            if (!dispensaAttiva && modificheAttive) ...[
+              _buildDivider(isDark),
+              _buildSettingsTile(
+                context: context,
+                icon: Icons.price_change_rounded,
+                iconBgColor: const Color(0xFF3B82F6).withValues(alpha: 0.12),
+                iconColor: const Color(0xFF3B82F6),
+                title: 'Prezzo Aggiunta Manuale',
+                subtitle:
+                    'Costo per ingrediente scritto a mano dal cliente: € ${(currentUserDocument?.prezzoAggiuntaManuale ?? 0.0).toStringAsFixed(2)}',
+                onTap: () => _mostraDialogPrezzoManuale(
+                  context,
+                  currentUserDocument?.prezzoAggiuntaManuale ?? 0.0,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ],
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 3. MENÙ MUTAFORMA (FASCE ORARIE)
+  // ═══════════════════════════════════════════════════════════════════════════
+  Widget _buildMutaformaSection(BuildContext context, bool isDark, ColorScheme colorScheme) {
+    final mutaformaAttivo = valueOrDefault<bool>(currentUserDocument?.menuMutaformaAttivo, false);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildSectionHeader(
+          context: context,
+          title: 'Menù Mutaforma (Fasce Orarie)',
+          icon: Icons.auto_awesome_rounded,
+          color: const Color(0xFF6366F1),
+        ),
+        const SizedBox(height: 8.0),
+        _buildSettingsCard(
+          context: context,
+          isDark: isDark,
           children: [
             _buildSettingsSwitchTile(
               context: context,
               icon: Icons.auto_awesome_rounded,
-              iconBgColor:
-                  const Color(0xFF6366F1).withValues(alpha: 0.15),
+              iconBgColor: const Color(0xFF6366F1).withValues(alpha: 0.12),
               iconColor: const Color(0xFF6366F1),
-              title: 'Attiva MenÙ Mutaforma',
+              title: 'Attiva Menù Mutaforma',
               subtitle:
-                  'Mostra ai clienti il menù adatto in base all\'orario (Colazione, Pranzo, Aperitivo, Cena). Gli altri menù saranno invisibili.',
+                  'Mostra ai clienti il menù adatto in base all\'orario (Colazione, Pranzo, Aperitivo, Cena).',
               trailingBadge: (currentUserDocument != null && !currentUserDocument!.hasPlus)
                   ? _buildTierBadge('PLUS', const Color(0xFF6366F1))
                   : null,
-              value: valueOrDefault<bool>(
-                  currentUserDocument?.menuMutaformaAttivo, false),
+              value: mutaformaAttivo,
               onChanged: (val) async {
                 if (currentUserDocument != null && !currentUserDocument!.hasPlus) {
                   _mostraUpgradePrompt(
@@ -349,16 +418,14 @@ class _ImpostazioniUtenteWidgetState extends State<ImpostazioniUtenteWidget> {
                 safeSetState(() {});
               },
             ),
-            if (valueOrDefault<bool>(
-                currentUserDocument?.menuMutaformaAttivo, false)) ...[
-              _buildDivider(colorScheme),
+            if (mutaformaAttivo) ...[
+              _buildDivider(isDark),
               _buildSettingsTile(
                 context: context,
                 icon: Icons.schedule_rounded,
-                iconBgColor:
-                    const Color(0xFF4F46E5).withValues(alpha: 0.15),
+                iconBgColor: const Color(0xFF4F46E5).withValues(alpha: 0.12),
                 iconColor: const Color(0xFF4F46E5),
-                title: 'Configura Menù & Orari',
+                title: 'Configura Fasce Orarie & Menù',
                 subtitle:
                     'Crea fasce orarie e assegna quali categorie mostrare ai clienti',
                 onTap: () {
@@ -367,8 +434,7 @@ class _ImpostazioniUtenteWidgetState extends State<ImpostazioniUtenteWidget> {
                     extra: <String, dynamic>{
                       '__transition_info__': const TransitionInfo(
                         hasTransition: true,
-                        transitionType:
-                            PageTransitionType.rightToLeft,
+                        transitionType: PageTransitionType.rightToLeft,
                       ),
                     },
                   );
@@ -381,23 +447,93 @@ class _ImpostazioniUtenteWidgetState extends State<ImpostazioniUtenteWidget> {
     );
   }
 
-  Widget _buildJukeboxSection(BuildContext context, ColorScheme colorScheme) {
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 4. ACCOUNT & PIANO
+  // ═══════════════════════════════════════════════════════════════════════════
+  Widget _buildAccountSection(BuildContext context, bool isDark, ColorScheme colorScheme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _buildSectionHeader(
           context: context,
-          title: 'INTRATTENIMENTO & JUKEBOX',
+          title: 'Account & Piano',
+          icon: Icons.workspace_premium_rounded,
+          color: const Color(0xFFF59E0B),
         ),
         const SizedBox(height: 8.0),
         _buildSettingsCard(
           context: context,
+          isDark: isDark,
+          children: [
+            _buildSettingsTile(
+              context: context,
+              icon: Icons.workspace_premium_rounded,
+              iconBgColor: const Color(0xFFF59E0B).withValues(alpha: 0.12),
+              iconColor: const Color(0xFFF59E0B),
+              title: 'Gestisci abbonamento',
+              subtitle: 'Piano attivo, rinnovo, fatturazione e vantaggi',
+              onTap: () {
+                context.pushNamed(
+                  PaginaAbbonamentoWidget.routeName,
+                  extra: <String, dynamic>{
+                    '__transition_info__': const TransitionInfo(
+                      hasTransition: true,
+                      transitionType: PageTransitionType.rightToLeft,
+                    ),
+                  },
+                );
+              },
+            ),
+            if (FFAppState().loginProvider == 'password') ...[
+              _buildDivider(isDark),
+              _buildSettingsTile(
+                context: context,
+                icon: Icons.lock_reset_rounded,
+                iconBgColor: const Color(0xFF8B5CF6).withValues(alpha: 0.12),
+                iconColor: const Color(0xFF8B5CF6),
+                title: 'Cambia password',
+                subtitle: 'Aggiorna le credenziali di accesso al locale',
+                onTap: () {
+                  context.pushNamed(
+                    CambiaPasswordWidget.routeName,
+                    extra: <String, dynamic>{
+                      '__transition_info__': const TransitionInfo(
+                        hasTransition: true,
+                        transitionType: PageTransitionType.rightToLeft,
+                      ),
+                    },
+                  );
+                },
+              ),
+            ],
+          ],
+        ),
+      ],
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 5. INTRATTENIMENTO & JUKEBOX
+  // ═══════════════════════════════════════════════════════════════════════════
+  Widget _buildJukeboxSection(BuildContext context, bool isDark, ColorScheme colorScheme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildSectionHeader(
+          context: context,
+          title: 'Intrattenimento & Jukebox',
+          icon: Icons.music_note_rounded,
+          color: const Color(0xFF1DB954),
+        ),
+        const SizedBox(height: 8.0),
+        _buildSettingsCard(
+          context: context,
+          isDark: isDark,
           children: [
             _buildSettingsTile(
               context: context,
               icon: Icons.music_note_rounded,
-              iconBgColor:
-                  const Color(0xFF1DB954).withValues(alpha: 0.15),
+              iconBgColor: const Color(0xFF1DB954).withValues(alpha: 0.12),
               iconColor: const Color(0xFF1DB954),
               title: 'Jukebox & Musica',
               subtitle:
@@ -419,206 +555,43 @@ class _ImpostazioniUtenteWidgetState extends State<ImpostazioniUtenteWidget> {
                   extra: <String, dynamic>{
                     '__transition_info__': const TransitionInfo(
                       hasTransition: true,
-                      transitionType:
-                          PageTransitionType.rightToLeft,
-                    ),
-                  },
-                );
-              },
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDispensaSection(BuildContext context, ColorScheme colorScheme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _buildSectionHeader(
-          context: context,
-          title: 'DISPENSA & INGREDIENTI',
-        ),
-        const SizedBox(height: 8.0),
-        _buildSettingsCard(
-          context: context,
-          children: [
-            _buildSettingsSwitchTile(
-              context: context,
-              icon: Icons.kitchen_rounded,
-              iconBgColor:
-                  const Color(0xFFF97316).withValues(alpha: 0.15),
-              iconColor: const Color(0xFFF97316),
-              title: 'Gestione Dispensa',
-              subtitle:
-                  'Traccia scorte, autocompleta gli ingredienti dei piatti e sbarra quelli esauriti nel menu cliente',
-              value: valueOrDefault<bool>(
-                  currentUserDocument?.dispensaAttiva, false),
-              onChanged: (val) async {
-                await currentUserReference?.update({
-                  'dispensa_attiva': val,
-                });
-                safeSetState(() {});
-              },
-            ),
-            if (valueOrDefault<bool>(
-                currentUserDocument?.dispensaAttiva, false)) ...[
-              _buildDivider(colorScheme),
-              _buildSettingsTile(
-                context: context,
-                icon: Icons.inventory_2_rounded,
-                iconBgColor:
-                    const Color(0xFFEA580C).withValues(alpha: 0.15),
-                iconColor: const Color(0xFFEA580C),
-                title: 'Apri Dispensa',
-                subtitle:
-                    'Visualizza ingredienti, gestisci scorte, esauriti e prezzi aggiunte',
-                onTap: () {
-                  context.pushNamed(
-                    GestioneDispensaWidget.routeName,
-                    queryParameters: {
-                      'ristoranteRef': serializeParam(
-                        widget.ristoranteRef,
-                        ParamType.DocumentReference,
-                      ),
-                    }.withoutNulls,
-                    extra: <String, dynamic>{
-                      '__transition_info__': const TransitionInfo(
-                        hasTransition: true,
-                        transitionType:
-                            PageTransitionType.rightToLeft,
-                      ),
-                    },
-                  );
-                },
-              ),
-            ],
-            _buildDivider(colorScheme),
-            _buildSettingsSwitchTile(
-              context: context,
-              icon: Icons.tune_rounded,
-              iconBgColor:
-                  const Color(0xFF10B981).withValues(alpha: 0.15),
-              iconColor: const Color(0xFF10B981),
-              title: 'Modifiche ai Piatti dai Clienti',
-              subtitle: valueOrDefault<bool>(
-                      currentUserDocument?.dispensaAttiva, false)
-                  ? 'I clienti potranno aggiungere ingredienti dalla tua dispensa (con i prezzi impostati) o togliere ingredienti'
-                  : 'I clienti potranno scrivere a mano le aggiunte desiderate o togliere ingredienti',
-              value: valueOrDefault<bool>(
-                  currentUserDocument?.modifichePiattiAttive, true),
-              onChanged: (val) async {
-                await currentUserReference?.update({
-                  'modifiche_piatti_attive': val,
-                });
-                safeSetState(() {});
-              },
-            ),
-            if (!valueOrDefault<bool>(
-                    currentUserDocument?.dispensaAttiva, false) &&
-                valueOrDefault<bool>(
-                    currentUserDocument?.modifichePiattiAttive, true)) ...[
-              _buildDivider(colorScheme),
-              _buildSettingsTile(
-                context: context,
-                icon: Icons.price_change_rounded,
-                iconBgColor:
-                    const Color(0xFF3B82F6).withValues(alpha: 0.15),
-                iconColor: const Color(0xFF3B82F6),
-                title: 'Prezzo Aggiunta Manuale',
-                subtitle:
-                    'Costo per ciascun ingrediente scritto a mano: € ${(currentUserDocument?.prezzoAggiuntaManuale ?? 0.0).toStringAsFixed(2)}',
-                onTap: () => _mostraDialogPrezzoManuale(
-                  context,
-                  currentUserDocument?.prezzoAggiuntaManuale ?? 0.0,
-                ),
-              ),
-            ],
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAccountSection(BuildContext context, ColorScheme colorScheme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _buildSectionHeader(
-          context: context,
-          title: 'ACCOUNT & PIANO',
-        ),
-        const SizedBox(height: 8.0),
-        _buildSettingsCard(
-          context: context,
-          children: [
-            _buildSettingsTile(
-              context: context,
-              icon: Icons.workspace_premium_rounded,
-              iconBgColor: const Color(0xFFF59E0B).withValues(alpha: 0.15),
-              iconColor: const Color(0xFFF59E0B),
-              title: 'Gestisci abbonamento',
-              subtitle: 'Piano attivo, rinnovo e fatturazione',
-              onTap: () {
-                context.pushNamed(
-                  PaginaAbbonamentoWidget.routeName,
-                  extra: <String, dynamic>{
-                    '__transition_info__': const TransitionInfo(
-                      hasTransition: true,
                       transitionType: PageTransitionType.rightToLeft,
                     ),
                   },
                 );
               },
             ),
-            if (FFAppState().loginProvider == 'password') ...[
-              _buildDivider(colorScheme),
-              _buildSettingsTile(
-                context: context,
-                icon: Icons.lock_reset_rounded,
-                iconBgColor: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
-                iconColor: const Color(0xFF8B5CF6),
-                title: 'Cambia password',
-                subtitle: 'Aggiorna le credenziali di accesso',
-                onTap: () {
-                  context.pushNamed(
-                    CambiaPasswordWidget.routeName,
-                    extra: <String, dynamic>{
-                      '__transition_info__': const TransitionInfo(
-                        hasTransition: true,
-                        transitionType: PageTransitionType.rightToLeft,
-                      ),
-                    },
-                  );
-                },
-              ),
-            ],
           ],
         ),
       ],
     );
   }
 
-  Widget _buildPrivacySection(BuildContext context, ColorScheme colorScheme) {
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 6. INFORMAZIONI & PRIVACY
+  // ═══════════════════════════════════════════════════════════════════════════
+  Widget _buildPrivacySection(BuildContext context, bool isDark, ColorScheme colorScheme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _buildSectionHeader(
           context: context,
-          title: 'INFO & PRIVACY',
+          title: 'Info & Note Legali',
+          icon: Icons.shield_outlined,
+          color: const Color(0xFF10B981),
         ),
         const SizedBox(height: 8.0),
         _buildSettingsCard(
           context: context,
+          isDark: isDark,
           children: [
             _buildSettingsTile(
               context: context,
               icon: Icons.shield_outlined,
-              iconBgColor: const Color(0xFF10B981).withValues(alpha: 0.15),
+              iconBgColor: const Color(0xFF10B981).withValues(alpha: 0.12),
               iconColor: const Color(0xFF10B981),
               title: 'Informativa sulla privacy',
-              subtitle: 'Trattamento dei dati personali e termini legali',
+              subtitle: 'Trattamento dei dati personali, cookie e termini legali',
               onTap: () {
                 context.pushNamed(
                   PrivacyPolicyWidget.routeName,
@@ -637,48 +610,70 @@ class _ImpostazioniUtenteWidgetState extends State<ImpostazioniUtenteWidget> {
     );
   }
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // COMPONENTI GRAFICI DI STILE DASHBOARD
+  // ═══════════════════════════════════════════════════════════════════════════
+
   Widget _buildSectionHeader({
     required BuildContext context,
     required String title,
+    required IconData icon,
+    required Color color,
   }) {
-    final theme = Theme.of(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
-      padding: const EdgeInsets.only(left: 6.0),
-      child: Text(
-        title,
-        style: TextStyle(
-          fontSize: 11.5,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 1.1,
-          color: theme.colorScheme.onSurfaceVariant,
-        ),
+      padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
+      child: Row(
+        children: [
+          Container(
+            width: 26.0,
+            height: 26.0,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(7.0),
+            ),
+            child: Icon(icon, size: 14.5, color: color),
+          ),
+          const SizedBox(width: 8.0),
+          Text(
+            title.toUpperCase(),
+            style: TextStyle(
+              fontSize: 11.5,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.8,
+              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildSettingsCard({
     required BuildContext context,
+    required bool isDark,
     required List<Widget> children,
   }) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    return Card(
-      elevation: 1.5,
-      shadowColor: isDark
-          ? Colors.black.withValues(alpha: 0.35)
-          : Colors.black.withValues(alpha: 0.05),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18.0),
-        side: BorderSide.none,
-      ),
-      color: theme.colorScheme.surface,
-      margin: EdgeInsets.zero,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(18.0),
-        child: Column(
-          children: children,
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        borderRadius: BorderRadius.circular(16.0),
+        border: Border.all(
+          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+          width: 1.0,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.03),
+            blurRadius: 10.0,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: children,
       ),
     );
   }
@@ -693,70 +688,71 @@ class _ImpostazioniUtenteWidgetState extends State<ImpostazioniUtenteWidget> {
     required VoidCallback onTap,
     Widget? trailingBadge,
   }) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
 
-    return InkWell(
-      onTap: onTap,
-      splashColor: colorScheme.primary.withValues(alpha: 0.08),
-      highlightColor: colorScheme.primary.withValues(alpha: 0.04),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
-        child: Row(
-          children: [
-            // Icon badge arrotondato moderno
-            Container(
-              width: 42.0,
-              height: 42.0,
-              decoration: BoxDecoration(
-                color: iconBgColor,
-                borderRadius: BorderRadius.circular(12.0),
-              ),
-              child: Center(
-                child: Icon(
-                  icon,
-                  color: iconColor,
-                  size: 22.0,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        splashColor: colorScheme.primary.withValues(alpha: 0.08),
+        highlightColor: colorScheme.primary.withValues(alpha: 0.04),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+          child: Row(
+            children: [
+              Container(
+                width: 40.0,
+                height: 40.0,
+                decoration: BoxDecoration(
+                  color: iconBgColor,
+                  borderRadius: BorderRadius.circular(11.0),
+                ),
+                child: Center(
+                  child: Icon(
+                    icon,
+                    color: iconColor,
+                    size: 20.0,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(width: 14.0),
-            // Testi titolo e descrizione
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 15.5,
-                      fontWeight: FontWeight.w600,
-                      color: colorScheme.onSurface,
+              const SizedBox(width: 14.0),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 15.0,
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 2.0),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      fontSize: 12.5,
-                      color: colorScheme.onSurfaceVariant,
+                    const SizedBox(height: 2.5),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                        height: 1.3,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            if (trailingBadge != null) ...[
+              if (trailingBadge != null) ...[
+                const SizedBox(width: 8.0),
+                trailingBadge,
+              ],
               const SizedBox(width: 8.0),
-              trailingBadge,
+              Icon(
+                Icons.chevron_right_rounded,
+                color: isDark ? const Color(0xFF475569) : const Color(0xFF94A3B8),
+                size: 22.0,
+              ),
             ],
-            const SizedBox(width: 8.0),
-            // Freccia di navigazione morbida
-            Icon(
-              Icons.chevron_right_rounded,
-              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
-              size: 24.0,
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -773,25 +769,25 @@ class _ImpostazioniUtenteWidgetState extends State<ImpostazioniUtenteWidget> {
     required ValueChanged<bool> onChanged,
     Widget? trailingBadge,
   }) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 13.0),
       child: Row(
         children: [
           Container(
-            width: 42.0,
-            height: 42.0,
+            width: 40.0,
+            height: 40.0,
             decoration: BoxDecoration(
               color: iconBgColor,
-              borderRadius: BorderRadius.circular(12.0),
+              borderRadius: BorderRadius.circular(11.0),
             ),
             child: Center(
               child: Icon(
                 icon,
                 color: iconColor,
-                size: 22.0,
+                size: 20.0,
               ),
             ),
           ),
@@ -803,17 +799,18 @@ class _ImpostazioniUtenteWidgetState extends State<ImpostazioniUtenteWidget> {
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 15.5,
+                    fontSize: 15.0,
                     fontWeight: FontWeight.w600,
-                    color: colorScheme.onSurface,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
                   ),
                 ),
-                const SizedBox(height: 2.0),
+                const SizedBox(height: 2.5),
                 Text(
                   subtitle,
                   style: TextStyle(
                     fontSize: 12.5,
-                    color: colorScheme.onSurfaceVariant,
+                    color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                    height: 1.3,
                   ),
                 ),
               ],
@@ -826,7 +823,7 @@ class _ImpostazioniUtenteWidgetState extends State<ImpostazioniUtenteWidget> {
           const SizedBox(width: 8.0),
           Switch(
             value: value,
-            activeTrackColor: colorScheme.primary.withValues(alpha: 0.5),
+            activeTrackColor: colorScheme.primary.withValues(alpha: 0.45),
             activeThumbColor: colorScheme.primary,
             onChanged: onChanged,
           ),
@@ -1021,13 +1018,15 @@ class _ImpostazioniUtenteWidgetState extends State<ImpostazioniUtenteWidget> {
     );
   }
 
-  Widget _buildDivider(ColorScheme colorScheme) {
+  Widget _buildDivider(bool isDark) {
     return Divider(
       height: 1.0,
       thickness: 1.0,
-      indent: 72.0, // Indenta dopo l'icona badge per un look stile iOS/Material pulito
+      indent: 70.0,
       endIndent: 16.0,
-      color: colorScheme.outlineVariant.withValues(alpha: 0.4),
+      color: isDark
+          ? const Color(0xFF334155).withValues(alpha: 0.6)
+          : const Color(0xFFF1F5F9),
     );
   }
 }
