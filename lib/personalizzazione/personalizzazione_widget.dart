@@ -1198,14 +1198,22 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                           ),
                         ),
 
-                        // B. Schermo scorrevole del menù cliente
+                        // B. Autentica AppBar Menù Cliente (Language Pill a sx, Logo Circolare + Nome Ristorante al centro, Carrello a dx)
+                        _buildMockupAppBar(
+                          restaurantName: restaurantName,
+                          titleFont: titleFont,
+                          primaryColor: primaryColor,
+                          clientDark: clientDark,
+                        ),
+
+                        // C. Schermo scorrevole del menù cliente
                         Expanded(
                           child: SingleChildScrollView(
-                            padding: const EdgeInsets.fromLTRB(12.0, 8.0, 12.0, 12.0),
+                            padding: const EdgeInsets.fromLTRB(12.0, 10.0, 12.0, 16.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                // Cover Banner & Info Ristorante
+                                // Cover Banner (solo se presente!)
                                 _buildMockupRestaurantHeader(
                                   bannerUrl: resolvedBanner,
                                   restaurantName: restaurantName,
@@ -1213,8 +1221,6 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                                   primaryColor: primaryColor,
                                   clientDark: clientDark,
                                 ),
-
-                                const SizedBox(height: 10.0),
 
                                 // Categorie a Scorrimento
                                 _buildMockupCategories(
@@ -1240,73 +1246,6 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                                 const SizedBox(height: 8.0),
                               ],
                             ),
-                          ),
-                        ),
-
-                        // C. Barra Carrello Flottante in basso al telefono
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8.0),
-                          decoration: BoxDecoration(
-                            color: clientDark ? const Color(0xFF1E293B) : Colors.white,
-                            border: Border(
-                              top: BorderSide(
-                                color: clientDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
-                              ),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    width: 8.0,
-                                    height: 8.0,
-                                    decoration: BoxDecoration(
-                                      color: primaryColor,
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8.0),
-                                  Text(
-                                    '1 Piatto • € 8,50',
-                                    style: GoogleFonts.getFont(
-                                      titleFont,
-                                      textStyle: TextStyle(
-                                        fontSize: 11.5,
-                                        fontWeight: FontWeight.bold,
-                                        color: clientDark ? Colors.white : const Color(0xFF0F172A),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-                                decoration: BoxDecoration(
-                                  color: primaryColor,
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Icon(Icons.shopping_bag_outlined, size: 13.0, color: Colors.white),
-                                    const SizedBox(width: 4.0),
-                                    Text(
-                                      'Carrello',
-                                      style: GoogleFonts.getFont(
-                                        titleFont,
-                                        textStyle: const TextStyle(
-                                          fontSize: 11.0,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
                           ),
                         ),
                       ],
@@ -1350,6 +1289,170 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     );
   }
 
+  Widget _buildMockupAppBar({
+    required String restaurantName,
+    required String titleFont,
+    required Color primaryColor,
+    required bool clientDark,
+  }) {
+    final photo = currentUserPhoto;
+    return Container(
+      height: 48.0,
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      decoration: BoxDecoration(
+        color: clientDark ? const Color(0xFF1E293B) : Colors.white,
+        border: Border(
+          bottom: BorderSide(
+            color: clientDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+            width: 1.0,
+          ),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: clientDark ? 0.25 : 0.05),
+            blurRadius: 4.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // 1. Selettore lingua a sinistra
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 3.5),
+            decoration: BoxDecoration(
+              color: primaryColor.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(16.0),
+              border: Border.all(
+                color: primaryColor.withValues(alpha: 0.28),
+                width: 1.0,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('🇮🇹', style: TextStyle(fontSize: 13.0)),
+                const SizedBox(width: 3.0),
+                Text(
+                  'IT',
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.bold,
+                    color: primaryColor,
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_drop_down_rounded,
+                  size: 15.0,
+                  color: primaryColor,
+                ),
+              ],
+            ),
+          ),
+
+          // 2. Centro: Logo circolare + Nome Ristorante
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6.0),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 28.0,
+                    height: 28.0,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: primaryColor.withValues(alpha: 0.35),
+                        width: 1.5,
+                      ),
+                    ),
+                    child: ClipOval(
+                      child: photo.isNotEmpty
+                          ? Image.network(
+                              photo,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Icon(
+                                Icons.restaurant_rounded,
+                                color: primaryColor,
+                                size: 16.0,
+                              ),
+                            )
+                          : Icon(
+                              Icons.restaurant_rounded,
+                              color: primaryColor,
+                              size: 16.0,
+                            ),
+                    ),
+                  ),
+                  const SizedBox(width: 6.0),
+                  Flexible(
+                    child: Text(
+                      restaurantName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.getFont(
+                        titleFont,
+                        textStyle: TextStyle(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.bold,
+                          color: clientDark ? Colors.white : const Color(0xFF0F172A),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // 3. Destra: Carrello con badge numerico
+          Padding(
+            padding: const EdgeInsets.only(right: 4.0),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Icon(
+                  Icons.shopping_cart_outlined,
+                  color: primaryColor,
+                  size: 20.0,
+                ),
+                Positioned(
+                  top: -4.0,
+                  right: -6.0,
+                  child: Container(
+                    padding: const EdgeInsets.all(2.5),
+                    decoration: BoxDecoration(
+                      color: primaryColor,
+                      shape: BoxShape.circle,
+                    ),
+                    constraints: const BoxConstraints(
+                      minWidth: 14.0,
+                      minHeight: 14.0,
+                    ),
+                    child: const Center(
+                      child: Text(
+                        '1',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 8.5,
+                          fontWeight: FontWeight.bold,
+                          height: 1.0,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildMockupRestaurantHeader({
     required String bannerUrl,
     required String restaurantName,
@@ -1357,81 +1460,62 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     required Color primaryColor,
     required bool clientDark,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: clientDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
-        borderRadius: BorderRadius.circular(14.0),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (bannerUrl.isNotEmpty)
-            Image.network(
-              bannerUrl,
-              height: 75.0,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(
-                height: 55.0,
-                color: primaryColor.withValues(alpha: 0.15),
-                child: Center(child: Icon(Icons.restaurant_rounded, color: primaryColor)),
-              ),
+    if (bannerUrl.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10.0),
+      child: Container(
+        width: double.infinity,
+        height: 100.0,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.15),
+              blurRadius: 8.0,
+              offset: const Offset(0, 3),
             ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Container(
-                  width: 34.0,
-                  height: 34.0,
-                  decoration: BoxDecoration(
-                    color: primaryColor.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(10.0),
-                    border: Border.all(color: primaryColor.withValues(alpha: 0.3)),
-                  ),
-                  child: Center(
-                    child: Icon(Icons.restaurant_menu_rounded, color: primaryColor, size: 18.0),
-                  ),
-                ),
-                const SizedBox(width: 8.0),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        restaurantName,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.getFont(
-                          titleFont,
-                          textStyle: TextStyle(
-                            fontSize: 13.0,
-                            fontWeight: FontWeight.bold,
-                            color: clientDark ? Colors.white : const Color(0xFF0F172A),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 2.0),
-                      Row(
-                        children: [
-                          const Icon(Icons.star_rounded, size: 12.0, color: Color(0xFFF59E0B)),
-                          const SizedBox(width: 3.0),
-                          Text(
-                            '4.9 • Aperto • Tavolo 4',
-                            style: TextStyle(
-                              fontSize: 10.0,
-                              color: clientDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
+          ],
+          image: DecorationImage(
+            image: NetworkImage(bannerUrl),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14.0),
+            gradient: LinearGradient(
+              colors: [
+                Colors.transparent,
+                Colors.black.withValues(alpha: 0.65),
               ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
             ),
           ),
-        ],
+          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+          alignment: Alignment.bottomLeft,
+          child: Text(
+            restaurantName.isNotEmpty ? restaurantName : 'Benvenuti',
+            style: GoogleFonts.getFont(
+              titleFont,
+              textStyle: const TextStyle(
+                color: Colors.white,
+                fontSize: 14.0,
+                fontWeight: FontWeight.bold,
+                letterSpacing: -0.2,
+                shadows: [
+                  Shadow(
+                    color: Colors.black87,
+                    blurRadius: 4.0,
+                    offset: Offset(0, 1),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -1451,12 +1535,33 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
           return Padding(
             padding: const EdgeInsets.only(right: 6.0),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 9.0, vertical: 4.5),
+              padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
               decoration: BoxDecoration(
                 color: isFirst
                     ? primaryColor
-                    : (clientDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0)),
-                borderRadius: BorderRadius.circular(8.0),
+                    : (clientDark ? const Color(0xFF1E293B) : Colors.white),
+                borderRadius: BorderRadius.circular(20.0),
+                border: Border.all(
+                  color: isFirst
+                      ? primaryColor
+                      : (clientDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+                  width: 1.0,
+                ),
+                boxShadow: isFirst
+                    ? [
+                        BoxShadow(
+                          color: primaryColor.withValues(alpha: 0.35),
+                          blurRadius: 6.0,
+                          offset: const Offset(0, 2.0),
+                        ),
+                      ]
+                    : [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.03),
+                          blurRadius: 3.0,
+                          offset: const Offset(0, 1.0),
+                        ),
+                      ],
               ),
               child: Text(
                 entry.value,
@@ -1464,7 +1569,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                   titleFont,
                   textStyle: TextStyle(
                     fontSize: 10.5,
-                    fontWeight: isFirst ? FontWeight.bold : FontWeight.w500,
+                    fontWeight: isFirst ? FontWeight.bold : FontWeight.w600,
                     color: isFirst
                         ? Colors.white
                         : (clientDark ? const Color(0xFF94A3B8) : const Color(0xFF475569)),
@@ -2290,11 +2395,11 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
             color: clientDark ? Colors.white.withValues(alpha: 0.10) : const Color(0xFFE2E8F0),
           ),
           const SizedBox(width: 6.0),
-          Column(
+          Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.5),
+                padding: const EdgeInsets.symmetric(horizontal: 6.5, vertical: 3.0),
                 decoration: priceDeco,
                 child: Text(
                   price,
@@ -2308,19 +2413,26 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                   ),
                 ),
               ),
-              const SizedBox(height: 4.0),
+              const SizedBox(width: 5.0),
               Container(
-                width: 22.0,
-                height: 22.0,
+                width: 24.0,
+                height: 24.0,
                 decoration: BoxDecoration(
                   color: primaryColor,
                   shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: primaryColor.withValues(alpha: 0.3),
+                      blurRadius: 4.0,
+                      offset: const Offset(0, 1.5),
+                    ),
+                  ],
                 ),
                 alignment: Alignment.center,
                 child: const Icon(
                   Icons.add,
                   color: Colors.white,
-                  size: 13.0,
+                  size: 15.0,
                 ),
               ),
             ],
