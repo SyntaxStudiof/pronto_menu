@@ -163,10 +163,10 @@ class PersonalizzazionePresets {
         if (isFilled) {
           return BoxDecoration(
             color: baseColor,
-            borderRadius: BorderRadius.circular(20.0),
+            borderRadius: BorderRadius.circular(999.0),
             boxShadow: [
               BoxShadow(
-                color: baseColor.withValues(alpha: isDark ? 0.35 : 0.25),
+                color: baseColor.withValues(alpha: isDark ? 0.40 : 0.28),
                 blurRadius: 4.0,
                 offset: const Offset(0.0, 1.5),
               ),
@@ -175,9 +175,9 @@ class PersonalizzazionePresets {
         }
         return BoxDecoration(
           color: baseColor.withValues(alpha: isDark ? 0.20 : 0.12),
-          borderRadius: BorderRadius.circular(20.0),
+          borderRadius: BorderRadius.circular(999.0),
           border: Border.all(
-            color: baseColor.withValues(alpha: isDark ? 0.40 : 0.25),
+            color: baseColor.withValues(alpha: isDark ? 0.45 : 0.28),
             width: 1.0,
           ),
         );
@@ -185,22 +185,24 @@ class PersonalizzazionePresets {
       case BadgeStyle.modernoSoft:
         if (isFilled) {
           return BoxDecoration(
-            color: baseColor,
-            borderRadius: BorderRadius.circular(7.0),
+            color: baseColor.withValues(alpha: isDark ? 0.25 : 0.14),
+            borderRadius: BorderRadius.circular(6.0),
+            border: Border.all(
+              color: baseColor.withValues(alpha: isDark ? 0.52 : 0.38),
+              width: 1.0,
+            ),
           );
         }
         return BoxDecoration(
-          color: baseColor.withValues(alpha: isDark ? 0.18 : 0.10),
-          borderRadius: BorderRadius.circular(7.0),
+          color: baseColor.withValues(alpha: isDark ? 0.14 : 0.08),
+          borderRadius: BorderRadius.circular(6.0),
           border: Border.all(
-            color: baseColor.withValues(alpha: isDark ? 0.35 : 0.22),
-            width: 1.0,
+            color: baseColor.withValues(alpha: isDark ? 0.30 : 0.20),
+            width: 0.8,
           ),
         );
 
       case BadgeStyle.minimalOutline:
-        // In minimalOutline, non c'è mai riempimento di sfondo (è trasparente).
-        // Calibriamo il colore del contorno affinché sia ben visibile sia su chiaro che su scuro:
         final outlineColor = isDark
             ? (baseColor.computeLuminance() < 0.35
                 ? HSLColor.fromColor(baseColor).withLightness(0.65).toColor()
@@ -210,7 +212,7 @@ class PersonalizzazionePresets {
                 : baseColor);
         return BoxDecoration(
           color: Colors.transparent,
-          borderRadius: BorderRadius.circular(8.0),
+          borderRadius: BorderRadius.circular(6.0),
           border: Border.all(
             color: outlineColor.withValues(alpha: isDark ? 0.90 : 0.85),
             width: 1.3,
@@ -220,12 +222,12 @@ class PersonalizzazionePresets {
       case BadgeStyle.boldTag:
         return BoxDecoration(
           color: baseColor,
-          borderRadius: BorderRadius.circular(4.0),
+          borderRadius: BorderRadius.circular(2.5),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.15),
+              color: Colors.black.withValues(alpha: isDark ? 0.50 : 0.25),
               blurRadius: 3.0,
-              offset: const Offset(0.0, 1.0),
+              offset: const Offset(0.0, 1.5),
             ),
           ],
         );
@@ -239,10 +241,13 @@ class PersonalizzazionePresets {
     bool isDark = false,
     bool isFilled = false,
   }) {
-    // 1. Determina se il badge ha un effettivo sfondo pieno colorato.
-    // NOTA FONDAMENTALE: MinimalOutline non ha MAI sfondo pieno (è trasparente)!
-    final bool hasSolidBackground = (isFilled || style == BadgeStyle.boldTag) &&
-        style != BadgeStyle.minimalOutline;
+    // 1. Determina se il badge ha un effettivo sfondo pieno colorato opaco.
+    // - MinimalOutline: non ha mai sfondo pieno (trasparente).
+    // - ModernoSoft: ha sfondo tenue satinato con testo colorato (non opaco).
+    // - Pillola: è solido solo quando isFilled = true (es. prezzo).
+    // - BoldTag: è SEMPRE solido opaco ad alto contrasto.
+    final bool hasSolidBackground = (style == BadgeStyle.boldTag) ||
+        (style == BadgeStyle.pillola && isFilled);
 
     if (hasSolidBackground) {
       // Quando il badge ha sfondo pieno, il testo poggia su baseColor:
@@ -253,12 +258,8 @@ class PersonalizzazionePresets {
           : Colors.white;
     }
 
-    // 2. Se il badge è outline o soft (sfondo trasparente o velato al 10-15%):
-    // Il testo poggia direttamente sul colore della superficie (chiara o scura della card)!
+    // 2. Se il badge è outline o soft (sfondo trasparente o velato):
     if (isDark) {
-      // Su sfondo scuro:
-      // Il testo DEVE essere luminoso e vivace per essere leggibile.
-      // Se baseColor è troppo scuro (luminanza < 0.40), aumentiamo la luminosità.
       final luminance = baseColor.computeLuminance();
       if (luminance < 0.40) {
         final hsl = HSLColor.fromColor(baseColor);
@@ -269,10 +270,6 @@ class PersonalizzazionePresets {
       }
       return baseColor;
     } else {
-      // Su sfondo chiaro (bianco / panna / grigio chiarissimo):
-      // Il testo DEVE essere scuro e intenso per garantire contrasto WCAG elevato (> 4.5:1).
-      // Se baseColor è chiaro o medio (luminanza > 0.22, es. arancio, oro, verde chiaro, pastello),
-      // lo scuriamo armonicamente conservando la tonalità (hue) e saturazione.
       final luminance = baseColor.computeLuminance();
       if (luminance > 0.22) {
         final hsl = HSLColor.fromColor(baseColor);

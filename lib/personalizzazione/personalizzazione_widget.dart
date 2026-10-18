@@ -1499,6 +1499,24 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     required String bodyFont,
     required bool clientDark,
   }) {
+    const dish1Name = 'Pizza Margherita DOP';
+    const dish1Desc = 'Pomodoro San Marzano DOP, mozzarella di bufala campana, basilico fresco, olio EVO';
+    const dish1Price = '€ 8,50';
+    const dish1Img = 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=400&q=80';
+    const dish1Tags = [
+      (label: '🌾 Senza Glutine', color: Color(0xFF10B981)),
+      (label: '🌱 Vegano', color: Color(0xFF059669)),
+    ];
+
+    const dish2Name = 'Pizza Vesuvio Piccante';
+    const dish2Desc = 'Salame piccante di Spilinga, fiordilatte, \'nduja calabrese, peperoncino fresco';
+    const dish2Price = '€ 10,50';
+    const dish2Img = 'https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=400&q=80';
+    const dish2Tags = [
+      (label: '🥛 Lattosio', color: Color(0xFFD97706)),
+      (label: '⚠️ 2 Allergeni', color: Color(0xFFEA580C)),
+    ];
+
     switch (dishLayout) {
       case DishCardLayout.griglia:
         return Row(
@@ -1507,11 +1525,11 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
             Expanded(
               child: _buildMockupGridDishCard(
                 context: context,
-                name: 'Margherita DOP',
-                description: 'Pomodoro San Marzano DOP, mozzarella di bufala campana',
-                price: '€ 8,50',
-                badgeLabel: 'CONSIGLIATO',
-                imageUrl: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=400&q=80',
+                name: dish1Name,
+                description: dish1Desc,
+                price: dish1Price,
+                tags: dish1Tags,
+                imageUrl: dish1Img,
                 badgeStyle: badgeStyle,
                 style: currentStyle,
                 primaryColor: primaryColor,
@@ -1524,11 +1542,11 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
             Expanded(
               child: _buildMockupGridDishCard(
                 context: context,
-                name: 'Vesuvio Piccante',
-                description: 'Salame piccante di Spilinga, fiordilatte, \'nduja',
-                price: '€ 10,50',
-                badgeLabel: 'PICCANTE 🌶️',
-                imageUrl: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=400&q=80',
+                name: dish2Name,
+                description: dish2Desc,
+                price: dish2Price,
+                tags: dish2Tags,
+                imageUrl: dish2Img,
                 badgeStyle: badgeStyle,
                 style: currentStyle,
                 primaryColor: primaryColor,
@@ -1562,10 +1580,10 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
             children: [
               _buildMockupMinimaleDishCard(
                 context: context,
-                name: 'Pizza Margherita DOP',
-                description: 'Pomodoro San Marzano DOP, mozzarella di bufala campana, basilico fresco, olio EVO',
-                price: '€ 8,50',
-                badgeLabel: 'CONSIGLIATO',
+                name: dish1Name,
+                description: dish1Desc,
+                price: dish1Price,
+                tags: dish1Tags,
                 badgeStyle: badgeStyle,
                 style: currentStyle,
                 primaryColor: primaryColor,
@@ -1583,10 +1601,10 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
               ),
               _buildMockupMinimaleDishCard(
                 context: context,
-                name: 'Pizza Vesuvio Piccante',
-                description: 'Salame piccante di Spilinga, fiordilatte, \'nduja calabrese, peperoncino fresco',
-                price: '€ 10,50',
-                badgeLabel: 'PICCANTE 🌶️',
+                name: dish2Name,
+                description: dish2Desc,
+                price: dish2Price,
+                tags: dish2Tags,
                 badgeStyle: badgeStyle,
                 style: currentStyle,
                 primaryColor: primaryColor,
@@ -1604,11 +1622,11 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
           children: [
             _buildMockupDishCard(
               context: context,
-              name: 'Pizza Margherita DOP',
-              description: 'Pomodoro San Marzano DOP, mozzarella di bufala campana, basilico fresco, olio EVO',
-              price: '€ 8,50',
-              badgeLabel: 'CONSIGLIATO',
-              imageUrl: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=400&q=80',
+              name: dish1Name,
+              description: dish1Desc,
+              price: dish1Price,
+              tags: dish1Tags,
+              imageUrl: dish1Img,
               layout: dishLayout,
               badgeStyle: badgeStyle,
               style: currentStyle,
@@ -1620,11 +1638,11 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
             const SizedBox(height: 9.0),
             _buildMockupDishCard(
               context: context,
-              name: 'Pizza Vesuvio Piccante',
-              description: 'Salame piccante di Spilinga, fiordilatte, \'nduja calabrese, peperoncino fresco',
-              price: '€ 10,50',
-              badgeLabel: 'PICCANTE 🌶️',
-              imageUrl: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=400&q=80',
+              name: dish2Name,
+              description: dish2Desc,
+              price: dish2Price,
+              tags: dish2Tags,
+              imageUrl: dish2Img,
               layout: dishLayout,
               badgeStyle: badgeStyle,
               style: currentStyle,
@@ -1643,7 +1661,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     required String name,
     required String description,
     required String price,
-    required String badgeLabel,
+    required List<({String label, Color color})> tags,
     required String imageUrl,
     required BadgeStyle badgeStyle,
     required AppDesignStyle style,
@@ -1659,13 +1677,13 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
       AppDesignStyle.tradizionale => BorderRadius.circular(12.0),
     };
 
-    final badgeDeco = PersonalizzazionePresets.getBadgeDecoration(
+    final priceDeco = PersonalizzazionePresets.getBadgeDecoration(
       style: badgeStyle,
       baseColor: primaryColor,
       isDark: clientDark,
       isFilled: true,
     );
-    final badgeTextColor = PersonalizzazionePresets.getBadgeTextColor(
+    final priceTextColor = PersonalizzazionePresets.getBadgeTextColor(
       style: badgeStyle,
       baseColor: primaryColor,
       isDark: clientDark,
@@ -1674,6 +1692,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
 
     final cardBg = clientDark ? const Color(0xFF1E293B) : Colors.white;
     final cardBorder = clientDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+    final firstTag = tags.isNotEmpty ? tags.first : null;
 
     return Container(
       decoration: BoxDecoration(
@@ -1705,22 +1724,33 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                   child: Center(child: Icon(Icons.fastfood_rounded, color: primaryColor, size: 22.0)),
                 ),
               ),
-              Positioned(
-                top: 5.0,
-                left: 5.0,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 2.0),
-                  decoration: badgeDeco,
-                  child: Text(
-                    badgeLabel,
-                    style: TextStyle(
-                      fontSize: 7.5,
-                      fontWeight: FontWeight.bold,
-                      color: badgeTextColor,
+              if (firstTag != null)
+                Positioned(
+                  top: 5.0,
+                  left: 5.0,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 2.0),
+                    decoration: PersonalizzazionePresets.getBadgeDecoration(
+                      style: badgeStyle,
+                      baseColor: firstTag.color,
+                      isDark: clientDark,
+                      isFilled: false,
+                    ),
+                    child: Text(
+                      firstTag.label,
+                      style: TextStyle(
+                        fontSize: 7.5,
+                        fontWeight: FontWeight.bold,
+                        color: PersonalizzazionePresets.getBadgeTextColor(
+                          style: badgeStyle,
+                          baseColor: firstTag.color,
+                          isDark: clientDark,
+                          isFilled: false,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
             ],
           ),
           Padding(
@@ -1759,8 +1789,8 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 5.5, vertical: 2.0),
-                      decoration: badgeDeco,
+                      padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.5),
+                      decoration: priceDeco,
                       child: Text(
                         price,
                         style: GoogleFonts.getFont(
@@ -1768,7 +1798,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                           textStyle: TextStyle(
                             fontSize: 10.0,
                             fontWeight: FontWeight.bold,
-                            color: badgeTextColor,
+                            color: priceTextColor,
                           ),
                         ),
                       ),
@@ -1802,7 +1832,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     required String name,
     required String description,
     required String price,
-    required String badgeLabel,
+    required List<({String label, Color color})> tags,
     required BadgeStyle badgeStyle,
     required AppDesignStyle style,
     required Color primaryColor,
@@ -1810,13 +1840,13 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     required String bodyFont,
     required bool clientDark,
   }) {
-    final badgeDeco = PersonalizzazionePresets.getBadgeDecoration(
+    final priceDeco = PersonalizzazionePresets.getBadgeDecoration(
       style: badgeStyle,
       baseColor: primaryColor,
       isDark: clientDark,
       isFilled: true,
     );
-    final badgeTextColor = PersonalizzazionePresets.getBadgeTextColor(
+    final priceTextColor = PersonalizzazionePresets.getBadgeTextColor(
       style: badgeStyle,
       baseColor: primaryColor,
       isDark: clientDark,
@@ -1833,38 +1863,19 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Flexible(
-                        child: Text(
-                          name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.getFont(
-                            titleFont,
-                            textStyle: TextStyle(
-                              fontSize: 12.0,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: -0.2,
-                              color: clientDark ? Colors.white : const Color(0xFF0F172A),
-                            ),
-                          ),
-                        ),
+                  Text(
+                    name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.getFont(
+                      titleFont,
+                      textStyle: TextStyle(
+                        fontSize: 12.0,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: -0.2,
+                        color: clientDark ? Colors.white : const Color(0xFF0F172A),
                       ),
-                      const SizedBox(width: 5.0),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 4.5, vertical: 1.5),
-                        decoration: badgeDeco,
-                        child: Text(
-                          badgeLabel,
-                          style: TextStyle(
-                            fontSize: 7.5,
-                            fontWeight: FontWeight.bold,
-                            color: badgeTextColor,
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                   const SizedBox(height: 2.0),
                   Text(
@@ -1880,6 +1891,37 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                       ),
                     ),
                   ),
+                  if (tags.isNotEmpty) ...[
+                    const SizedBox(height: 4.0),
+                    Wrap(
+                      spacing: 4.0,
+                      runSpacing: 2.0,
+                      children: tags.map((t) {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 4.5, vertical: 1.5),
+                          decoration: PersonalizzazionePresets.getBadgeDecoration(
+                            style: badgeStyle,
+                            baseColor: t.color,
+                            isDark: clientDark,
+                            isFilled: false,
+                          ),
+                          child: Text(
+                            t.label,
+                            style: TextStyle(
+                              fontSize: 7.5,
+                              fontWeight: FontWeight.bold,
+                              color: PersonalizzazionePresets.getBadgeTextColor(
+                                style: badgeStyle,
+                                baseColor: t.color,
+                                isDark: clientDark,
+                                isFilled: false,
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -1889,7 +1931,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
               children: [
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.5),
-                  decoration: badgeDeco,
+                  decoration: priceDeco,
                   child: Text(
                     price,
                     style: GoogleFonts.getFont(
@@ -1897,7 +1939,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                       textStyle: TextStyle(
                         fontSize: 10.5,
                         fontWeight: FontWeight.bold,
-                        color: badgeTextColor,
+                        color: priceTextColor,
                       ),
                     ),
                   ),
@@ -1930,7 +1972,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
     required String name,
     required String description,
     required String price,
-    required String badgeLabel,
+    required List<({String label, Color color})> tags,
     required String imageUrl,
     required DishCardLayout layout,
     required BadgeStyle badgeStyle,
@@ -1946,7 +1988,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
         name: name,
         description: description,
         price: price,
-        badgeLabel: badgeLabel,
+        tags: tags,
         imageUrl: imageUrl,
         badgeStyle: badgeStyle,
         style: style,
@@ -1979,7 +2021,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
           name: name,
           description: description,
           price: price,
-          badgeLabel: badgeLabel,
+          tags: tags,
           badgeStyle: badgeStyle,
           style: style,
           primaryColor: primaryColor,
@@ -1997,13 +2039,13 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
       AppDesignStyle.tradizionale => BorderRadius.circular(12.0),
     };
 
-    final badgeDeco = PersonalizzazionePresets.getBadgeDecoration(
+    final priceDeco = PersonalizzazionePresets.getBadgeDecoration(
       style: badgeStyle,
       baseColor: primaryColor,
       isDark: clientDark,
       isFilled: true,
     );
-    final badgeTextColor = PersonalizzazionePresets.getBadgeTextColor(
+    final priceTextColor = PersonalizzazionePresets.getBadgeTextColor(
       style: badgeStyle,
       baseColor: primaryColor,
       isDark: clientDark,
@@ -2012,6 +2054,7 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
 
     final cardBg = clientDark ? const Color(0xFF1E293B) : Colors.white;
     final cardBorder = clientDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+    final firstTag = tags.isNotEmpty ? tags.first : null;
 
     if (layout == DishCardLayout.fotoGrande) {
       return Container(
@@ -2044,39 +2087,47 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
                     child: Center(child: Icon(Icons.fastfood_rounded, color: primaryColor)),
                   ),
                 ),
-                Positioned(
-                  top: 6.0,
-                  left: 6.0,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.5),
-                    decoration: badgeDeco,
-                    child: Text(
-                      badgeLabel,
-                      style: TextStyle(
-                        fontSize: 8.5,
-                        fontWeight: FontWeight.bold,
-                        color: badgeTextColor,
+                if (firstTag != null)
+                  Positioned(
+                    top: 6.0,
+                    left: 6.0,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.5),
+                      decoration: PersonalizzazionePresets.getBadgeDecoration(
+                        style: badgeStyle,
+                        baseColor: firstTag.color,
+                        isDark: clientDark,
+                        isFilled: false,
+                      ),
+                      child: Text(
+                        firstTag.label,
+                        style: TextStyle(
+                          fontSize: 8.5,
+                          fontWeight: FontWeight.bold,
+                          color: PersonalizzazionePresets.getBadgeTextColor(
+                            style: badgeStyle,
+                            baseColor: firstTag.color,
+                            isDark: clientDark,
+                            isFilled: false,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
                 Positioned(
                   bottom: 6.0,
                   right: 6.0,
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 7.0, vertical: 3.5),
-                    decoration: BoxDecoration(
-                      color: Colors.black87,
-                      borderRadius: BorderRadius.circular(6.0),
-                    ),
+                    decoration: priceDeco,
                     child: Text(
                       price,
                       style: GoogleFonts.getFont(
                         titleFont,
-                        textStyle: const TextStyle(
+                        textStyle: TextStyle(
                           fontSize: 11.0,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: priceTextColor,
                         ),
                       ),
                     ),
@@ -2144,9 +2195,9 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
       );
     }
 
-    // Default Standard & Compatto (Classico Orizzontale)
+    // Default Standard & Compatto (Classico Orizzontale fedele a MenuClienteWidget)
     return Container(
-      padding: const EdgeInsets.all(9.0),
+      padding: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         color: cardBg,
         borderRadius: cardRadius,
@@ -2160,111 +2211,130 @@ class _PersonalizzazioneWidgetState extends State<PersonalizzazioneWidget>
         ],
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           ClipRRect(
             borderRadius: cardRadius,
             child: Image.network(
               imageUrl,
-              width: 62.0,
-              height: 62.0,
+              width: 60.0,
+              height: 60.0,
               fit: BoxFit.cover,
               errorBuilder: (_, __, ___) => Container(
-                width: 62.0,
-                height: 62.0,
+                width: 60.0,
+                height: 60.0,
                 color: primaryColor.withValues(alpha: 0.1),
                 child: Center(child: Icon(Icons.fastfood_rounded, color: primaryColor)),
               ),
             ),
           ),
-          const SizedBox(width: 9.0),
+          const SizedBox(width: 8.0),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.getFont(
-                          titleFont,
-                          textStyle: TextStyle(
-                            fontSize: 12.0,
-                            fontWeight: FontWeight.bold,
-                            color: clientDark ? Colors.white : const Color(0xFF0F172A),
-                          ),
-                        ),
-                      ),
+                Text(
+                  name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.getFont(
+                    titleFont,
+                    textStyle: TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.bold,
+                      color: clientDark ? Colors.white : const Color(0xFF0F172A),
                     ),
-                    Text(
-                      price,
-                      style: GoogleFonts.getFont(
-                        titleFont,
-                        textStyle: TextStyle(
-                          fontSize: 12.0,
-                          fontWeight: FontWeight.bold,
-                          color: primaryColor,
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-                const SizedBox(height: 2.5),
+                const SizedBox(height: 2.0),
                 Text(
                   description,
-                  maxLines: 2,
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.getFont(
                     bodyFont,
                     textStyle: TextStyle(
-                      fontSize: 9.5,
+                      fontSize: 9.0,
                       color: clientDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                      height: 1.3,
+                      height: 1.25,
                     ),
                   ),
                 ),
-                const SizedBox(height: 5.0),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 2.0),
-                      decoration: badgeDeco,
-                      child: Text(
-                        badgeLabel,
-                        style: TextStyle(
-                          fontSize: 8.5,
-                          fontWeight: FontWeight.bold,
-                          color: badgeTextColor,
+                if (tags.isNotEmpty) ...[
+                  const SizedBox(height: 3.5),
+                  Wrap(
+                    spacing: 3.5,
+                    runSpacing: 2.0,
+                    children: tags.map((t) {
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 4.5, vertical: 1.5),
+                        decoration: PersonalizzazionePresets.getBadgeDecoration(
+                          style: badgeStyle,
+                          baseColor: t.color,
+                          isDark: clientDark,
+                          isFilled: false,
                         ),
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 3.0),
-                      decoration: BoxDecoration(
-                        color: primaryColor.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(6.0),
-                      ),
-                      child: Text(
-                        '+ Aggiungi',
-                        style: GoogleFonts.getFont(
-                          titleFont,
-                          textStyle: TextStyle(
-                            fontSize: 10.0,
+                        child: Text(
+                          t.label,
+                          style: TextStyle(
+                            fontSize: 7.5,
                             fontWeight: FontWeight.bold,
-                            color: primaryColor,
+                            color: PersonalizzazionePresets.getBadgeTextColor(
+                              style: badgeStyle,
+                              baseColor: t.color,
+                              isDark: clientDark,
+                              isFilled: false,
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                  ],
-                ),
+                      );
+                    }).toList(),
+                  ),
+                ],
               ],
             ),
+          ),
+          const SizedBox(width: 6.0),
+          Container(
+            height: 44.0,
+            width: 1.0,
+            color: clientDark ? Colors.white.withValues(alpha: 0.10) : const Color(0xFFE2E8F0),
+          ),
+          const SizedBox(width: 6.0),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.5),
+                decoration: priceDeco,
+                child: Text(
+                  price,
+                  style: GoogleFonts.getFont(
+                    titleFont,
+                    textStyle: TextStyle(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.bold,
+                      color: priceTextColor,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 4.0),
+              Container(
+                width: 22.0,
+                height: 22.0,
+                decoration: BoxDecoration(
+                  color: primaryColor,
+                  shape: BoxShape.circle,
+                ),
+                alignment: Alignment.center,
+                child: const Icon(
+                  Icons.add,
+                  color: Colors.white,
+                  size: 13.0,
+                ),
+              ),
+            ],
           ),
         ],
       ),
